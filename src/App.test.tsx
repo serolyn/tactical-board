@@ -239,4 +239,123 @@ describe('App — sélection multiple', () => {
       }),
     ).toBeInTheDocument()
   }, 10_000)
+
+})
+
+describe('App — mode plein écran du plateau', () => {
+  it('conserve les interactions du plateau et restaure le chrome avec Échap', async () => {
+    const scenario = scenarioWithTwoUnits()
+    await tacticalBoardRepository.saveScenario(scenario)
+    await tacticalBoardRepository.setSetting('activeScenarioId', scenario.id)
+    await tacticalBoardRepository.setSetting(
+      'objectiveCampaignVersion',
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+    const user = userEvent.setup()
+    const { container } = render(<App />)
+
+    const enterBoardOnly = await screen.findByRole('button', {
+      name: 'Activer le mode plein écran du plateau',
+    })
+    expect(screen.getByText('Tactical Board')).toBeInTheDocument()
+    expect(
+      screen.getByRole('toolbar', { name: 'Outils du plateau' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Bibliothèque' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Inspecteur' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Flèche' }))
+    expect(useAppStore.getState().tool).toBe('arrow')
+
+    await user.click(enterBoardOnly)
+
+    const app = container.querySelector<HTMLElement>('[data-board-only]')
+    expect(app).toHaveAttribute('data-board-only', 'true')
+    expect(useAppStore.getState().tool).toBe('select')
+    expect(screen.queryByText('Tactical Board')).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('toolbar', { name: 'Outils du plateau' }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: 'Bibliothèque' }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole('heading', { name: 'Inspecteur' }),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('grid', { name: 'Cases du plateau' }),
+    ).toBeInTheDocument()
+
+    const alpha = screen.getByRole('button', {
+      name: 'Alpha, faction Mes forces, active',
+    })
+    await user.click(alpha)
+    expect(useAppStore.getState().selection).toEqual({ kind: 'unit', id: 'alpha' })
+
+    await user.click(screen.getByRole('gridcell', { name: 'Case A2, vide' }))
+    await waitFor(() => {
+      expect(
+        screen.getByRole('gridcell', { name: 'Case A2, Alpha' }),
+      ).toBeInTheDocument()
+    })
+    expect(app).toHaveAttribute('data-board-only', 'true')
+    expect(
+      screen.getByRole('button', {
+        name: 'Alpha, faction Mes forces, active',
+      }),
+    ).toHaveAttribute('aria-pressed', 'true')
+
+    await user.keyboard('{Escape}')
+
+    expect(app).toHaveAttribute('data-board-only', 'false')
+    expect(screen.getByText('Tactical Board')).toBeInTheDocument()
+    expect(
+      screen.getByRole('toolbar', { name: 'Outils du plateau' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Bibliothèque' })).toBeInTheDocument()
+    expect(
+      screen.getByRole('heading', { name: 'Propriétés de l’unité' }),
+    ).toBeInTheDocument()
+    expect(useAppStore.getState().selection).toEqual({ kind: 'unit', id: 'alpha' })
+  }, 10_000)
+
+  it('quitte automatiquement le mode plateau seul quand les actions groupées sont requises', async () => {
+    const scenario = scenarioWithTwoUnits()
+    await tacticalBoardRepository.saveScenario(scenario)
+    await tacticalBoardRepository.setSetting('activeScenarioId', scenario.id)
+    await tacticalBoardRepository.setSetting(
+      'objectiveCampaignVersion',
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+    const user = userEvent.setup()
+    const { container } = render(<App />)
+
+    await user.click(
+      await screen.findByRole('button', {
+        name: 'Activer le mode plein écran du plateau',
+      }),
+    )
+    const app = container.querySelector<HTMLElement>('[data-board-only]')
+    expect(app).toHaveAttribute('data-board-only', 'true')
+
+    const alpha = screen.getByRole('button', {
+      name: 'Alpha, faction Mes forces, active',
+    })
+    const bravo = screen.getByRole('button', {
+      name: 'Bravo, faction Mes forces, active',
+    })
+    await user.keyboard('{Shift>}')
+    await user.click(alpha)
+    await user.click(bravo)
+    expect(app).toHaveAttribute('data-board-only', 'true')
+
+    await user.keyboard('{/Shift}')
+
+    await waitFor(() => {
+      expect(app).toHaveAttribute('data-board-only', 'false')
+    })
+    expect(
+      await screen.findByRole('heading', { name: 'Actions groupées' }),
+    ).toBeInTheDocument()
+    expect(screen.getByText('2 unités sélectionnées')).toBeInTheDocument()
+  }, 10_000)
 })

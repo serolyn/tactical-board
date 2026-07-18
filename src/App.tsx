@@ -3,6 +3,8 @@ import {
   Crosshair,
   Focus,
   Grid3X3,
+  Maximize2,
+  Minimize2,
   Minus,
   PanelLeft,
   PanelRight,
@@ -267,15 +269,83 @@ export default function App() {
   const [scenarioDetailsOpen, setScenarioDetailsOpen] = useState(false)
   const [boardSettingsOpen, setBoardSettingsOpen] = useState(false)
   const [multiSelectionOpen, setMultiSelectionOpen] = useState(false)
+  const [boardOnlyMode, setBoardOnlyMode] = useState(false)
   const [saveSnapshot, setSaveSnapshot] = useState<AutosaveSnapshot>({
     state: 'idle',
     error: null,
     lastSavedAt: null,
   })
   const boardRef = useRef<HTMLDivElement>(null)
+  const appRef = useRef<HTMLDivElement>(null)
+  const boardOnlyExitRef = useRef<HTMLButtonElement>(null)
+  const boardOnlyModeRef = useRef(false)
+  const ownsBrowserFullscreenRef = useRef(false)
   const viewportRef = useRef<HTMLDivElement>(null)
   const lastFittedScenarioId = useRef<string | null>(null)
   const shiftSelectionRef = useRef(false)
+
+  const leaveBoardOnlyMode = useCallback(() => {
+    boardOnlyModeRef.current = false
+    setBoardOnlyMode(false)
+    const ownsCurrentFullscreen = document.fullscreenElement === appRef.current
+    ownsBrowserFullscreenRef.current = false
+    if (ownsCurrentFullscreen && document.exitFullscreen) {
+      void document.exitFullscreen().catch(() => undefined)
+    }
+  }, [])
+
+  const enterBoardOnlyMode = useCallback(() => {
+    setLeftPanelOpen(false)
+    setRightPanelOpen(false)
+    setMultiSelectionOpen(false)
+    setTool('select')
+    boardOnlyModeRef.current = true
+    setBoardOnlyMode(true)
+
+    const target = appRef.current
+    if (!target?.requestFullscreen || document.fullscreenElement) return
+    void target.requestFullscreen().then(
+      () => {
+        ownsBrowserFullscreenRef.current = true
+        if (
+          !boardOnlyModeRef.current &&
+          document.fullscreenElement === target &&
+          document.exitFullscreen
+        ) {
+          ownsBrowserFullscreenRef.current = false
+          void document.exitFullscreen().catch(() => undefined)
+        }
+      },
+      () => {
+        ownsBrowserFullscreenRef.current = false
+      },
+    )
+  }, [setLeftPanelOpen, setRightPanelOpen, setTool])
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (document.fullscreenElement === appRef.current) {
+        ownsBrowserFullscreenRef.current = true
+        if (!boardOnlyModeRef.current && document.exitFullscreen) {
+          ownsBrowserFullscreenRef.current = false
+          void document.exitFullscreen().catch(() => undefined)
+        }
+        return
+      }
+      if (!ownsBrowserFullscreenRef.current) return
+      ownsBrowserFullscreenRef.current = false
+      boardOnlyModeRef.current = false
+      setBoardOnlyMode(false)
+    }
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  }, [])
+
+  useEffect(() => {
+    if (!boardOnlyMode) return
+    const frame = requestAnimationFrame(() => boardOnlyExitRef.current?.focus())
+    return () => cancelAnimationFrame(frame)
+  }, [boardOnlyMode])
 
   const autosave = useMemo(
     () =>
@@ -372,6 +442,30 @@ export default function App() {
     const timer = window.setTimeout(clearNotification, 3600)
     return () => window.clearTimeout(timer)
   }, [clearNotification, notification])
+
+  useEffect(() => {
+    const interfaceRequired =
+      multiSelectionOpen ||
+      newScenarioOpen ||
+      Boolean(nextScenarioSourceId) ||
+      objectiveReachedOpen ||
+      progressOpen ||
+      scenarioDetailsOpen ||
+      boardSettingsOpen ||
+      saveSnapshot.state === 'error'
+    if (boardOnlyMode && interfaceRequired) leaveBoardOnlyMode()
+  }, [
+    boardOnlyMode,
+    boardSettingsOpen,
+    leaveBoardOnlyMode,
+    multiSelectionOpen,
+    newScenarioOpen,
+    nextScenarioSourceId,
+    objectiveReachedOpen,
+    progressOpen,
+    saveSnapshot.state,
+    scenarioDetailsOpen,
+  ])
 
   const unitTypes = useMemo<readonly UnitType[]>(
     () => [...BUILT_IN_UNIT_TYPES, ...(activeScenario?.customUnitTypes ?? [])],
@@ -480,13 +574,19 @@ export default function App() {
       setSelection(ids[0] ? { kind: 'unit', id: ids[0] } : null)
       return
     }
+    leaveBoardOnlyMode()
     setMultiSelectionOpen(true)
     setRightPanelOpen(true)
     notify(`${ids.length} unités sélectionnées.`)
-  }, [notify, setRightPanelOpen, setSelection])
+  }, [leaveBoardOnlyMode, notify, setRightPanelOpen, setSelection])
 
   useEffect(() => {
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape' && boardOnlyMode) {
+        event.preventDefault()
+        leaveBoardOnlyMode()
+        return
+      }
       const modifier = event.ctrlKey || event.metaKey
       if (modifier && event.key.toLowerCase() === 's') {
         event.preventDefault()
@@ -533,7 +633,7 @@ export default function App() {
       window.removeEventListener('keyup', handleKeyUp)
       window.removeEventListener('blur', handleWindowBlur)
     }
-  }, [deleteSelection, finishMultiSelection, forceSave, notify, redo, setLeftPanelOpen, setRightPanelOpen, setSelection, setTool, undo])
+  }, [boardOnlyMode, deleteSelection, finishMultiSelection, forceSave, leaveBoardOnlyMode, notify, redo, setLeftPanelOpen, setRightPanelOpen, setSelection, setTool, undo])
 
   useEffect(() => {
     if (selection?.kind !== 'units') setMultiSelectionOpen(false)
@@ -893,6 +993,7 @@ export default function App() {
   const reachObjective = (unitId: string, objectiveUnitId: string) => {
     const changed = safelyCommit({ type: 'reachObjective', unitId, objectiveUnitId })
     if (!changed) return
+    leaveBoardOnlyMode()
     setSelection({ kind: 'unit', id: unitId })
     setObjectiveReachedOpen(true)
     notify('Objectif final atteint.', 'success')
@@ -1016,8 +1117,13 @@ export default function App() {
   const saveState = saveStateFor(saveSnapshot)
 
   return (
-    <div className={styles.app}>
-      <TopBar
+    <div
+      className={`${styles.app} ${boardOnlyMode ? styles.appBoardOnly : ''}`}
+      data-board-only={boardOnlyMode ? 'true' : 'false'}
+      ref={appRef}
+    >
+      {!boardOnlyMode ? (
+        <TopBar
         activeScenarioId={activeScenario.id}
         canRedo={Boolean(history?.future.length)}
         canUndo={Boolean(history?.past.length)}
@@ -1054,10 +1160,14 @@ export default function App() {
           status,
           updatedAt,
         }))}
-      />
+        />
+      ) : null}
 
-      <main className={styles.workspace}>
-        <div className={styles.leftPanel}>
+      <main
+        className={`${styles.workspace} ${boardOnlyMode ? styles.workspaceBoardOnly : ''}`}
+      >
+        {!boardOnlyMode ? (
+          <div className={styles.leftPanel}>
           <LibraryPanel
             activeFactionId={placementFaction?.id ?? null}
             activeUnitTypeId={placementType?.id ?? null}
@@ -1075,10 +1185,12 @@ export default function App() {
             resolveAssetUrl={(assetId) => assetUrls[assetId]}
             unitTypes={unitTypes}
           />
-        </div>
+          </div>
+        ) : null}
 
         <section className={styles.center} aria-label="Éditeur tactique">
-          <BoardToolbar
+          {!boardOnlyMode ? (
+            <BoardToolbar
             tool={tool}
             onToolChange={setTool}
             canPlace={Boolean(placementType && placementFaction)}
@@ -1090,8 +1202,10 @@ export default function App() {
             onArrowColorChange={setArrowColor}
             onMarkerKindChange={setMarkerKind}
             onMarkerColorChange={setMarkerColor}
-          />
-          <div className={styles.boardMeta}>
+            />
+          ) : null}
+          {!boardOnlyMode ? (
+            <div className={styles.boardMeta}>
             <div className={styles.scenarioSummary}>
               <div className={styles.scenarioHeading}>
                 <span className={styles.scenarioPulse}>{activeScenario.name}</span>
@@ -1143,12 +1257,22 @@ export default function App() {
             <button className={styles.metaAction} type="button" onClick={recenterBoard} title="Recentrer le plateau">
               <Crosshair aria-hidden /><span>Recentrer</span>
             </button>
+            <button
+              aria-label="Activer le mode plein écran du plateau"
+              className={styles.metaAction}
+              onClick={enterBoardOnlyMode}
+              title="Afficher seulement le plateau"
+              type="button"
+            >
+              <Maximize2 aria-hidden /><span>Plein écran</span>
+            </button>
             <div className={styles.zoomGroup} aria-label="Contrôles de zoom">
               <button type="button" aria-label="Réduire le zoom" onClick={() => setZoom(zoom - 0.1)}><Minus aria-hidden /></button>
               <span className={styles.zoomValue}>{Math.round(zoom * 100)}%</span>
               <button type="button" aria-label="Augmenter le zoom" onClick={() => setZoom(zoom + 0.1)}><Plus aria-hidden /></button>
             </div>
-          </div>
+            </div>
+          ) : null}
           <Board
             ref={boardRef}
             scenario={activeScenario}
@@ -1180,7 +1304,8 @@ export default function App() {
           />
         </section>
 
-        <div className={styles.rightPanel}>
+        {!boardOnlyMode ? (
+          <div className={styles.rightPanel}>
           <InspectorPanel
             annotation={selectedAnnotation}
             factions={activeScenario.factions}
@@ -1228,10 +1353,12 @@ export default function App() {
             units={multiSelectionOpen ? selectedUnits : []}
             unitTypes={unitTypes}
           />
-        </div>
+          </div>
+        ) : null}
       </main>
 
-      <nav className={styles.mobileBottomBar} aria-label="Navigation mobile">
+      {!boardOnlyMode ? (
+        <nav className={styles.mobileBottomBar} aria-label="Navigation mobile">
         <button type="button" onClick={() => setLeftPanelOpen(true)}>
           <PanelLeft aria-hidden />
           Unités
@@ -1244,7 +1371,22 @@ export default function App() {
           <PanelRight aria-hidden />{multiSelectionOpen ? 'Actions' : 'Propriétés'}
         </button>
         <button type="button" disabled={!history?.past.length} onClick={undo}><Undo2 aria-hidden />Annuler</button>
-      </nav>
+        </nav>
+      ) : null}
+
+      {boardOnlyMode ? (
+        <button
+          aria-keyshortcuts="Escape"
+          aria-label="Quitter le mode plein écran"
+          className={styles.boardOnlyExit}
+          onClick={leaveBoardOnlyMode}
+          ref={boardOnlyExitRef}
+          title="Quitter le plein écran (Échap)"
+          type="button"
+        >
+          <Minimize2 aria-hidden="true" />
+        </button>
+      ) : null}
 
       <NewScenarioModal
         open={newScenarioOpen}

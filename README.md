@@ -42,6 +42,8 @@ Chaque envoi sur la branche `main` publie automatiquement la version de producti
 
 Pour agir sur plusieurs unités, maintenez `Shift` et cliquez chacune d’elles. L’**Inspecteur** affiche les actions groupées lorsque vous relâchez la touche. Il ne propose que les actions applicables à toute la sélection, notamment le ralliement, la neutralisation et les changements communs de faction ou de statut. Faites glisser l’une des unités sélectionnées pour déplacer toute la formation : les aperçus semi-transparents conservent ses écarts et le mouvement est refusé si une destination est occupée ou hors limites. Une modification groupée ne crée qu’une seule étape d’historique.
 
+Le bouton **Plein écran** masque toute l’interface pour ne conserver que le plateau interactif. `Échap` ou le bouton discret en haut à droite restaure l’interface. Le mode se ferme aussi automatiquement lorsqu’un panneau d’actions ou un dialogue est nécessaire, par exemple après une multi-sélection.
+
 Le menu **Plateau** règle les dimensions de 5 × 5 à 20 × 20, les coordonnées et le vidage complet. Une réduction qui retire du contenu demande confirmation et reste annulable.
 
 Les factions et types personnalisés sont propres à chaque scénario. Les images PNG, JPEG, WebP et SVG sont validées, nettoyées puis optimisées avant leur stockage. Archiver un type personnalisé ne modifie pas les unités déjà placées.
