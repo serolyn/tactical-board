@@ -38,7 +38,6 @@ import {
 import {
   InspectorPanel,
   LibraryPanel,
-  MultiUnitActionsPanel,
   NewScenarioModal,
   TopBar,
   type CustomTypeDraft,
@@ -482,10 +481,9 @@ export default function App() {
       return
     }
     setMultiSelectionOpen(true)
-    setRightPanelOpen(false)
-    setLeftPanelOpen(true)
+    setRightPanelOpen(true)
     notify(`${ids.length} unités sélectionnées.`)
-  }, [notify, setLeftPanelOpen, setRightPanelOpen, setSelection])
+  }, [notify, setRightPanelOpen, setSelection])
 
   useEffect(() => {
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
@@ -1042,41 +1040,23 @@ export default function App() {
 
       <main className={styles.workspace}>
         <div className={styles.leftPanel}>
-          {multiSelectionOpen && selectedUnits.length >= 2 ? (
-            <MultiUnitActionsPanel
-              onChangeStatus={changeSelectedUnitsStatus}
-              onClearSelection={() => {
-                setMultiSelectionOpen(false)
-                setSelection(null)
-                setLeftPanelOpen(false)
-              }}
-              onClose={() => setLeftPanelOpen(false)}
-              onNeutralize={
-                canNeutralizeSelectedUnits ? neutralizeSelectedUnits : undefined
-              }
-              onRally={canRallySelectedUnits ? rallySelectedUnits : undefined}
-              open={leftPanelOpen || desktopLayout}
-              units={selectedUnits}
-            />
-          ) : (
-            <LibraryPanel
-              activeFactionId={placementFaction?.id ?? null}
-              activeUnitTypeId={placementType?.id ?? null}
-              factions={activeScenario.factions}
-              onClose={() => setLeftPanelOpen(false)}
-              onCreateCustomType={createCustomType}
-              onCreateFaction={createFaction}
-              onDeleteCustomType={deleteCustomType}
-              onDeleteFaction={deleteFaction}
-              onEditCustomType={editCustomType}
-              onEditFaction={editFaction}
-              onSelectFaction={setActiveFactionId}
-              onSelectUnitType={setSelectedTypeId}
-              open={leftPanelOpen || desktopLayout}
-              resolveAssetUrl={(assetId) => assetUrls[assetId]}
-              unitTypes={unitTypes}
-            />
-          )}
+          <LibraryPanel
+            activeFactionId={placementFaction?.id ?? null}
+            activeUnitTypeId={placementType?.id ?? null}
+            factions={activeScenario.factions}
+            onClose={() => setLeftPanelOpen(false)}
+            onCreateCustomType={createCustomType}
+            onCreateFaction={createFaction}
+            onDeleteCustomType={deleteCustomType}
+            onDeleteFaction={deleteFaction}
+            onEditCustomType={editCustomType}
+            onEditFaction={editFaction}
+            onSelectFaction={setActiveFactionId}
+            onSelectUnitType={setSelectedTypeId}
+            open={leftPanelOpen || desktopLayout}
+            resolveAssetUrl={(assetId) => assetUrls[assetId]}
+            unitTypes={unitTypes}
+          />
         </div>
 
         <section className={styles.center} aria-label="Éditeur tactique">
@@ -1195,6 +1175,16 @@ export default function App() {
               safelyCommit({ type: 'removeUnit', unitId })
               setSelection(null)
             }}
+            onClearUnitsSelection={() => {
+              setMultiSelectionOpen(false)
+              setSelection(null)
+              setRightPanelOpen(false)
+            }}
+            onNeutralizeUnits={
+              canNeutralizeSelectedUnits ? neutralizeSelectedUnits : undefined
+            }
+            onRallyUnits={canRallySelectedUnits ? rallySelectedUnits : undefined}
+            onUpdateUnitsStatus={changeSelectedUnitsStatus}
             onUpdateAnnotation={updateAnnotation}
             onUpdateUnit={updateUnit}
             onRallyUnit={
@@ -1215,6 +1205,7 @@ export default function App() {
             open={rightPanelOpen || desktopLayout}
             resolveAssetUrl={(assetId) => assetUrls[assetId]}
             unit={selectedUnit}
+            units={multiSelectionOpen ? selectedUnits : []}
             unitTypes={unitTypes}
           />
         </div>
@@ -1223,15 +1214,14 @@ export default function App() {
       <nav className={styles.mobileBottomBar} aria-label="Navigation mobile">
         <button type="button" onClick={() => setLeftPanelOpen(true)}>
           <PanelLeft aria-hidden />
-          {multiSelectionOpen ? 'Actions' : 'Unités'}
+          Unités
         </button>
         <button type="button" onClick={() => setTool('select')}><Grid3X3 aria-hidden />Sélection</button>
         <button
           type="button"
-          disabled={selection?.kind === 'units'}
           onClick={() => setRightPanelOpen(true)}
         >
-          <PanelRight aria-hidden />Propriétés
+          <PanelRight aria-hidden />{multiSelectionOpen ? 'Actions' : 'Propriétés'}
         </button>
         <button type="button" disabled={!history?.past.length} onClick={undo}><Undo2 aria-hidden />Annuler</button>
       </nav>

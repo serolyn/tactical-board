@@ -103,7 +103,11 @@ describe('App — sélection multiple', () => {
     expect(
       await screen.findByRole('heading', { name: 'Actions groupées' }),
     ).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Inspecteur' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Bibliothèque' })).toBeInTheDocument()
     expect(screen.getByText('2 unités sélectionnées')).toBeInTheDocument()
+    expect(useAppStore.getState().rightPanelOpen).toBe(true)
+    expect(useAppStore.getState().leftPanelOpen).toBe(false)
 
     await user.selectOptions(
       screen.getByLabelText('Nouveau statut commun'),

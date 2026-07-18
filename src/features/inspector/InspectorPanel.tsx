@@ -6,9 +6,11 @@ import {
   EyeOff,
   Handshake,
   MapPin,
+  MousePointer2,
   ShieldAlert,
   Skull,
   Trash2,
+  X,
 } from 'lucide-react'
 
 import { Button, PanelShell, UnitGlyph } from '../../components'
@@ -62,16 +64,21 @@ export interface InspectorPanelProps {
   annotation?: BoardAnnotation | null
   factions: readonly Faction[]
   onChangeUnitType: (unitId: string, typeId: string) => void
+  onClearUnitsSelection?: () => void
   onClose?: () => void
   onDeleteAnnotation?: (annotationId: string) => void
   onDeleteUnit: (unitId: string) => void
   onNeutralizeUnit?: (unitId: string) => void
+  onNeutralizeUnits?: () => void
   onRallyUnit?: (unitId: string) => void
+  onRallyUnits?: () => void
   onUpdateAnnotation?: (annotationId: string, changes: AnnotationChanges) => void
   onUpdateUnit: (unitId: string, changes: UnitEditableChanges) => void
+  onUpdateUnitsStatus?: (status: UnitStatus) => void
   open?: boolean
   resolveAssetUrl?: (assetId: string) => string | undefined
   unit?: TacticalUnit | null
+  units?: readonly TacticalUnit[]
   unitTypes: readonly UnitType[]
 }
 
@@ -79,20 +86,34 @@ export function InspectorPanel({
   annotation,
   factions,
   onChangeUnitType,
+  onClearUnitsSelection,
   onClose,
   onDeleteAnnotation,
   onDeleteUnit,
   onNeutralizeUnit,
+  onNeutralizeUnits,
   onRallyUnit,
+  onRallyUnits,
   onUpdateAnnotation,
   onUpdateUnit,
+  onUpdateUnitsStatus,
   open = true,
   resolveAssetUrl,
   unit,
+  units = [],
   unitTypes,
 }: InspectorPanelProps) {
-  const title = unit ? 'Propriétés de l’unité' : annotation ? 'Annotation' : 'Inspecteur'
-  const description = unit
+  const multiUnits = units.length >= 2 ? units : null
+  const title = multiUnits
+    ? 'Inspecteur'
+    : unit
+      ? 'Propriétés de l’unité'
+      : annotation
+        ? 'Annotation'
+        : 'Inspecteur'
+  const description = multiUnits
+    ? `${multiUnits.length} unités sélectionnées`
+    : unit
     ? `${positionLabel(unit.position)} · ${unit.typeSnapshot.name}`
     : annotation
       ? annotation.kind === 'arrow'
@@ -108,7 +129,15 @@ export function InspectorPanel({
       side="right"
       title={title}
     >
-      {unit ? (
+      {multiUnits ? (
+        <MultiUnitInspector
+          onClearSelection={onClearUnitsSelection}
+          onNeutralize={onNeutralizeUnits}
+          onRally={onRallyUnits}
+          onUpdateStatus={onUpdateUnitsStatus}
+          units={multiUnits}
+        />
+      ) : unit ? (
         <UnitInspector
           factions={factions}
           onChangeType={(typeId) => onChangeUnitType(unit.id, typeId)}
@@ -134,6 +163,126 @@ export function InspectorPanel({
         <EmptyInspector />
       )}
     </PanelShell>
+  )
+}
+
+interface MultiUnitInspectorProps {
+  onClearSelection?: () => void
+  onNeutralize?: () => void
+  onRally?: () => void
+  onUpdateStatus?: (status: UnitStatus) => void
+  units: readonly TacticalUnit[]
+}
+
+function MultiUnitInspector({
+  onClearSelection,
+  onNeutralize,
+  onRally,
+  onUpdateStatus,
+  units,
+}: MultiUnitInspectorProps) {
+  const hasActions = Boolean(onNeutralize || onRally || onUpdateStatus)
+  const visibleUnits = units.slice(0, 4)
+  const remainingCount = units.length - visibleUnits.length
+
+  return (
+    <div className={`${styles.inspector} ${styles.multiInspector}`}>
+      <div className={styles.multiSummary}>
+        <MousePointer2 aria-hidden="true" />
+        <div>
+          <h3>Actions groupées</h3>
+          <span>Toutes les modifications concernent la sélection entière.</span>
+        </div>
+      </div>
+
+      <section className={styles.section} aria-label="Unités sélectionnées">
+        <h3>Sélection</h3>
+        <ul className={styles.multiUnitList}>
+          {visibleUnits.map((selectedUnit) => (
+            <li key={selectedUnit.id}>{selectedUnit.name}</li>
+          ))}
+          {remainingCount > 0 ? <li>+ {remainingCount} autres</li> : null}
+        </ul>
+      </section>
+
+      {hasActions ? (
+        <>
+          {onRally || onNeutralize ? (
+            <section className={styles.section} aria-label="Actions communes">
+              <h3>Actions communes</h3>
+              <div className={styles.multiActionStack}>
+                {onRally ? (
+                  <Button
+                    icon={<Handshake aria-hidden="true" />}
+                    onClick={onRally}
+                    variant="primary"
+                  >
+                    Rallier la sélection
+                  </Button>
+                ) : null}
+                {onNeutralize ? (
+                  <Button
+                    icon={<CircleOff aria-hidden="true" />}
+                    onClick={onNeutralize}
+                  >
+                    Neutraliser la sélection
+                  </Button>
+                ) : null}
+              </div>
+            </section>
+          ) : null}
+
+          {onUpdateStatus ? (
+            <section className={styles.section}>
+              <h3>Changer le statut</h3>
+              <label className={styles.multiStatusField}>
+                <span>Nouveau statut commun</span>
+                <select
+                  aria-label="Nouveau statut commun"
+                  defaultValue=""
+                  onChange={(event) => {
+                    const status = event.target.value as UnitStatus
+                    if (!status) return
+                    onUpdateStatus(status)
+                    event.target.value = ''
+                  }}
+                >
+                  <option value="">Choisir un statut…</option>
+                  {STATUS_OPTIONS.map((status) => (
+                    <option
+                      disabled={units.every((selectedUnit) => selectedUnit.status === status.value)}
+                      key={status.value}
+                      value={status.value}
+                    >
+                      {status.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p className={styles.multiHint}>
+                Le changement s’annule en une seule fois.
+              </p>
+            </section>
+          ) : null}
+        </>
+      ) : (
+        <p className={styles.multiEmpty} role="status">
+          Aucune action commune à effectuer
+        </p>
+      )}
+
+      {onClearSelection ? (
+        <div className={styles.multiFooter}>
+          <Button
+            icon={<X aria-hidden="true" />}
+            onClick={onClearSelection}
+            variant="ghost"
+          >
+            Terminer la sélection
+          </Button>
+        </div>
+      ) : null}
+    </div>
   )
 }
 

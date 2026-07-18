@@ -40,7 +40,7 @@ Chaque envoi sur la branche `main` publie automatiquement la version de producti
 5. Une opportunité **À rallier** peut rejoindre immédiatement **Mes forces** ; un **Obstacle** peut être neutralisé depuis ce même inspecteur.
 6. Les outils **Flèche** et **Marqueur** ajoutent les annotations tactiques. La palette de flèches propose attaque/menace, soutien et route/déplacement. La gomme ne supprime que les annotations ; l’outil suppression vise les unités.
 
-Pour agir sur plusieurs unités, maintenez `Shift` et cliquez chacune d’elles. Le panneau **Actions groupées** s’ouvre à gauche lorsque vous relâchez la touche. Il ne propose que les actions applicables à toute la sélection, notamment le ralliement, la neutralisation et le changement de statut. Une modification groupée ne crée qu’une seule étape d’historique.
+Pour agir sur plusieurs unités, maintenez `Shift` et cliquez chacune d’elles. L’**Inspecteur** affiche les actions groupées lorsque vous relâchez la touche. Il ne propose que les actions applicables à toute la sélection, notamment le ralliement, la neutralisation et le changement de statut. Une modification groupée ne crée qu’une seule étape d’historique.
 
 Le menu **Plateau** règle les dimensions de 5 × 5 à 20 × 20, les coordonnées et le vidage complet. Une réduction qui retire du contenu demande confirmation et reste annulable.
 

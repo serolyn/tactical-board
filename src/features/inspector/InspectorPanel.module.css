@@ -2,6 +2,106 @@
   min-height: 100%;
 }
 
+.multiInspector {
+  display: flex;
+  flex-direction: column;
+}
+
+.multiSummary {
+  display: grid;
+  min-height: 5.5rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1rem 1.1rem;
+  border-bottom: 1px solid var(--tb-border, #2a3b4f);
+  background: #111816;
+}
+
+.multiSummary > svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  color: var(--tb-accent, #a4b58b);
+}
+
+.multiSummary div {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.multiSummary h3 {
+  margin: 0;
+  color: var(--tb-text, #e6edf5);
+  font-size: 0.88rem;
+}
+
+.multiSummary span {
+  color: var(--tb-text-muted, #91a1b3);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.multiUnitList {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  color: var(--tb-text, #e6edf5);
+  font-size: 0.8rem;
+  list-style: none;
+}
+
+.multiUnitList li {
+  overflow: hidden;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--tb-border-strong, #465750);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.multiActionStack {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.multiActionStack button,
+.multiFooter button {
+  width: 100%;
+}
+
+.multiStatusField {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.multiStatusField span {
+  color: var(--tb-text-muted, #91a1b3);
+  font-size: 0.76rem;
+}
+
+.multiHint {
+  margin: 0.65rem 0 0;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.multiEmpty {
+  margin: 1.1rem;
+  padding: 0.9rem;
+  border-left: 3px solid var(--tb-border-strong, #465750);
+  border-radius: 3px;
+  color: var(--tb-text-muted, #91a1b3);
+  background: var(--tb-surface-raised, #202a27);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.multiFooter {
+  margin-top: auto;
+  padding: 1.1rem;
+}
+
 .unitPreview,
 .annotationSummary {
   align-items: center;

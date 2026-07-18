@@ -35,6 +35,12 @@ const unit: TacticalUnit = {
     typeId: unitType.id,
   },
 }
+const secondUnit: TacticalUnit = {
+  ...unit,
+  id: 'unit-2',
+  name: 'Bravo',
+  position: { column: 1, row: 0 },
+}
 
 describe('InspectorPanel', () => {
   it('publie des modifications métier sans dépendre du store', async () => {
@@ -85,6 +91,53 @@ describe('InspectorPanel', () => {
 
     await user.click(screen.getByRole('button', { name: 'Rallier' }))
     expect(onRallyUnit).toHaveBeenCalledWith(unit.id)
+  })
+
+  it('affiche les actions groupées directement dans l’inspecteur', async () => {
+    const user = userEvent.setup()
+    const onRallyUnits = vi.fn()
+    const onUpdateUnitsStatus = vi.fn()
+
+    render(
+      <InspectorPanel
+        factions={[faction]}
+        onChangeUnitType={vi.fn()}
+        onDeleteUnit={vi.fn()}
+        onRallyUnits={onRallyUnits}
+        onUpdateUnit={vi.fn()}
+        onUpdateUnitsStatus={onUpdateUnitsStatus}
+        units={[unit, secondUnit]}
+        unitTypes={[unitType]}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Inspecteur' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Actions groupées' })).toBeInTheDocument()
+    expect(screen.getByText('2 unités sélectionnées')).toBeInTheDocument()
+    expect(screen.getByText('Alpha')).toBeInTheDocument()
+    expect(screen.getByText('Bravo')).toBeInTheDocument()
+
+    await user.selectOptions(screen.getByLabelText('Nouveau statut commun'), 'wounded')
+    expect(onUpdateUnitsStatus).toHaveBeenCalledWith('wounded')
+    await user.click(screen.getByRole('button', { name: 'Rallier la sélection' }))
+    expect(onRallyUnits).toHaveBeenCalledOnce()
+  })
+
+  it('affiche l’état sans action commune dans l’inspecteur', () => {
+    render(
+      <InspectorPanel
+        factions={[faction]}
+        onChangeUnitType={vi.fn()}
+        onDeleteUnit={vi.fn()}
+        onUpdateUnit={vi.fn()}
+        units={[unit, secondUnit]}
+        unitTypes={[unitType]}
+      />,
+    )
+
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Aucune action commune à effectuer',
+    )
   })
 
   it('conserve les flèches dans les trois styles sémantiques', async () => {
