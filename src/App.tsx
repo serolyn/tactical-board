@@ -1152,6 +1152,7 @@ export default function App() {
             }}
             onPlaceUnit={placeUnit}
             onMoveUnit={(unitId, position) => safelyCommit({ type: 'moveUnit', unitId, to: position })}
+            onMoveUnits={(unitIds, delta) => safelyCommit({ type: 'moveUnits', unitIds, delta })}
             onReachObjective={reachObjective}
             onDeleteUnit={(unitId) => safelyCommit({ type: 'removeUnit', unitId })}
             onAddArrow={addArrow}

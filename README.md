@@ -35,12 +35,12 @@ Chaque envoi sur la branche `main` publie automatiquement la version de producti
 
 1. Choisissez une faction et un type dans la bibliothèque.
 2. Touchez ou cliquez une case pour placer autant d’unités que nécessaire.
-3. Revenez à l’outil **Sélection** pour déplacer une unité par glisser-déposer, ou sélectionnez-la puis choisissez sa destination.
-4. Utilisez l’inspecteur compact pour modifier son nom, sa faction, son type, son icône et son statut.
+3. Revenez à l’outil **Sélection** pour déplacer une unité par glisser-déposer, ou sélectionnez-la puis choisissez sa destination. Un aperçu semi-transparent suit le pointeur pendant le glissement ; les collisions et sorties du plateau sont refusées.
+4. Utilisez l’inspecteur compact pour modifier son nom, sa faction, son type, son icône et son statut. Une unité détruite reste visible sous une grande croix rouge.
 5. Une opportunité **À rallier** peut rejoindre immédiatement **Mes forces** ; un **Obstacle** peut être neutralisé depuis ce même inspecteur.
 6. Les outils **Flèche** et **Marqueur** ajoutent les annotations tactiques. La palette de flèches propose attaque/menace, soutien et route/déplacement. La gomme ne supprime que les annotations ; l’outil suppression vise les unités.
 
-Pour agir sur plusieurs unités, maintenez `Shift` et cliquez chacune d’elles. L’**Inspecteur** affiche les actions groupées lorsque vous relâchez la touche. Il ne propose que les actions applicables à toute la sélection, notamment le ralliement, la neutralisation et le changement de statut. Une modification groupée ne crée qu’une seule étape d’historique.
+Pour agir sur plusieurs unités, maintenez `Shift` et cliquez chacune d’elles. L’**Inspecteur** affiche les actions groupées lorsque vous relâchez la touche. Il ne propose que les actions applicables à toute la sélection, notamment le ralliement, la neutralisation et le changement de statut. Faites glisser l’une des unités sélectionnées pour déplacer toute la formation : les aperçus semi-transparents conservent ses écarts et le mouvement est refusé si une destination est occupée ou hors limites. Une modification groupée ne crée qu’une seule étape d’historique.
 
 Le menu **Plateau** règle les dimensions de 5 × 5 à 20 × 20, les coordonnées et le vidage complet. Une réduction qui retire du contenu demande confirmation et reste annulable.
 

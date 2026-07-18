@@ -11,6 +11,7 @@ import {
   type DomainErrorCode,
   type Faction,
   type IconRef,
+  type MoveUnitsPreview,
   type Position,
   type ResizeImpact,
   type ScenarioCommand,
@@ -328,6 +329,101 @@ function moveUnit(
     ...current,
     position: { ...command.to },
   }))
+  return result(document, changedDocument(document, command, { units }))
+}
+
+function positionKey(position: Position): string {
+  return `${position.row}:${position.column}`
+}
+
+export function previewMoveUnits(
+  document: ScenarioDocumentV1,
+  requestedUnitIds: readonly string[],
+  delta: Position,
+): MoveUnitsPreview {
+  const unitIds = [...new Set(requestedUnitIds)]
+  if (!unitIds.length) return { moves: [], changed: false }
+
+  const unitsById = new Map(document.units.map((unit) => [unit.id, unit]))
+  const missingId = unitIds.find((unitId) => !unitsById.has(unitId))
+  if (missingId) {
+    fail('NOT_FOUND', "L'une des unités demandées est introuvable.", { unitId: missingId })
+  }
+
+  if (!Number.isInteger(delta.row) || !Number.isInteger(delta.column)) {
+    fail('OUT_OF_BOUNDS', 'Le déplacement doit correspondre à un nombre entier de cases.', {
+      delta,
+    })
+  }
+
+  const moves = unitIds.map((unitId) => {
+    const unit = unitsById.get(unitId)
+    if (!unit) throw new Error('Unreachable: unit identifiers were validated above.')
+    return {
+      unitId,
+      from: { ...unit.position },
+      to: {
+        row: unit.position.row + delta.row,
+        column: unit.position.column + delta.column,
+      },
+    }
+  })
+  if (delta.row === 0 && delta.column === 0) {
+    return { moves, changed: false }
+  }
+
+  const selectedIds = new Set(unitIds)
+  const destinationOwners = new Map<string, string>()
+
+  // Validate every destination before producing a new document. A selected unit may enter a
+  // selected neighbour's current cell because that neighbour is translated in the same action.
+  for (const move of moves) {
+    const destination = move.to
+    assertInside(document, destination)
+
+    const key = positionKey(destination)
+    const otherSelectedUnitId = destinationOwners.get(key)
+    if (otherSelectedUnitId) {
+      fail('CELL_OCCUPIED', 'Plusieurs unités de la sélection arriveraient sur la même case.', {
+        position: destination,
+        unitIds: [otherSelectedUnitId, move.unitId],
+      })
+    }
+    destinationOwners.set(key, move.unitId)
+  }
+
+  const occupiedByUnselected = new Map(
+    document.units
+      .filter((unit) => !selectedIds.has(unit.id))
+      .map((unit) => [positionKey(unit.position), unit.id]),
+  )
+  for (const move of moves) {
+    const occupantId = occupiedByUnselected.get(positionKey(move.to))
+    if (occupantId) {
+      fail('CELL_OCCUPIED', 'Cette case contient déjà une unité.', {
+        position: move.to,
+        unitId: move.unitId,
+        occupantId,
+      })
+    }
+  }
+
+  return { moves, changed: true }
+}
+
+function moveUnits(
+  document: ScenarioDocumentV1,
+  command: Extract<ScenarioCommand, { type: 'moveUnits' }>,
+): CommandResult {
+  const preview = previewMoveUnits(document, command.unitIds, command.delta)
+  if (!preview.changed) return result(document, document)
+
+  const destinations = new Map(preview.moves.map((move) => [move.unitId, move.to]))
+
+  const units = document.units.map((unit) => {
+    const destination = destinations.get(unit.id)
+    return destination ? { ...unit, position: { ...destination } } : unit
+  })
   return result(document, changedDocument(document, command, { units }))
 }
 
@@ -708,6 +804,8 @@ export function applyCommand(
       return placeUnit(document, command)
     case 'moveUnit':
       return moveUnit(document, command)
+    case 'moveUnits':
+      return moveUnits(document, command)
     case 'updateUnit':
       return updateUnit(document, command)
     case 'updateUnits':

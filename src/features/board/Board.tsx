@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import {
   forwardRef,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -22,11 +23,13 @@ import type {
   BoardAnnotation,
   Faction,
   MarkerAnnotation,
+  MoveUnitsPreview,
   Position,
   ScenarioDocumentV1,
   TacticalUnit,
   UnitType,
 } from '../../domain'
+import { previewMoveUnits } from '../../domain'
 import type { ArrowStyle, BoardTool, MarkerKind } from './BoardToolbar'
 import { BuiltinIcon } from './BuiltinIcon'
 import {
@@ -54,6 +57,7 @@ export interface BoardProps {
   onSelectionChange: (selection: BoardSelection) => void
   onPlaceUnit: (type: UnitType, faction: Faction, position: Position) => void
   onMoveUnit: (unitId: string, position: Position) => void
+  onMoveUnits: (unitIds: readonly string[], delta: Position) => void
   onReachObjective?: (unitId: string, objectiveUnitId: string) => void
   onDeleteUnit: (unitId: string) => void
   onAddArrow: (start: Position, end: Position, style: ArrowStyle, color: string) => void
@@ -63,11 +67,31 @@ export interface BoardProps {
 }
 
 interface DragState {
-  unitId: string
+  anchorPosition: Position
+  anchorUnitId: string
+  unitIds: readonly string[]
   pointerId: number
   clientX: number
   clientY: number
+  lastClientX: number
+  lastClientY: number
+  scrollLeft: number
+  scrollTop: number
   moved: boolean
+  selectOnDrag: boolean
+  selectionChanged: boolean
+}
+
+interface DragPreviewState {
+  unitIds: readonly string[]
+  translateX: number
+  translateY: number
+  delta: Position | null
+  moves: MoveUnitsPreview['moves']
+  valid: boolean
+  changed: boolean
+  message?: string
+  objectiveTargetId?: string
 }
 
 interface ArrowPointerState {
@@ -157,6 +181,48 @@ function unitClassName(unit: TacticalUnit, selected: boolean) {
     .join(' ')
 }
 
+interface UnitVisualProps {
+  assetUrl?: string
+  faction?: Faction
+  unit: TacticalUnit
+}
+
+function UnitVisual({ assetUrl, faction, unit }: UnitVisualProps) {
+  const status = statusDetails(unit.status)
+  return (
+    <>
+      <span className={styles.iconFrame}>
+        {unit.icon.kind === 'asset' && assetUrl ? (
+          <img className={styles.iconImage} src={assetUrl} alt="" draggable={false} />
+        ) : (
+          <BuiltinIcon
+            iconKey={unit.icon.kind === 'catalog' ? unit.icon.name : 'target'}
+            aria-hidden
+          />
+        )}
+        <span className={styles.factionBadge} aria-hidden>
+          {faction?.name.charAt(0).toUpperCase() ?? '?'}
+        </span>
+        {status ? (
+          <span className={`${styles.statusBadge} ${status.className}`} aria-hidden>
+            {status.symbol}
+          </span>
+        ) : null}
+      </span>
+      <span className={styles.unitLabel}>{unit.name}</span>
+      {unit.status === 'destroyed' ? (
+        <span
+          aria-hidden="true"
+          className={styles.destroyedOverlay}
+          data-destroyed-overlay
+        >
+          <X />
+        </span>
+      ) : null}
+    </>
+  )
+}
+
 export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   {
     scenario,
@@ -174,6 +240,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
     onSelectionChange,
     onPlaceUnit,
     onMoveUnit,
+    onMoveUnits,
     onReachObjective,
     onDeleteUnit,
     onAddArrow,
@@ -183,15 +250,38 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   },
   boardRef,
 ) {
-  const [dragTarget, setDragTarget] = useState<Position | null>(null)
+  const [dragPreview, setDragPreview] = useState<DragPreviewState | null>(null)
   const [arrowStart, setArrowStart] = useState<Position | null>(null)
   const [arrowPreview, setArrowPreview] = useState<Position | null>(null)
   const dragRef = useRef<DragState | null>(null)
+  const gridRef = useRef<HTMLDivElement>(null)
   const arrowPointerRef = useRef<ArrowPointerState | null>(null)
   const suppressClickRef = useRef(false)
+  const suppressClickTimerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    if (dragRef.current) {
+      dragRef.current = null
+      setDragPreview(null)
+    }
+  }, [scenario, tool])
+
+  useEffect(
+    () => () => {
+      dragRef.current = null
+      if (suppressClickTimerRef.current !== null) {
+        window.clearTimeout(suppressClickTimerRef.current)
+      }
+    },
+    [],
+  )
 
   const unitByCell = useMemo(
     () => new Map(scenario.units.map((unit) => [cellKey(unit.position), unit])),
+    [scenario.units],
+  )
+  const unitById = useMemo(
+    () => new Map(scenario.units.map((unit) => [unit.id, unit])),
     [scenario.units],
   )
   const factionById = useMemo(
@@ -229,14 +319,119 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   }
 
   const positionFromClientPoint = (clientX: number, clientY: number): Position | null => {
-    const element = document.elementFromPoint(clientX, clientY)?.closest<HTMLElement>('[data-cell]')
-    if (!element) return null
-    const row = Number(element.dataset.row)
-    const column = Number(element.dataset.column)
+    const grid = gridRef.current
+    if (!grid) return null
+    const bounds = grid.getBoundingClientRect()
+    if (
+      bounds.width <= 0 ||
+      bounds.height <= 0 ||
+      clientX < bounds.left ||
+      clientX >= bounds.right ||
+      clientY < bounds.top ||
+      clientY >= bounds.bottom
+    ) return null
+    const column = Math.floor(
+      ((clientX - bounds.left) / bounds.width) * scenario.grid.columns,
+    )
+    const row = Math.floor(
+      ((clientY - bounds.top) / bounds.height) * scenario.grid.rows,
+    )
     const position = { row, column }
     return Number.isInteger(row) && Number.isInteger(column) && isPositionInGrid(position, scenario)
       ? position
       : null
+  }
+
+  const rememberDragPreview = (next: DragPreviewState | null) => {
+    setDragPreview(next)
+  }
+
+  const calculateDragPreview = (
+    drag: DragState,
+    clientX: number,
+    clientY: number,
+  ): DragPreviewState => {
+    const viewport = viewportRef.current
+    const translateX =
+      clientX - drag.clientX + (viewport?.scrollLeft ?? drag.scrollLeft) - drag.scrollLeft
+    const translateY =
+      clientY - drag.clientY + (viewport?.scrollTop ?? drag.scrollTop) - drag.scrollTop
+    const target = positionFromClientPoint(clientX, clientY)
+    if (!target) {
+      return {
+        unitIds: drag.unitIds,
+        translateX,
+        translateY,
+        delta: null,
+        moves: [],
+        valid: false,
+        changed: false,
+        message: 'Relâchez la sélection à l’intérieur du plateau.',
+      }
+    }
+
+    const delta = {
+      row: target.row - drag.anchorPosition.row,
+      column: target.column - drag.anchorPosition.column,
+    }
+    const anchorUnit = unitById.get(drag.anchorUnitId)
+    const occupant = unitByCell.get(cellKey(target))
+    if (
+      drag.unitIds.length === 1 &&
+      anchorUnit &&
+      occupant &&
+      occupant.id !== anchorUnit.id &&
+      canReachObjective(anchorUnit, occupant)
+    ) {
+      return {
+        unitIds: drag.unitIds,
+        translateX,
+        translateY,
+        delta,
+        moves: [{ unitId: anchorUnit.id, from: anchorUnit.position, to: target }],
+        valid: true,
+        changed: true,
+        objectiveTargetId: occupant.id,
+      }
+    }
+
+    const rawMoves = drag.unitIds.flatMap((unitId) => {
+      const unit = unitById.get(unitId)
+      return unit
+        ? [{
+            unitId,
+            from: unit.position,
+            to: {
+              row: unit.position.row + delta.row,
+              column: unit.position.column + delta.column,
+            },
+          }]
+        : []
+    })
+
+    try {
+      const preview = previewMoveUnits(scenario, drag.unitIds, delta)
+      return {
+        unitIds: drag.unitIds,
+        translateX,
+        translateY,
+        delta,
+        moves: preview.moves,
+        valid: true,
+        changed: preview.changed,
+      }
+    } catch (error) {
+      return {
+        unitIds: drag.unitIds,
+        translateX,
+        translateY,
+        delta,
+        moves: rawMoves,
+        valid: false,
+        changed: false,
+        message: error instanceof Error ? error.message : 'Déplacement impossible.',
+      }
+    }
   }
 
   const moveSelectedUnit = (position: Position) => {
@@ -325,13 +520,32 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   }
 
   const handleUnitPointerDown = (event: PointerEvent<HTMLButtonElement>, unit: TacticalUnit) => {
-    if (tool !== 'select' || event.shiftKey) return
+    if (
+      tool !== 'select' ||
+      event.shiftKey ||
+      event.button !== 0 ||
+      event.isPrimary === false ||
+      dragRef.current
+    ) return
+    const moveSelection =
+      selection?.kind === 'units' && selectedUnitIdSet.has(unit.id)
+        ? selectedUnitIds(selection)
+        : [unit.id]
+    const viewport = viewportRef.current
     dragRef.current = {
-      unitId: unit.id,
+      anchorPosition: unit.position,
+      anchorUnitId: unit.id,
+      unitIds: [...new Set(moveSelection)],
       pointerId: event.pointerId,
       clientX: event.clientX,
       clientY: event.clientY,
+      lastClientX: event.clientX,
+      lastClientY: event.clientY,
+      scrollLeft: viewport?.scrollLeft ?? 0,
+      scrollTop: viewport?.scrollTop ?? 0,
       moved: false,
+      selectOnDrag: !selectedUnitIdSet.has(unit.id),
+      selectionChanged: false,
     }
     event.currentTarget.setPointerCapture?.(event.pointerId)
   }
@@ -339,31 +553,70 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   const handleUnitPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
     const drag = dragRef.current
     if (!drag || drag.pointerId !== event.pointerId) return
+    drag.lastClientX = event.clientX
+    drag.lastClientY = event.clientY
     if (Math.hypot(event.clientX - drag.clientX, event.clientY - drag.clientY) >= 6) drag.moved = true
     if (!drag.moved) return
-    setDragTarget(positionFromClientPoint(event.clientX, event.clientY))
+    event.preventDefault()
+    if (drag.selectOnDrag && !drag.selectionChanged) {
+      drag.selectionChanged = true
+      onSelectionChange({ kind: 'unit', id: drag.anchorUnitId })
+    }
+    rememberDragPreview(calculateDragPreview(drag, event.clientX, event.clientY))
   }
 
-  const finishUnitPointer = (event: PointerEvent<HTMLButtonElement>, unit: TacticalUnit) => {
+  const handleViewportScroll = () => {
     const drag = dragRef.current
-    dragRef.current = null
-    setDragTarget(null)
+    if (!drag?.moved) return
+    rememberDragPreview(calculateDragPreview(drag, drag.lastClientX, drag.lastClientY))
+  }
+
+  const suppressFollowingClick = () => {
+    suppressClickRef.current = true
+    if (suppressClickTimerRef.current !== null) {
+      window.clearTimeout(suppressClickTimerRef.current)
+    }
+    suppressClickTimerRef.current = window.setTimeout(() => {
+      suppressClickRef.current = false
+      suppressClickTimerRef.current = null
+    }, 0)
+  }
+
+  const finishUnitPointer = (
+    event: PointerEvent<HTMLButtonElement>,
+    cancelled = false,
+  ) => {
+    const drag = dragRef.current
     if (!drag || drag.pointerId !== event.pointerId) return
+    const preview = !cancelled && drag.moved
+      ? calculateDragPreview(drag, event.clientX, event.clientY)
+      : null
+    dragRef.current = null
+    rememberDragPreview(null)
     if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
       event.currentTarget.releasePointerCapture?.(event.pointerId)
     }
-    if (drag.moved) {
-      suppressClickRef.current = true
-      const target = positionFromClientPoint(event.clientX, event.clientY)
-      if (!target || samePosition(target, unit.position)) return
-      const occupant = unitByCell.get(cellKey(target))
-      if (occupant && tryReachObjective(unit, occupant)) return
-      if (occupant) {
-        onNotify('Déplacement impossible : la case est occupée.')
-        return
-      }
-      onMoveUnit(unit.id, target)
+    if (cancelled || !drag.moved) return
+
+    suppressFollowingClick()
+    if (!preview?.valid || !preview.delta) {
+      onNotify(preview?.message ?? 'Déplacement impossible.')
+      return
     }
+    if (preview.objectiveTargetId) {
+      const anchor = unitById.get(drag.anchorUnitId)
+      const objective = unitById.get(preview.objectiveTargetId)
+      if (anchor && objective) tryReachObjective(anchor, objective)
+      return
+    }
+    if (!preview.changed) return
+
+    if (drag.unitIds.length === 1) {
+      const move = preview.moves[0]
+      if (move) onMoveUnit(move.unitId, move.to)
+      return
+    }
+    onMoveUnits(drag.unitIds, preview.delta)
   }
 
   const handleUnitClick = (event: React.MouseEvent<HTMLButtonElement>, unit: TacticalUnit) => {
@@ -438,12 +691,28 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
 
   const previewStart = arrowStart
   const previewEnd = arrowPreview
+  const dragDestinationKeys = new Set(
+    (dragPreview?.moves ?? [])
+      .filter((move) => isPositionInGrid(move.to, scenario))
+      .map((move) => cellKey(move.to)),
+  )
+  const dragSourceIds = new Set(dragPreview?.unitIds ?? [])
+  const draggedUnits = (dragPreview?.unitIds ?? []).flatMap((unitId) => {
+    const unit = unitById.get(unitId)
+    return unit ? [unit] : []
+  })
   const cssVariables = {
     '--cell-size': `${Math.round(64 * zoom)}px`,
   } as CSSProperties
 
   return (
-    <div ref={viewportRef} className={styles.viewport} data-tool={tool} aria-label="Zone du plateau">
+    <div
+      ref={viewportRef}
+      className={styles.viewport}
+      data-tool={tool}
+      aria-label="Zone du plateau"
+      onScroll={handleViewportScroll}
+    >
       <div className={styles.stage}>
         <div
           ref={boardRef}
@@ -453,6 +722,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
           aria-label={`Plateau tactique ${scenario.grid.columns} par ${scenario.grid.rows}`}
         >
           <div
+            ref={gridRef}
             className={styles.grid}
             role="grid"
             aria-multiselectable="true"
@@ -465,7 +735,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
             {positions.map((position) => {
               const unit = unitByCell.get(cellKey(position))
               const coordinate = coordinateLabel(position)
-              const target = dragTarget && samePosition(dragTarget, position)
+              const target = dragDestinationKeys.has(cellKey(position))
               return (
                 <button
                   key={cellKey(position)}
@@ -474,9 +744,18 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
                   className={[
                     styles.cell,
                     (position.row + position.column) % 2 ? styles.cellDark : styles.cellLight,
-                    target ? (unit ? styles.cellBlocked : styles.cellTarget) : '',
+                    target ? (dragPreview?.valid ? styles.cellTarget : styles.cellBlocked) : '',
                   ].filter(Boolean).join(' ')}
-                  data-png-remove-class={target ? (unit ? styles.cellBlocked : styles.cellTarget) : undefined}
+                  data-png-remove-class={
+                    target
+                      ? dragPreview?.valid
+                        ? styles.cellTarget
+                        : styles.cellBlocked
+                      : undefined
+                  }
+                  data-drag-target={
+                    target ? (dragPreview?.valid ? 'valid' : 'invalid') : undefined
+                  }
                   data-cell={cellKey(position)}
                   data-row={position.row}
                   data-column={position.column}
@@ -589,14 +868,20 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
               const status = statusDetails(unit.status)
               const assetUrl = unit.icon.kind === 'asset' ? assetUrls[unit.icon.assetId] : undefined
               const selected = selectedUnitIdSet.has(unit.id)
+              const dragSource = dragSourceIds.has(unit.id)
+              const exportClasses = [
+                selected ? styles.unitSelected : '',
+                dragSource ? styles.unitDragSource : '',
+              ].filter(Boolean).join(' ')
               return (
                 <button
                   key={unit.id}
                   aria-pressed={selected}
-                  className={unitClassName(unit, selected)}
+                  className={`${unitClassName(unit, selected)} ${dragSource ? styles.unitDragSource : ''}`}
                   data-cell={cellKey(unit.position)}
                   data-column={unit.position.column}
-                  data-png-remove-class={selected ? styles.unitSelected : undefined}
+                  data-drag-source={dragSource ? 'true' : undefined}
+                  data-png-remove-class={exportClasses || undefined}
                   data-row={unit.position.row}
                   type="button"
                   title={unit.name}
@@ -610,26 +895,53 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
                   onClick={(event) => handleUnitClick(event, unit)}
                   onPointerDown={(event) => handleUnitPointerDown(event, unit)}
                   onPointerMove={handleUnitPointerMove}
-                  onPointerUp={(event) => finishUnitPointer(event, unit)}
-                  onPointerCancel={(event) => finishUnitPointer(event, unit)}
+                  onPointerUp={(event) => finishUnitPointer(event)}
+                  onPointerCancel={(event) => finishUnitPointer(event, true)}
+                  onLostPointerCapture={(event) => {
+                    if (dragRef.current?.pointerId === event.pointerId) {
+                      finishUnitPointer(event, true)
+                    }
+                  }}
                 >
-                  <span className={styles.iconFrame}>
-                    {unit.icon.kind === 'asset' && assetUrl ? (
-                      <img className={styles.iconImage} src={assetUrl} alt="" draggable={false} />
-                    ) : (
-                      <BuiltinIcon
-                        iconKey={unit.icon.kind === 'catalog' ? unit.icon.name : 'target'}
-                        aria-hidden
-                      />
-                    )}
-                    <span className={styles.factionBadge} aria-hidden>{faction?.name.charAt(0).toUpperCase() ?? '?'}</span>
-                    {status && <span className={`${styles.statusBadge} ${status.className}`} aria-hidden>{status.symbol}</span>}
-                  </span>
-                  <span className={styles.unitLabel}>{unit.name}</span>
+                  <UnitVisual assetUrl={assetUrl} faction={faction} unit={unit} />
                 </button>
               )
             })}
           </div>
+
+          {dragPreview ? (
+            <div
+              aria-hidden="true"
+              className={styles.dragGhostLayer}
+              data-png-hide="true"
+            >
+              {draggedUnits.map((unit) => {
+                const faction = factionById.get(unit.factionId)
+                const assetUrl =
+                  unit.icon.kind === 'asset' ? assetUrls[unit.icon.assetId] : undefined
+                return (
+                  <div
+                    className={[
+                      styles.dragGhost,
+                      unit.status === 'destroyed' ? styles.unitDestroyed : '',
+                      dragPreview.valid ? '' : styles.dragGhostInvalid,
+                    ].filter(Boolean).join(' ')}
+                    data-drag-ghost={unit.id}
+                    key={unit.id}
+                    style={{
+                      left: `calc(${unit.position.column} * var(--cell-size))`,
+                      top: `calc(${unit.position.row} * var(--cell-size))`,
+                      transform: `translate(${dragPreview.translateX}px, ${dragPreview.translateY}px)`,
+                      '--unit-color': unit.color,
+                      '--faction-color': faction?.color ?? '#94a3b8',
+                    } as CSSProperties}
+                  >
+                    <UnitVisual assetUrl={assetUrl} faction={faction} unit={unit} />
+                  </div>
+                )
+              })}
+            </div>
+          ) : null}
 
           {!scenario.units.length && (
             <div className={styles.emptyHint} data-png-hide="true">

@@ -21,6 +21,17 @@ export interface Position {
   readonly column: number
 }
 
+export interface UnitMovePreview {
+  readonly unitId: EntityId
+  readonly from: Position
+  readonly to: Position
+}
+
+export interface MoveUnitsPreview {
+  readonly moves: readonly UnitMovePreview[]
+  readonly changed: boolean
+}
+
 export interface GridConfig {
   readonly rows: number
   readonly columns: number
@@ -227,6 +238,12 @@ export type ScenarioCommand =
       readonly status?: UnitStatus
     } & CommandBase)
   | ({ readonly type: 'moveUnit'; readonly unitId: EntityId; readonly to: Position } & CommandBase)
+  | ({
+      readonly type: 'moveUnits'
+      readonly unitIds: readonly EntityId[]
+      /** Translation applied to every selected unit; negative values move up or left. */
+      readonly delta: Position
+    } & CommandBase)
   | ({
       readonly type: 'updateUnit'
       readonly unitId: EntityId

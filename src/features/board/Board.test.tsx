@@ -7,6 +7,7 @@ import {
   applyCommand,
   BUILT_IN_UNIT_TYPES,
   createDefaultScenario,
+  type Position,
   type ScenarioDocumentV1,
 } from '../../domain'
 import { Board, type BoardProps } from './Board'
@@ -14,7 +15,72 @@ import type { BoardSelection } from './selection'
 
 const infantry = BUILT_IN_UNIT_TYPES.find((type) => type.id === 'infantry')!
 
-afterEach(cleanup)
+afterEach(() => {
+  cleanup()
+  vi.restoreAllMocks()
+})
+
+const cellSize = 64
+
+function cellCenter(position: Position) {
+  return {
+    clientX: (position.column + 0.5) * cellSize,
+    clientY: (position.row + 0.5) * cellSize,
+  }
+}
+
+function mockGridBounds(scenario: ScenarioDocumentV1) {
+  const grid = screen.getByRole('grid', { name: 'Cases du plateau' })
+  const width = scenario.grid.columns * cellSize
+  const height = scenario.grid.rows * cellSize
+  vi.spyOn(grid, 'getBoundingClientRect').mockReturnValue({
+    bottom: height,
+    height,
+    left: 0,
+    right: width,
+    top: 0,
+    width,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  })
+  return grid
+}
+
+function startUnitDrag(
+  unit: HTMLElement,
+  from: Position,
+  to: Position,
+  pointerId = 7,
+) {
+  fireEvent.pointerDown(unit, {
+    ...cellCenter(from),
+    button: 0,
+    buttons: 1,
+    isPrimary: true,
+    pointerId,
+    pointerType: 'mouse',
+  })
+  fireEvent.pointerMove(unit, {
+    ...cellCenter(to),
+    button: 0,
+    buttons: 1,
+    isPrimary: true,
+    pointerId,
+    pointerType: 'mouse',
+  })
+}
+
+function finishUnitDrag(unit: HTMLElement, position: Position, pointerId = 7) {
+  fireEvent.pointerUp(unit, {
+    ...cellCenter(position),
+    button: 0,
+    buttons: 0,
+    isPrimary: true,
+    pointerId,
+    pointerType: 'mouse',
+  })
+}
 
 function createScenarioWithUnit(): ScenarioDocumentV1 {
   const scenario = createDefaultScenario('Test', {
@@ -52,6 +118,7 @@ function boardProps(
   onDeleteAnnotation: ReturnType<typeof vi.fn>
   onDeleteUnit: ReturnType<typeof vi.fn>
   onMoveUnit: ReturnType<typeof vi.fn>
+  onMoveUnits: ReturnType<typeof vi.fn>
   onPlaceUnit: ReturnType<typeof vi.fn>
   onSelectionChange: ReturnType<typeof vi.fn>
 } {
@@ -72,6 +139,7 @@ function boardProps(
     onDeleteAnnotation: vi.fn(),
     onDeleteUnit: vi.fn(),
     onMoveUnit: vi.fn(),
+    onMoveUnits: vi.fn(),
     onNotify: vi.fn(),
     onPlaceUnit: vi.fn(),
     onSelectionChange: vi.fn(),
@@ -88,6 +156,7 @@ function boardProps(
     onDeleteAnnotation: ReturnType<typeof vi.fn>
     onDeleteUnit: ReturnType<typeof vi.fn>
     onMoveUnit: ReturnType<typeof vi.fn>
+    onMoveUnits: ReturnType<typeof vi.fn>
     onPlaceUnit: ReturnType<typeof vi.fn>
     onSelectionChange: ReturnType<typeof vi.fn>
   }
@@ -141,6 +210,189 @@ describe('Board', () => {
       column: 1,
       row: 0,
     })
+  })
+
+  it('prévisualise une unité en transparence pendant le glissement puis valide sa destination', () => {
+    const scenario = createScenarioWithUnit()
+    const props = boardProps({ scenario })
+    const { container } = render(<Board {...props} />)
+    mockGridBounds(scenario)
+    const unit = screen.getByRole('button', {
+      name: `Alpha, faction ${scenario.factions[0]?.name}, active`,
+    })
+
+    startUnitDrag(unit, { column: 0, row: 0 }, { column: 1, row: 1 })
+
+    const ghost = container.querySelector<HTMLElement>('[data-drag-ghost="unit-alpha"]')
+    expect(ghost).not.toBeNull()
+    expect(unit).toHaveAttribute('data-drag-source', 'true')
+    expect(ghost).toHaveStyle({ transform: 'translate(64px, 64px)' })
+    expect(Number.parseFloat(getComputedStyle(ghost!).opacity)).toBeLessThan(1)
+    expect(screen.getByRole('gridcell', { name: 'Case B2, vide' })).toHaveAttribute(
+      'data-drag-target',
+      'valid',
+    )
+
+    const viewport = props.viewportRef.current
+    expect(viewport).not.toBeNull()
+    viewport!.scrollLeft = 32
+    fireEvent.scroll(viewport!)
+    expect(ghost).toHaveStyle({ transform: 'translate(96px, 64px)' })
+    viewport!.scrollLeft = 0
+    fireEvent.scroll(viewport!)
+
+    finishUnitDrag(unit, { column: 1, row: 1 })
+
+    expect(props.onMoveUnit).toHaveBeenCalledWith('unit-alpha', {
+      column: 1,
+      row: 1,
+    })
+    expect(props.onMoveUnits).not.toHaveBeenCalled()
+    expect(container.querySelector('[data-drag-ghost]')).toBeNull()
+  })
+
+  it('déplace une multi-sélection en conservant sa formation', () => {
+    const scenario = createScenarioWithTwoUnits()
+    const selection: BoardSelection = {
+      kind: 'units',
+      ids: ['unit-alpha', 'unit-bravo'],
+    }
+    const props = boardProps({ scenario, selection })
+    const { container } = render(<Board {...props} />)
+    mockGridBounds(scenario)
+    const alpha = screen.getByRole('button', {
+      name: `Alpha, faction ${scenario.factions[0]?.name}, active`,
+    })
+
+    startUnitDrag(alpha, { column: 0, row: 0 }, { column: 0, row: 1 })
+
+    const ghosts = container.querySelectorAll<HTMLElement>('[data-drag-ghost]')
+    expect(ghosts).toHaveLength(2)
+    expect(
+      [...ghosts].map((ghost) => [ghost.dataset.dragGhost, ghost.style.transform]),
+    ).toEqual([
+      ['unit-alpha', 'translate(0px, 64px)'],
+      ['unit-bravo', 'translate(0px, 64px)'],
+    ])
+    expect(screen.getByRole('gridcell', { name: 'Case A2, vide' })).toHaveAttribute(
+      'data-drag-target',
+      'valid',
+    )
+    expect(screen.getByRole('gridcell', { name: 'Case B2, vide' })).toHaveAttribute(
+      'data-drag-target',
+      'valid',
+    )
+
+    finishUnitDrag(alpha, { column: 0, row: 1 })
+
+    expect(props.onMoveUnits).toHaveBeenCalledTimes(1)
+    expect(props.onMoveUnits).toHaveBeenCalledWith(
+      ['unit-alpha', 'unit-bravo'],
+      { column: 0, row: 1 },
+    )
+    expect(props.onMoveUnit).not.toHaveBeenCalled()
+  })
+
+  it('refuse atomiquement un déplacement groupé qui rencontre une unité', () => {
+    const twoUnits = createScenarioWithTwoUnits()
+    const scenario = applyCommand(twoUnits, {
+      factionId: 'red',
+      name: 'Bloqueur',
+      position: { column: 1, row: 1 },
+      type: 'placeUnit',
+      typeId: infantry.id,
+      unitId: 'unit-blocker',
+    }).document
+    const selection: BoardSelection = {
+      kind: 'units',
+      ids: ['unit-alpha', 'unit-bravo'],
+    }
+    const props = boardProps({ scenario, selection })
+    const { container } = render(<Board {...props} />)
+    mockGridBounds(scenario)
+    const alpha = screen.getByRole('button', {
+      name: `Alpha, faction ${scenario.factions[0]?.name}, active`,
+    })
+
+    startUnitDrag(alpha, { column: 0, row: 0 }, { column: 0, row: 1 })
+
+    expect(container.querySelectorAll('[data-drag-ghost]')).toHaveLength(2)
+    expect(container.querySelectorAll('[data-drag-target="invalid"]')).toHaveLength(2)
+    finishUnitDrag(alpha, { column: 0, row: 1 })
+
+    expect(props.onMoveUnits).not.toHaveBeenCalled()
+    expect(props.onMoveUnit).not.toHaveBeenCalled()
+    expect(props.onNotify).toHaveBeenCalledWith('Cette case contient déjà une unité.')
+    expect(container.querySelector('[data-drag-ghost]')).toBeNull()
+  })
+
+  it('annule le glissement sans déplacer au pointercancel', () => {
+    const scenario = createScenarioWithUnit()
+    const props = boardProps({ scenario })
+    const { container } = render(<Board {...props} />)
+    mockGridBounds(scenario)
+    const unit = screen.getByRole('button', {
+      name: `Alpha, faction ${scenario.factions[0]?.name}, active`,
+    })
+
+    startUnitDrag(unit, { column: 0, row: 0 }, { column: 2, row: 0 }, 19)
+    expect(container.querySelector('[data-drag-ghost]')).not.toBeNull()
+    fireEvent.pointerCancel(unit, {
+      ...cellCenter({ column: 2, row: 0 }),
+      pointerId: 19,
+      pointerType: 'mouse',
+    })
+
+    expect(props.onMoveUnit).not.toHaveBeenCalled()
+    expect(props.onMoveUnits).not.toHaveBeenCalled()
+    expect(props.onNotify).not.toHaveBeenCalled()
+    expect(container.querySelector('[data-drag-ghost]')).toBeNull()
+  })
+
+  it('libère le glissement si l’outil change avant le relâchement', () => {
+    const scenario = createScenarioWithUnit()
+    const props = boardProps({ scenario })
+    const view = render(<Board {...props} />)
+    mockGridBounds(scenario)
+    const unitName = `Alpha, faction ${scenario.factions[0]?.name}, active`
+    const unit = screen.getByRole('button', { name: unitName })
+
+    startUnitDrag(unit, { column: 0, row: 0 }, { column: 1, row: 0 }, 23)
+    expect(view.container.querySelector('[data-drag-ghost]')).not.toBeNull()
+
+    view.rerender(<Board {...props} tool="marker" />)
+    expect(view.container.querySelector('[data-drag-ghost]')).toBeNull()
+
+    view.rerender(<Board {...props} tool="select" />)
+    const availableUnit = screen.getByRole('button', { name: unitName })
+    startUnitDrag(availableUnit, { column: 0, row: 0 }, { column: 2, row: 0 }, 24)
+    finishUnitDrag(availableUnit, { column: 2, row: 0 }, 24)
+
+    expect(props.onMoveUnit).toHaveBeenCalledWith('unit-alpha', {
+      column: 2,
+      row: 0,
+    })
+  })
+
+  it('recouvre une unité détruite d’une grande croix rouge et l’annonce', () => {
+    const placed = createScenarioWithUnit()
+    const scenario = applyCommand(placed, {
+      changes: { status: 'destroyed' },
+      type: 'updateUnit',
+      unitId: 'unit-alpha',
+    }).document
+    const props = boardProps({ scenario })
+    const { container } = render(<Board {...props} />)
+
+    const unit = screen.getByRole('button', {
+      name: `Alpha, faction ${scenario.factions[0]?.name}, détruite`,
+    })
+    const overlay = unit.querySelector<HTMLElement>('[data-destroyed-overlay]')
+    expect(overlay).not.toBeNull()
+    expect(overlay).toHaveAttribute('aria-hidden', 'true')
+    expect(overlay?.querySelector('svg')).toBeInTheDocument()
+    expect(getComputedStyle(overlay!).color).toBe('rgb(255, 63, 63)')
+    expect(container.querySelectorAll('[data-destroyed-overlay]')).toHaveLength(1)
   })
 
   it('accumule et retire des unités avec Shift sans déplacer le groupe', () => {

@@ -9,6 +9,7 @@ import {
   createDefaultScenario,
   createHistory,
   migrateScenarioDocumentV1,
+  previewMoveUnits,
   previewResize,
   pushHistory,
   redoHistory,
@@ -258,6 +259,145 @@ describe('unités', () => {
         to: { row: 1, column: 1 },
       }),
     ).toThrowError(expect.objectContaining({ code: 'CELL_OCCUPIED' }))
+  })
+
+  it('déplace une formation entière en conservant ses positions relatives', () => {
+    const document = place(
+      place(place(scenario(), 'unit-1', 1, 1), 'unit-2', 1, 2),
+      'untouched',
+      6,
+      6,
+    )
+    const untouched = document.units.find((unit) => unit.id === 'untouched')
+    const moved = applyCommand(document, {
+      type: 'moveUnits',
+      unitIds: ['unit-1', 'unit-2', 'unit-1'],
+      delta: { row: 2, column: 1 },
+      at: '2026-07-18T00:03:00.000Z',
+    })
+
+    expect(moved.changed).toBe(true)
+    expect(
+      moved.document.units
+        .filter((unit) => unit.id !== 'untouched')
+        .map((unit) => unit.position),
+    ).toEqual([
+      { row: 3, column: 2 },
+      { row: 3, column: 3 },
+    ])
+    expect(moved.document.units.find((unit) => unit.id === 'untouched')).toBe(untouched)
+    expect(moved.document.updatedAt).toBe('2026-07-18T00:03:00.000Z')
+    expect(document.units[0]?.position).toEqual({ row: 1, column: 1 })
+  })
+
+  it('prévisualise les destinations avec la même validation que la commande', () => {
+    const document = place(place(scenario(), 'unit-1', 1, 1), 'unit-2', 2, 3)
+
+    expect(previewMoveUnits(document, ['unit-1', 'unit-2'], { row: 2, column: -1 })).toEqual({
+      changed: true,
+      moves: [
+        { unitId: 'unit-1', from: { row: 1, column: 1 }, to: { row: 3, column: 0 } },
+        { unitId: 'unit-2', from: { row: 2, column: 3 }, to: { row: 4, column: 2 } },
+      ],
+    })
+    expect(previewMoveUnits(document, ['unit-1'], { row: 0, column: 0 })).toEqual({
+      changed: false,
+      moves: [
+        { unitId: 'unit-1', from: { row: 1, column: 1 }, to: { row: 1, column: 1 } },
+      ],
+    })
+    expect(() =>
+      previewMoveUnits(document, ['unit-1'], { row: -2, column: 0 }),
+    ).toThrowError(expect.objectContaining({ code: 'OUT_OF_BOUNDS' }))
+  })
+
+  it('autorise une formation à occuper les cases libérées par ses propres unités', () => {
+    const document = place(place(scenario(), 'unit-1', 2, 2), 'unit-2', 2, 3)
+    const moved = applyCommand(document, {
+      type: 'moveUnits',
+      unitIds: ['unit-1', 'unit-2'],
+      delta: { row: 0, column: 1 },
+    }).document
+
+    expect(moved.units.map((unit) => unit.position)).toEqual([
+      { row: 2, column: 3 },
+      { row: 2, column: 4 },
+    ])
+  })
+
+  it('refuse atomiquement une formation hors limites ou en collision externe', () => {
+    const document = place(
+      place(place(scenario(), 'unit-1', 0, 0), 'unit-2', 0, 1),
+      'blocker',
+      1,
+      2,
+    )
+
+    expect(() =>
+      applyCommand(document, {
+        type: 'moveUnits',
+        unitIds: ['unit-1', 'unit-2'],
+        delta: { row: -1, column: 0 },
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'OUT_OF_BOUNDS' }))
+    expect(() =>
+      applyCommand(document, {
+        type: 'moveUnits',
+        unitIds: ['unit-1', 'unit-2'],
+        delta: { row: 1, column: 1 },
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'CELL_OCCUPIED' }))
+    expect(document.units.map((unit) => unit.position)).toEqual([
+      { row: 0, column: 0 },
+      { row: 0, column: 1 },
+      { row: 1, column: 2 },
+    ])
+  })
+
+  it('prévalide les identifiants et les collisions internes de la formation', () => {
+    const document = place(place(scenario(), 'unit-1', 1, 1), 'unit-2', 1, 2)
+
+    expect(() =>
+      applyCommand(document, {
+        type: 'moveUnits',
+        unitIds: ['unit-1', 'missing'],
+        delta: { row: 1, column: 0 },
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'NOT_FOUND' }))
+
+    const malformed = {
+      ...document,
+      units: document.units.map((unit) => ({
+        ...unit,
+        position: { row: 1, column: 1 },
+      })),
+    }
+    expect(() =>
+      applyCommand(malformed, {
+        type: 'moveUnits',
+        unitIds: ['unit-1', 'unit-2'],
+        delta: { row: 1, column: 0 },
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'CELL_OCCUPIED' }))
+  })
+
+  it('conserve le document pour une formation vide ou un déplacement nul', () => {
+    const document = place(scenario(), 'unit-1', 1, 1)
+    const empty = applyCommand(document, {
+      type: 'moveUnits',
+      unitIds: [],
+      delta: { row: 1, column: 1 },
+    })
+    const stationary = applyCommand(document, {
+      type: 'moveUnits',
+      unitIds: ['unit-1'],
+      delta: { row: 0, column: 0 },
+    })
+
+    expect(empty.changed).toBe(false)
+    expect(empty.document).toBe(document)
+    expect(stationary.changed).toBe(false)
+    expect(stationary.document).toBe(document)
   })
 
   it('met à jour les propriétés et valide les références de faction', () => {
@@ -674,6 +814,24 @@ describe('partage structurel et historique', () => {
     expect(applied.history.present.units.map((unit) => unit.status)).toEqual([
       'hidden',
       'hidden',
+    ])
+    const undone = undoHistory(applied.history)
+    expect(undone.present).toBe(initial)
+    expect(redoHistory(undone).present).toBe(applied.history.present)
+  })
+
+  it('annule et rétablit le déplacement de toute une formation en une seule action', () => {
+    const initial = place(place(scenario(), 'unit-1', 1, 1), 'unit-2', 1, 2)
+    const applied = applyCommandToHistory(createHistory(initial), {
+      type: 'moveUnits',
+      unitIds: ['unit-1', 'unit-2'],
+      delta: { row: 2, column: 2 },
+    })
+
+    expect(applied.history.past).toEqual([initial])
+    expect(applied.history.present.units.map((unit) => unit.position)).toEqual([
+      { row: 3, column: 3 },
+      { row: 3, column: 4 },
     ])
     const undone = undoHistory(applied.history)
     expect(undone.present).toBe(initial)
