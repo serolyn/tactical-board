@@ -358,6 +358,45 @@ function updateUnit(
   return result(document, changedDocument(document, command, { units }))
 }
 
+function updateUnits(
+  document: ScenarioDocumentV1,
+  command: Extract<ScenarioCommand, { type: 'updateUnits' }>,
+): CommandResult {
+  const unitIds = [...new Set(command.unitIds)]
+  if (!unitIds.length) return result(document, document)
+
+  const selectedIds = new Set(unitIds)
+  const existingIds = new Set(document.units.map((unit) => unit.id))
+  const missingId = unitIds.find((unitId) => !existingIds.has(unitId))
+  if (missingId) {
+    fail('NOT_FOUND', "L'une des unités demandées est introuvable.", { unitId: missingId })
+  }
+  if (command.changes.factionId !== undefined) {
+    requireFaction(document, command.changes.factionId)
+  }
+
+  let changed = false
+  const units = document.units.map((unit) => {
+    if (!selectedIds.has(unit.id)) return unit
+    const nextIcon = command.changes.icon ?? unit.icon
+    const hasChanges = Object.entries(command.changes).some(([key, value]) => {
+      if (key === 'icon') return !sameIcon(unit.icon, value as IconRef)
+      return unit[key as keyof TacticalUnit] !== value
+    })
+    if (!hasChanges) return unit
+    changed = true
+    return {
+      ...unit,
+      ...command.changes,
+      icon: copyIcon(nextIcon),
+    }
+  })
+
+  return changed
+    ? result(document, changedDocument(document, command, { units }))
+    : result(document, document)
+}
+
 function changeUnitType(
   document: ScenarioDocumentV1,
   command: Extract<ScenarioCommand, { type: 'changeUnitType' }>,
@@ -671,6 +710,8 @@ export function applyCommand(
       return moveUnit(document, command)
     case 'updateUnit':
       return updateUnit(document, command)
+    case 'updateUnits':
+      return updateUnits(document, command)
     case 'changeUnitType':
       return changeUnitType(document, command)
     case 'removeUnit': {
@@ -678,6 +719,22 @@ export function applyCommand(
       if (index < 0) fail('NOT_FOUND', "L'unité demandée est introuvable.", { unitId: command.unitId })
       const units = [...document.units.slice(0, index), ...document.units.slice(index + 1)]
       return result(document, changedDocument(document, command, { units }))
+    }
+    case 'removeUnits': {
+      const unitIds = [...new Set(command.unitIds)]
+      if (!unitIds.length) return result(document, document)
+      const existingIds = new Set(document.units.map((unit) => unit.id))
+      const missingId = unitIds.find((unitId) => !existingIds.has(unitId))
+      if (missingId) {
+        fail('NOT_FOUND', "L'une des unités demandées est introuvable.", { unitId: missingId })
+      }
+      const selectedIds = new Set(unitIds)
+      const units = document.units.filter((unit) => !selectedIds.has(unit.id))
+      return result(
+        document,
+        changedDocument(document, command, { units }),
+        { removedUnitIds: unitIds, removedAnnotationIds: [] },
+      )
     }
     case 'reachObjective':
       return reachObjective(document, command)

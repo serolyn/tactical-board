@@ -29,12 +29,14 @@ import type {
 } from '../../domain'
 import type { ArrowStyle, BoardTool, MarkerKind } from './BoardToolbar'
 import { BuiltinIcon } from './BuiltinIcon'
+import {
+  selectedUnitIds,
+  toggleUnitSelection,
+  type BoardSelection,
+} from './selection'
 import styles from './Board.module.css'
 
-export type BoardSelection =
-  | { kind: 'unit'; id: string }
-  | { kind: 'annotation'; id: string }
-  | null
+export type { BoardSelection } from './selection'
 
 export interface BoardProps {
   scenario: ScenarioDocumentV1
@@ -208,6 +210,10 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   }, [scenario.grid.columns, scenario.grid.rows])
 
   const selectedUnitId = selection?.kind === 'unit' ? selection.id : null
+  const selectedUnitIdSet = useMemo(
+    () => new Set(selectedUnitIds(selection)),
+    [selection],
+  )
   const selectedAnnotationId = selection?.kind === 'annotation' ? selection.id : null
 
   const canReachObjective = (unit: TacticalUnit, target: TacticalUnit) =>
@@ -247,7 +253,10 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
     return true
   }
 
-  const handleCellClick = (position: Position) => {
+  const handleCellClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    position: Position,
+  ) => {
     if (suppressClickRef.current) {
       suppressClickRef.current = false
       return
@@ -304,6 +313,8 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
       return
     }
 
+    if (event.shiftKey) return
+
     if (unit) {
       onSelectionChange({ kind: 'unit', id: unit.id })
       return
@@ -314,7 +325,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   }
 
   const handleUnitPointerDown = (event: PointerEvent<HTMLButtonElement>, unit: TacticalUnit) => {
-    if (tool !== 'select') return
+    if (tool !== 'select' || event.shiftKey) return
     dragRef.current = {
       unitId: unit.id,
       pointerId: event.pointerId,
@@ -366,6 +377,10 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
       return
     }
     if (tool === 'select') {
+      if (event.shiftKey) {
+        onSelectionChange(toggleUnitSelection(selection, unit.id))
+        return
+      }
       const selectedUnit = scenario.units.find((candidate) => candidate.id === selectedUnitId)
       if (selectedUnit && selectedUnit.id !== unit.id && tryReachObjective(selectedUnit, unit)) {
         return
@@ -440,6 +455,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
           <div
             className={styles.grid}
             role="grid"
+            aria-multiselectable="true"
             aria-label="Cases du plateau"
             style={{
               gridTemplateColumns: `repeat(${scenario.grid.columns}, var(--cell-size))`,
@@ -466,7 +482,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
                   data-column={position.column}
                   aria-label={`Case ${coordinate}${unit ? `, ${unit.name}` : ', vide'}`}
                   tabIndex={position.row === 0 && position.column === 0 ? 0 : -1}
-                  onClick={() => handleCellClick(position)}
+                  onClick={(event) => handleCellClick(event, position)}
                   onKeyDown={(event) => handleCellKeyDown(event, position)}
                   onPointerDown={(event) => handleCellPointerDown(event, position)}
                   onPointerMove={(event) => handleCellPointerMove(event, position)}
@@ -572,13 +588,15 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
               const faction = factionById.get(unit.factionId)
               const status = statusDetails(unit.status)
               const assetUrl = unit.icon.kind === 'asset' ? assetUrls[unit.icon.assetId] : undefined
+              const selected = selectedUnitIdSet.has(unit.id)
               return (
                 <button
                   key={unit.id}
-                  className={unitClassName(unit, selectedUnitId === unit.id)}
+                  aria-pressed={selected}
+                  className={unitClassName(unit, selected)}
                   data-cell={cellKey(unit.position)}
                   data-column={unit.position.column}
-                  data-png-remove-class={selectedUnitId === unit.id ? styles.unitSelected : undefined}
+                  data-png-remove-class={selected ? styles.unitSelected : undefined}
                   data-row={unit.position.row}
                   type="button"
                   title={unit.name}

@@ -233,12 +233,18 @@ export type ScenarioCommand =
       readonly changes: UnitEditableChanges
     } & CommandBase)
   | ({
+      readonly type: 'updateUnits'
+      readonly unitIds: readonly EntityId[]
+      readonly changes: UnitEditableChanges
+    } & CommandBase)
+  | ({
       readonly type: 'changeUnitType'
       readonly unitId: EntityId
       readonly typeId: EntityId
       readonly resetAppearance?: boolean
     } & CommandBase)
   | ({ readonly type: 'removeUnit'; readonly unitId: EntityId } & CommandBase)
+  | ({ readonly type: 'removeUnits'; readonly unitIds: readonly EntityId[] } & CommandBase)
   | ({
       readonly type: 'reachObjective'
       readonly unitId: EntityId

@@ -299,6 +299,82 @@ describe('unités', () => {
     expect(neutralized.units[0]?.status).toBe('neutralized')
   })
 
+  it('met à jour plusieurs unités dans une seule commande atomique', () => {
+    const document = place(
+      place(place(scenario(), 'unit-1', 0, 0), 'unit-2', 0, 1),
+      'unit-3',
+      0,
+      2,
+    )
+    const untouched = document.units.find((unit) => unit.id === 'unit-3')
+    const updated = applyCommand(document, {
+      type: 'updateUnits',
+      unitIds: ['unit-1', 'unit-2', 'unit-1'],
+      changes: { factionId: 'red', status: 'wounded' },
+    })
+
+    expect(updated.changed).toBe(true)
+    expect(
+      updated.document.units
+        .filter((unit) => unit.id !== 'unit-3')
+        .map(({ factionId, status }) => ({ factionId, status })),
+    ).toEqual([
+      { factionId: 'red', status: 'wounded' },
+      { factionId: 'red', status: 'wounded' },
+    ])
+    expect(updated.document.units.find((unit) => unit.id === 'unit-3')).toBe(untouched)
+    expect(document.units.every((unit) => unit.factionId === 'blue')).toBe(true)
+  })
+
+  it('refuse entièrement une mise à jour groupée si une référence est invalide', () => {
+    const document = place(place(scenario(), 'unit-1', 0, 0), 'unit-2', 0, 1)
+
+    expect(() =>
+      applyCommand(document, {
+        type: 'updateUnits',
+        unitIds: ['unit-1', 'missing'],
+        changes: { status: 'destroyed' },
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'NOT_FOUND' }))
+    expect(() =>
+      applyCommand(document, {
+        type: 'updateUnits',
+        unitIds: ['unit-1', 'unit-2'],
+        changes: { factionId: 'missing' },
+      }),
+    ).toThrowError(expect.objectContaining({ code: 'INVALID_REFERENCE' }))
+    expect(document.units.map((unit) => unit.status)).toEqual(['active', 'active'])
+  })
+
+  it('ne crée aucun changement si tout le groupe possède déjà la valeur demandée', () => {
+    const document = place(place(scenario(), 'unit-1', 0, 0), 'unit-2', 0, 1)
+    const result = applyCommand(document, {
+      type: 'updateUnits',
+      unitIds: ['unit-1', 'unit-2'],
+      changes: { status: 'active' },
+    })
+
+    expect(result.changed).toBe(false)
+    expect(result.document).toBe(document)
+  })
+
+  it('retire une sélection multiple dans une seule commande', () => {
+    const document = place(
+      place(place(scenario(), 'unit-1', 0, 0), 'unit-2', 0, 1),
+      'unit-3',
+      0,
+      2,
+    )
+    const removed = applyCommand(document, {
+      type: 'removeUnits',
+      unitIds: ['unit-1', 'unit-2'],
+    })
+
+    expect(removed.document.units.map((unit) => unit.id)).toEqual(['unit-3'])
+    expect(removed.effects.removedUnitIds).toEqual(['unit-1', 'unit-2'])
+    expect(document.units).toHaveLength(3)
+  })
+
   it('retire un objectif et y déplace le Commandant dans une action atomique', () => {
     const withCommander = place(scenario(), 'commander-1', 0, 0, 'commander')
     const withObjective = place(withCommander, 'objective-1', 4, 5, 'objective')
@@ -584,6 +660,24 @@ describe('partage structurel et historique', () => {
 
     expect(applied.history.past).toEqual([initial])
     expect(undoHistory(applied.history).present).toBe(initial)
+  })
+
+  it('annule et rétablit toute une mise à jour groupée en une seule action', () => {
+    const initial = place(place(scenario(), 'unit-1', 0, 0), 'unit-2', 0, 1)
+    const applied = applyCommandToHistory(createHistory(initial), {
+      type: 'updateUnits',
+      unitIds: ['unit-1', 'unit-2'],
+      changes: { status: 'hidden' },
+    })
+
+    expect(applied.history.past).toEqual([initial])
+    expect(applied.history.present.units.map((unit) => unit.status)).toEqual([
+      'hidden',
+      'hidden',
+    ])
+    const undone = undoHistory(applied.history)
+    expect(undone.present).toBe(initial)
+    expect(redoHistory(undone).present).toBe(applied.history.present)
   })
 
   it('limite le passé aux 100 dernières actions et efface le futur après une action', () => {

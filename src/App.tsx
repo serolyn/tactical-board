@@ -26,6 +26,7 @@ import {
   type Position,
   type ScenarioDocumentV1,
   type UnitEditableChanges,
+  type UnitStatus,
   type UnitType,
 } from './domain'
 import {
@@ -37,6 +38,7 @@ import {
 import {
   InspectorPanel,
   LibraryPanel,
+  MultiUnitActionsPanel,
   NewScenarioModal,
   TopBar,
   type CustomTypeDraft,
@@ -265,6 +267,7 @@ export default function App() {
   const [progressOpen, setProgressOpen] = useState(false)
   const [scenarioDetailsOpen, setScenarioDetailsOpen] = useState(false)
   const [boardSettingsOpen, setBoardSettingsOpen] = useState(false)
+  const [multiSelectionOpen, setMultiSelectionOpen] = useState(false)
   const [saveSnapshot, setSaveSnapshot] = useState<AutosaveSnapshot>({
     state: 'idle',
     error: null,
@@ -273,6 +276,7 @@ export default function App() {
   const boardRef = useRef<HTMLDivElement>(null)
   const viewportRef = useRef<HTMLDivElement>(null)
   const lastFittedScenarioId = useRef<string | null>(null)
+  const shiftSelectionRef = useRef(false)
 
   const autosave = useMemo(
     () =>
@@ -384,10 +388,31 @@ export default function App() {
     selection?.kind === 'unit'
       ? activeScenario?.units.find((unit) => unit.id === selection.id) ?? null
       : null
+  const selectedUnits = useMemo(() => {
+    if (selection?.kind !== 'units' || !activeScenario) return []
+    const unitById = new Map(activeScenario.units.map((unit) => [unit.id, unit]))
+    return selection.ids
+      .map((unitId) => unitById.get(unitId))
+      .filter((unit): unit is NonNullable<typeof unit> => Boolean(unit))
+  }, [activeScenario, selection])
   const selectedAnnotation =
     selection?.kind === 'annotation'
       ? activeScenario?.annotations.find((annotation) => annotation.id === selection.id) ?? null
       : null
+  const ownFaction = activeScenario?.factions.find((faction) => faction.role === 'own')
+  const selectedFactionRoles = selectedUnits.map(
+    (unit) =>
+      activeScenario?.factions.find((faction) => faction.id === unit.factionId)?.role,
+  )
+  const canRallySelectedUnits = Boolean(
+    ownFaction &&
+      selectedUnits.length >= 2 &&
+      selectedFactionRoles.every((role) => role === 'rally'),
+  )
+  const canNeutralizeSelectedUnits =
+    selectedUnits.length >= 2 &&
+    selectedFactionRoles.every((role) => role === 'obstacle') &&
+    selectedUnits.every((unit) => unit.status !== 'neutralized')
   const orderedDocuments = useMemo(
     () =>
       [...documents].sort((left, right) => {
@@ -432,13 +457,35 @@ export default function App() {
 
   const deleteSelection = useCallback(() => {
     if (!selection) return
-    safelyCommit(
-      selection.kind === 'unit'
-        ? { type: 'removeUnit', unitId: selection.id }
-        : { type: 'removeAnnotation', annotationId: selection.id },
-    )
+    if (selection.kind === 'unit') {
+      safelyCommit({ type: 'removeUnit', unitId: selection.id })
+    } else if (selection.kind === 'units') {
+      safelyCommit({ type: 'removeUnits', unitIds: selection.ids })
+    } else {
+      safelyCommit({ type: 'removeAnnotation', annotationId: selection.id })
+    }
+    setMultiSelectionOpen(false)
     setSelection(null)
   }, [safelyCommit, selection, setSelection])
+
+  const finishMultiSelection = useCallback(() => {
+    shiftSelectionRef.current = false
+    const currentSelection = useAppStore.getState().selection
+    if (currentSelection?.kind !== 'units') {
+      setMultiSelectionOpen(false)
+      return
+    }
+    const ids = [...new Set(currentSelection.ids)]
+    if (ids.length < 2) {
+      setMultiSelectionOpen(false)
+      setSelection(ids[0] ? { kind: 'unit', id: ids[0] } : null)
+      return
+    }
+    setMultiSelectionOpen(true)
+    setRightPanelOpen(false)
+    setLeftPanelOpen(true)
+    notify(`${ids.length} unités sélectionnées.`)
+  }, [notify, setLeftPanelOpen, setRightPanelOpen, setSelection])
 
   useEffect(() => {
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
@@ -449,6 +496,11 @@ export default function App() {
         return
       }
       if (isEditableTarget(event.target)) return
+      if (event.key === 'Shift' && !event.repeat) {
+        shiftSelectionRef.current = true
+        setMultiSelectionOpen(false)
+        return
+      }
       if (modifier && event.key.toLowerCase() === 'z') {
         event.preventDefault()
         if (event.shiftKey) redo()
@@ -461,15 +513,33 @@ export default function App() {
         return
       }
       if (event.key === 'Escape') {
+        shiftSelectionRef.current = false
+        setMultiSelectionOpen(false)
         setSelection(null)
         setTool('select')
         setLeftPanelOpen(false)
         setRightPanelOpen(false)
       }
     }
+    const handleKeyUp = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Shift' && shiftSelectionRef.current) finishMultiSelection()
+    }
+    const handleWindowBlur = () => {
+      if (shiftSelectionRef.current) finishMultiSelection()
+    }
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [deleteSelection, forceSave, notify, redo, setLeftPanelOpen, setRightPanelOpen, setSelection, setTool, undo])
+    window.addEventListener('keyup', handleKeyUp)
+    window.addEventListener('blur', handleWindowBlur)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+      window.removeEventListener('blur', handleWindowBlur)
+    }
+  }, [deleteSelection, finishMultiSelection, forceSave, notify, redo, setLeftPanelOpen, setRightPanelOpen, setSelection, setTool, undo])
+
+  useEffect(() => {
+    if (selection?.kind !== 'units') setMultiSelectionOpen(false)
+  }, [selection])
 
   const createScenario = async (
     name: string,
@@ -768,6 +838,42 @@ export default function App() {
     if (changed) notify('Obstacle neutralisé.', 'success')
   }
 
+  const changeSelectedUnitsStatus = (status: UnitStatus) => {
+    if (selectedUnits.length < 2) return
+    const changed = safelyCommit({
+      type: 'updateUnits',
+      unitIds: selectedUnits.map((unit) => unit.id),
+      changes: { status },
+    })
+    if (changed) {
+      notify(`Statut mis à jour pour ${selectedUnits.length} unités.`, 'success')
+    }
+  }
+
+  const rallySelectedUnits = () => {
+    if (!ownFaction || !canRallySelectedUnits) return
+    const changed = safelyCommit({
+      type: 'updateUnits',
+      unitIds: selectedUnits.map((unit) => unit.id),
+      changes: { factionId: ownFaction.id, status: 'active' },
+    })
+    if (changed) {
+      notify(`${selectedUnits.length} unités ralliées à vos forces.`, 'success')
+    }
+  }
+
+  const neutralizeSelectedUnits = () => {
+    if (!canNeutralizeSelectedUnits) return
+    const changed = safelyCommit({
+      type: 'updateUnits',
+      unitIds: selectedUnits.map((unit) => unit.id),
+      changes: { status: 'neutralized' },
+    })
+    if (changed) {
+      notify(`${selectedUnits.length} obstacles neutralisés.`, 'success')
+    }
+  }
+
   const reachObjective = (unitId: string, objectiveUnitId: string) => {
     const changed = safelyCommit({ type: 'reachObjective', unitId, objectiveUnitId })
     if (!changed) return
@@ -936,23 +1042,41 @@ export default function App() {
 
       <main className={styles.workspace}>
         <div className={styles.leftPanel}>
-          <LibraryPanel
-            activeFactionId={placementFaction?.id ?? null}
-            activeUnitTypeId={placementType?.id ?? null}
-            factions={activeScenario.factions}
-            onClose={() => setLeftPanelOpen(false)}
-            onCreateCustomType={createCustomType}
-            onCreateFaction={createFaction}
-            onDeleteCustomType={deleteCustomType}
-            onDeleteFaction={deleteFaction}
-            onEditCustomType={editCustomType}
-            onEditFaction={editFaction}
-            onSelectFaction={setActiveFactionId}
-            onSelectUnitType={setSelectedTypeId}
-            open={leftPanelOpen || desktopLayout}
-            resolveAssetUrl={(assetId) => assetUrls[assetId]}
-            unitTypes={unitTypes}
-          />
+          {multiSelectionOpen && selectedUnits.length >= 2 ? (
+            <MultiUnitActionsPanel
+              onChangeStatus={changeSelectedUnitsStatus}
+              onClearSelection={() => {
+                setMultiSelectionOpen(false)
+                setSelection(null)
+                setLeftPanelOpen(false)
+              }}
+              onClose={() => setLeftPanelOpen(false)}
+              onNeutralize={
+                canNeutralizeSelectedUnits ? neutralizeSelectedUnits : undefined
+              }
+              onRally={canRallySelectedUnits ? rallySelectedUnits : undefined}
+              open={leftPanelOpen || desktopLayout}
+              units={selectedUnits}
+            />
+          ) : (
+            <LibraryPanel
+              activeFactionId={placementFaction?.id ?? null}
+              activeUnitTypeId={placementType?.id ?? null}
+              factions={activeScenario.factions}
+              onClose={() => setLeftPanelOpen(false)}
+              onCreateCustomType={createCustomType}
+              onCreateFaction={createFaction}
+              onDeleteCustomType={deleteCustomType}
+              onDeleteFaction={deleteFaction}
+              onEditCustomType={editCustomType}
+              onEditFaction={editFaction}
+              onSelectFaction={setActiveFactionId}
+              onSelectUnitType={setSelectedTypeId}
+              open={leftPanelOpen || desktopLayout}
+              resolveAssetUrl={(assetId) => assetUrls[assetId]}
+              unitTypes={unitTypes}
+            />
+          )}
         </div>
 
         <section className={styles.center} aria-label="Éditeur tactique">
@@ -1042,6 +1166,7 @@ export default function App() {
             assetUrls={assetUrls}
             viewportRef={viewportRef}
             onSelectionChange={(nextSelection) => {
+              setMultiSelectionOpen(false)
               setSelection(nextSelection)
               if (nextSelection && !desktopLayout) setRightPanelOpen(false)
             }}
@@ -1096,9 +1221,18 @@ export default function App() {
       </main>
 
       <nav className={styles.mobileBottomBar} aria-label="Navigation mobile">
-        <button type="button" onClick={() => setLeftPanelOpen(true)}><PanelLeft aria-hidden />Unités</button>
+        <button type="button" onClick={() => setLeftPanelOpen(true)}>
+          <PanelLeft aria-hidden />
+          {multiSelectionOpen ? 'Actions' : 'Unités'}
+        </button>
         <button type="button" onClick={() => setTool('select')}><Grid3X3 aria-hidden />Sélection</button>
-        <button type="button" onClick={() => setRightPanelOpen(true)}><PanelRight aria-hidden />Propriétés</button>
+        <button
+          type="button"
+          disabled={selection?.kind === 'units'}
+          onClick={() => setRightPanelOpen(true)}
+        >
+          <PanelRight aria-hidden />Propriétés
+        </button>
         <button type="button" disabled={!history?.past.length} onClick={undo}><Undo2 aria-hidden />Annuler</button>
       </nav>
 

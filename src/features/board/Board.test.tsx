@@ -1,5 +1,5 @@
 import { createRef } from 'react'
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
@@ -9,7 +9,8 @@ import {
   createDefaultScenario,
   type ScenarioDocumentV1,
 } from '../../domain'
-import { Board, type BoardProps, type BoardSelection } from './Board'
+import { Board, type BoardProps } from './Board'
+import type { BoardSelection } from './selection'
 
 const infantry = BUILT_IN_UNIT_TYPES.find((type) => type.id === 'infantry')!
 
@@ -29,6 +30,18 @@ function createScenarioWithUnit(): ScenarioDocumentV1 {
     type: 'placeUnit',
     typeId: infantry.id,
     unitId: 'unit-alpha',
+  }).document
+}
+
+function createScenarioWithTwoUnits(): ScenarioDocumentV1 {
+  const first = createScenarioWithUnit()
+  return applyCommand(first, {
+    factionId: 'blue',
+    name: 'Bravo',
+    position: { column: 1, row: 0 },
+    type: 'placeUnit',
+    typeId: infantry.id,
+    unitId: 'unit-bravo',
   }).document
 }
 
@@ -130,6 +143,51 @@ describe('Board', () => {
     })
   })
 
+  it('accumule et retire des unités avec Shift sans déplacer le groupe', () => {
+    const scenario = createScenarioWithTwoUnits()
+    const props = boardProps({ scenario })
+    const view = render(<Board {...props} />)
+    const alpha = screen.getByRole('button', {
+      name: `Alpha, faction ${scenario.factions[0]?.name}, active`,
+    })
+    const bravo = screen.getByRole('button', {
+      name: `Bravo, faction ${scenario.factions[0]?.name}, active`,
+    })
+
+    fireEvent.click(alpha, { shiftKey: true })
+    expect(props.onSelectionChange).toHaveBeenLastCalledWith({
+      kind: 'units',
+      ids: ['unit-alpha'],
+    })
+
+    const firstSelection: BoardSelection = { kind: 'units', ids: ['unit-alpha'] }
+    view.rerender(<Board {...props} selection={firstSelection} />)
+    fireEvent.click(bravo, { shiftKey: true })
+    expect(props.onSelectionChange).toHaveBeenLastCalledWith({
+      kind: 'units',
+      ids: ['unit-alpha', 'unit-bravo'],
+    })
+
+    const groupSelection: BoardSelection = {
+      kind: 'units',
+      ids: ['unit-alpha', 'unit-bravo'],
+    }
+    view.rerender(<Board {...props} selection={groupSelection} />)
+    expect(alpha).toHaveAttribute('aria-pressed', 'true')
+    expect(bravo).toHaveAttribute('aria-pressed', 'true')
+
+    fireEvent.click(screen.getByRole('gridcell', { name: 'Case C1, vide' }), {
+      shiftKey: true,
+    })
+    expect(props.onMoveUnit).not.toHaveBeenCalled()
+
+    fireEvent.click(alpha, { shiftKey: true })
+    expect(props.onSelectionChange).toHaveBeenLastCalledWith({
+      kind: 'units',
+      ids: ['unit-bravo'],
+    })
+  })
+
   it('crée une flèche en deux clics avec le style actif', async () => {
     const user = userEvent.setup()
     const props = boardProps({
@@ -226,5 +284,45 @@ describe('Board', () => {
     await user.click(objectiveButton)
 
     expect(onReachObjective).toHaveBeenCalledWith('commander-one', 'objective-one')
+  })
+
+  it('ajoute un objectif à la sélection avec Shift sans le déclencher', () => {
+    const base = createDefaultScenario('Test')
+    const commander = applyCommand(base, {
+      type: 'placeUnit',
+      unitId: 'commander-one',
+      typeId: 'commander',
+      factionId: base.factions.find((faction) => faction.role === 'own')!.id,
+      position: { row: 0, column: 0 },
+      name: 'Commandant',
+    }).document
+    const scenario = applyCommand(commander, {
+      type: 'placeUnit',
+      unitId: 'objective-one',
+      typeId: 'objective',
+      factionId: base.factions.find((faction) => faction.role === 'objective')!.id,
+      position: { row: 0, column: 1 },
+      name: 'Objectif final',
+    }).document
+    const onReachObjective = vi.fn()
+    const props = boardProps({
+      scenario,
+      selection: { kind: 'unit', id: 'commander-one' },
+      onReachObjective,
+    })
+    render(<Board {...props} />)
+
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: 'Objectif final, faction Objectifs, active',
+      }),
+      { shiftKey: true },
+    )
+
+    expect(onReachObjective).not.toHaveBeenCalled()
+    expect(props.onSelectionChange).toHaveBeenCalledWith({
+      kind: 'units',
+      ids: ['commander-one', 'objective-one'],
+    })
   })
 })

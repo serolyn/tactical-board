@@ -1,0 +1,100 @@
+.panelBody {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+.selectionSection,
+.actionSection {
+  padding: 1.1rem;
+  border-bottom: 1px solid var(--tb-border);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.sectionHeading svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--tb-accent);
+}
+
+.selectionSection h3,
+.actionSection h3 {
+  margin: 0 0 0.75rem;
+  color: var(--tb-text-muted);
+  font-size: 0.69rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.sectionHeading h3 {
+  margin: 0;
+}
+
+.unitList {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  color: var(--tb-text);
+  font-size: 0.8rem;
+  list-style: none;
+}
+
+.unitList li {
+  overflow: hidden;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--tb-border-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.actionStack {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.actionStack button {
+  width: 100%;
+}
+
+.statusField {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.statusField span {
+  color: var(--tb-text-muted);
+  font-size: 0.76rem;
+}
+
+.hint {
+  margin: 0.65rem 0 0;
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.emptyState {
+  margin: 1.1rem;
+  padding: 0.9rem;
+  border-left: 3px solid var(--tb-border-strong);
+  border-radius: 3px;
+  color: var(--tb-text-muted);
+  background: var(--tb-surface-raised);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.footer {
+  margin-top: auto;
+  padding: 1rem;
+}
+
+.footer button {
+  width: 100%;
+}

@@ -9,7 +9,7 @@ import {
   type ScenarioCommand,
   type ScenarioDocumentV1,
 } from '../domain'
-import type { BoardSelection } from '../features/board/Board'
+import type { BoardSelection } from '../features/board/selection'
 import type { ArrowStyle, BoardTool, MarkerKind } from '../features/board/BoardToolbar'
 
 export interface AppNotification {
@@ -77,6 +77,13 @@ function selectionStillExists(
   if (!selection) return null
   if (selection.kind === 'unit') {
     return document.units.some((unit) => unit.id === selection.id) ? selection : null
+  }
+  if (selection.kind === 'units') {
+    const availableIds = new Set(document.units.map((unit) => unit.id))
+    const ids = [...new Set(selection.ids)].filter((id) => availableIds.has(id))
+    if (!ids.length) return null
+    if (ids.length === 1) return { kind: 'unit', id: ids[0]! }
+    return { kind: 'units', ids }
   }
   return document.annotations.some((annotation) => annotation.id === selection.id) ? selection : null
 }
@@ -235,10 +242,12 @@ export const useAppStore = create<AppStoreState>((set, get) => ({
     set({ activeFactionId: id })
   },
   setSelection(selection) {
+    const inspectable = selection?.kind === 'unit' || selection?.kind === 'annotation'
     set({
       selection,
-      rightPanelOpen: Boolean(selection),
-      leftPanelOpen: selection ? false : get().leftPanelOpen,
+      rightPanelOpen: inspectable,
+      leftPanelOpen:
+        selection && selection.kind !== 'units' ? false : get().leftPanelOpen,
     })
   },
   setZoom(zoom) {

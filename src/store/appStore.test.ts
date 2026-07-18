@@ -140,6 +140,68 @@ describe('appStore — commandes et historique', () => {
 })
 
 describe('appStore — scénarios et sélection', () => {
+  it('conserve une sélection multiple dans le panneau gauche sans ouvrir l’inspecteur', () => {
+    const initial = makeScenario('alpha', 'Alpha')
+    const first = applyCommand(initial, {
+      type: 'placeUnit',
+      unitId: 'unit-1',
+      typeId: 'infantry',
+      factionId: 'alpha-blue',
+      position: { row: 0, column: 0 },
+    }).document
+    const populated = applyCommand(first, {
+      type: 'placeUnit',
+      unitId: 'unit-2',
+      typeId: 'tank',
+      factionId: 'alpha-blue',
+      position: { row: 0, column: 1 },
+    }).document
+    useAppStore.getState().hydrate([populated])
+    useAppStore.getState().setLeftPanelOpen(true)
+
+    useAppStore.getState().setSelection({
+      kind: 'units',
+      ids: ['unit-1', 'unit-2'],
+    })
+
+    expect(useAppStore.getState().selection).toEqual({
+      kind: 'units',
+      ids: ['unit-1', 'unit-2'],
+    })
+    expect(useAppStore.getState().leftPanelOpen).toBe(true)
+    expect(useAppStore.getState().rightPanelOpen).toBe(false)
+  })
+
+  it('normalise une sélection multiple quand une unité disparaît', () => {
+    const initial = makeScenario('alpha', 'Alpha')
+    const first = applyCommand(initial, {
+      type: 'placeUnit',
+      unitId: 'unit-1',
+      typeId: 'infantry',
+      factionId: 'alpha-blue',
+      position: { row: 0, column: 0 },
+    }).document
+    const populated = applyCommand(first, {
+      type: 'placeUnit',
+      unitId: 'unit-2',
+      typeId: 'tank',
+      factionId: 'alpha-blue',
+      position: { row: 0, column: 1 },
+    }).document
+    useAppStore.getState().hydrate([populated])
+    useAppStore.getState().setSelection({
+      kind: 'units',
+      ids: ['unit-1', 'unit-2'],
+    })
+
+    useAppStore.getState().commit({ type: 'removeUnit', unitId: 'unit-1' })
+
+    expect(useAppStore.getState().selection).toEqual({
+      kind: 'unit',
+      id: 'unit-2',
+    })
+  })
+
   it('bascule de scénario et réinitialise l’état éphémère associé', () => {
     const alpha = makeScenario('alpha', 'Alpha')
     const bravo = makeScenario('bravo', 'Bravo')
