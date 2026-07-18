@@ -37,13 +37,22 @@
   isolation: isolate;
   border: 2px solid #56655d;
   border-radius: 2px;
-  background: #46534e;
+  background-color: #23271f;
+  background-image: url('../../assets/tactical-terrain.webp');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
   box-shadow: 0 12px 28px rgb(0 0 0 / 30%);
   user-select: none;
 }
 
 .boardFrame::before {
-  display: none;
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: rgb(5 8 6 / 18%);
+  content: '';
+  pointer-events: none;
 }
 
 .grid {
@@ -64,24 +73,18 @@
   overflow: visible;
   padding: 0;
   border: 0;
-  border-right: 1px solid rgb(198 207 197 / 12%);
-  border-bottom: 1px solid rgb(198 207 197 / 12%);
+  border-right: 1px solid rgb(232 237 227 / 15%);
+  border-bottom: 1px solid rgb(232 237 227 / 15%);
   border-radius: 0;
   color: var(--text);
+  background: transparent;
   transition: filter 100ms ease, outline-color 100ms ease;
-}
-
-.cellLight {
-  background: #526158;
-}
-
-.cellDark {
-  background: #44534e;
 }
 
 .cell:hover,
 .cell:focus-visible {
   z-index: 4;
+  background: rgb(238 241 232 / 6%);
   filter: brightness(1.12);
   outline: 2px solid #c3ceb5;
   outline-offset: -2px;

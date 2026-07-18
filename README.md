@@ -44,6 +44,8 @@ Pour agir sur plusieurs unités, maintenez `Shift` et cliquez chacune d’elles.
 
 Le bouton **Plein écran** masque toute l’interface pour ne conserver que le plateau interactif. `Échap` ou le bouton discret en haut à droite restaure l’interface. Le mode se ferme aussi automatiquement lorsqu’un panneau d’actions ou un dialogue est nécessaire, par exemple après une multi-sélection.
 
+Le plateau utilise une texture de terrain centrée et recadrée sans déformation. La grille interactive reste dessinée séparément au-dessus du terrain avec des lignes discrètes, afin de conserver son alignement pour toutes les dimensions.
+
 Le menu **Plateau** règle les dimensions de 5 × 5 à 20 × 20, les coordonnées et le vidage complet. Une réduction qui retire du contenu demande confirmation et reste annulable.
 
 Les factions et types personnalisés sont propres à chaque scénario. Les images PNG, JPEG, WebP et SVG sont validées, nettoyées puis optimisées avant leur stockage. Archiver un type personnalisé ne modifie pas les unités déjà placées.

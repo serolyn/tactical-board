@@ -163,6 +163,15 @@ function boardProps(
 }
 
 describe('Board', () => {
+  it('affiche une surface de terrain unique sous la grille interactive', () => {
+    const { container } = render(<Board {...boardProps()} />)
+    const board = container.querySelector('[data-board-export]')
+    const cells = screen.getAllByRole('gridcell')
+
+    expect(board).toHaveAttribute('data-board-surface', 'terrain')
+    expect(cells[0]!.className).toBe(cells[1]!.className)
+  })
+
   it('place répétitivement le type et la faction actifs par clic', async () => {
     const user = userEvent.setup()
     const props = boardProps({ tool: 'place' })

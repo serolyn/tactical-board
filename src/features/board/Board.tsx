@@ -719,6 +719,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
           className={styles.boardFrame}
           style={cssVariables}
           data-board-export
+          data-board-surface="terrain"
           aria-label={`Plateau tactique ${scenario.grid.columns} par ${scenario.grid.rows}`}
         >
           <div
@@ -743,7 +744,6 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
                   role="gridcell"
                   className={[
                     styles.cell,
-                    (position.row + position.column) % 2 ? styles.cellDark : styles.cellLight,
                     target ? (dragPreview?.valid ? styles.cellTarget : styles.cellBlocked) : '',
                   ].filter(Boolean).join(' ')}
                   data-png-remove-class={
