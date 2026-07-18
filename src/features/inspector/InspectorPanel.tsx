@@ -74,6 +74,7 @@ export interface InspectorPanelProps {
   onRallyUnits?: () => void
   onUpdateAnnotation?: (annotationId: string, changes: AnnotationChanges) => void
   onUpdateUnit: (unitId: string, changes: UnitEditableChanges) => void
+  onUpdateUnitsFaction?: (factionId: string) => void
   onUpdateUnitsStatus?: (status: UnitStatus) => void
   open?: boolean
   resolveAssetUrl?: (assetId: string) => string | undefined
@@ -96,6 +97,7 @@ export function InspectorPanel({
   onRallyUnits,
   onUpdateAnnotation,
   onUpdateUnit,
+  onUpdateUnitsFaction,
   onUpdateUnitsStatus,
   open = true,
   resolveAssetUrl,
@@ -131,9 +133,11 @@ export function InspectorPanel({
     >
       {multiUnits ? (
         <MultiUnitInspector
+          factions={factions}
           onClearSelection={onClearUnitsSelection}
           onNeutralize={onNeutralizeUnits}
           onRally={onRallyUnits}
+          onUpdateFaction={onUpdateUnitsFaction}
           onUpdateStatus={onUpdateUnitsStatus}
           units={multiUnits}
         />
@@ -167,21 +171,27 @@ export function InspectorPanel({
 }
 
 interface MultiUnitInspectorProps {
+  factions: readonly Faction[]
   onClearSelection?: () => void
   onNeutralize?: () => void
   onRally?: () => void
+  onUpdateFaction?: (factionId: string) => void
   onUpdateStatus?: (status: UnitStatus) => void
   units: readonly TacticalUnit[]
 }
 
 function MultiUnitInspector({
+  factions,
   onClearSelection,
   onNeutralize,
   onRally,
+  onUpdateFaction,
   onUpdateStatus,
   units,
 }: MultiUnitInspectorProps) {
-  const hasActions = Boolean(onNeutralize || onRally || onUpdateStatus)
+  const hasActions = Boolean(
+    onNeutralize || onRally || onUpdateFaction || onUpdateStatus,
+  )
   const visibleUnits = units.slice(0, 4)
   const remainingCount = units.length - visibleUnits.length
 
@@ -232,10 +242,45 @@ function MultiUnitInspector({
             </section>
           ) : null}
 
+          {onUpdateFaction ? (
+            <section className={styles.section}>
+              <h3>Changer la faction</h3>
+              <label className={styles.multiSelectField}>
+                <span>Nouvelle faction commune</span>
+                <select
+                  aria-label="Nouvelle faction commune"
+                  defaultValue=""
+                  onChange={(event) => {
+                    const factionId = event.target.value
+                    if (!factionId) return
+                    onUpdateFaction(factionId)
+                    event.target.value = ''
+                  }}
+                >
+                  <option value="">Choisir une faction…</option>
+                  {factions.map((faction) => (
+                    <option
+                      disabled={units.every(
+                        (selectedUnit) => selectedUnit.factionId === faction.id,
+                      )}
+                      key={faction.id}
+                      value={faction.id}
+                    >
+                      {faction.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <p className={styles.multiHint}>
+                La faction est appliquée à toute la sélection en une seule fois.
+              </p>
+            </section>
+          ) : null}
+
           {onUpdateStatus ? (
             <section className={styles.section}>
               <h3>Changer le statut</h3>
-              <label className={styles.multiStatusField}>
+              <label className={styles.multiSelectField}>
                 <span>Nouveau statut commun</span>
                 <select
                   aria-label="Nouveau statut commun"

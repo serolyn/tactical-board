@@ -8,6 +8,12 @@ import { InspectorPanel } from './InspectorPanel'
 afterEach(cleanup)
 
 const faction: Faction = { color: '#2563eb', id: 'blue', name: 'Bleue', role: 'own' }
+const secondFaction: Faction = {
+  color: '#dc2626',
+  id: 'red',
+  name: 'Rouge',
+  role: 'custom',
+}
 const unitType: UnitType = {
   archived: false,
   builtin: true,
@@ -96,15 +102,17 @@ describe('InspectorPanel', () => {
   it('affiche les actions groupées directement dans l’inspecteur', async () => {
     const user = userEvent.setup()
     const onRallyUnits = vi.fn()
+    const onUpdateUnitsFaction = vi.fn()
     const onUpdateUnitsStatus = vi.fn()
 
     render(
       <InspectorPanel
-        factions={[faction]}
+        factions={[faction, secondFaction]}
         onChangeUnitType={vi.fn()}
         onDeleteUnit={vi.fn()}
         onRallyUnits={onRallyUnits}
         onUpdateUnit={vi.fn()}
+        onUpdateUnitsFaction={onUpdateUnitsFaction}
         onUpdateUnitsStatus={onUpdateUnitsStatus}
         units={[unit, secondUnit]}
         unitTypes={[unitType]}
@@ -117,6 +125,11 @@ describe('InspectorPanel', () => {
     expect(screen.getByText('Alpha')).toBeInTheDocument()
     expect(screen.getByText('Bravo')).toBeInTheDocument()
 
+    const factionSelect = screen.getByLabelText('Nouvelle faction commune')
+    expect(screen.getByRole('option', { name: 'Bleue' })).toBeDisabled()
+    await user.selectOptions(factionSelect, 'red')
+    expect(onUpdateUnitsFaction).toHaveBeenCalledWith('red')
+    expect(factionSelect).toHaveValue('')
     await user.selectOptions(screen.getByLabelText('Nouveau statut commun'), 'wounded')
     expect(onUpdateUnitsStatus).toHaveBeenCalledWith('wounded')
     await user.click(screen.getByRole('button', { name: 'Rallier la sélection' }))

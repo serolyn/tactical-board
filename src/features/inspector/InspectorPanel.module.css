@@ -69,12 +69,12 @@
   width: 100%;
 }
 
-.multiStatusField {
+.multiSelectField {
   display: grid;
   gap: 0.45rem;
 }
 
-.multiStatusField span {
+.multiSelectField span {
   color: var(--tb-text-muted, #91a1b3);
   font-size: 0.76rem;
 }

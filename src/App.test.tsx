@@ -184,4 +184,59 @@ describe('App — sélection multiple', () => {
     ).not.toBeInTheDocument()
     expect(useAppStore.getState().history?.past).toHaveLength(1)
   }, 10_000)
+
+  it('change la faction de toute la sélection en une seule action annulable', async () => {
+    const scenario = scenarioWithTwoUnits()
+    await tacticalBoardRepository.saveScenario(scenario)
+    await tacticalBoardRepository.setSetting('activeScenarioId', scenario.id)
+    await tacticalBoardRepository.setSetting(
+      'objectiveCampaignVersion',
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+    const user = userEvent.setup()
+    render(<App />)
+
+    const alpha = await screen.findByRole('button', {
+      name: 'Alpha, faction Mes forces, active',
+    })
+    const bravo = screen.getByRole('button', {
+      name: 'Bravo, faction Mes forces, active',
+    })
+    await user.keyboard('{Shift>}')
+    await user.click(alpha)
+    await user.click(bravo)
+    await user.keyboard('{/Shift}')
+
+    await user.selectOptions(
+      await screen.findByLabelText('Nouvelle faction commune'),
+      'obstacles',
+    )
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', {
+          name: 'Alpha, faction Obstacles, active',
+        }),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', {
+          name: 'Bravo, faction Obstacles, active',
+        }),
+      ).toBeInTheDocument()
+    })
+    expect(useAppStore.getState().history?.past).toHaveLength(1)
+
+    act(() => {
+      useAppStore.getState().undo()
+    })
+    expect(
+      screen.getByRole('button', {
+        name: 'Alpha, faction Mes forces, active',
+      }),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', {
+        name: 'Bravo, faction Mes forces, active',
+      }),
+    ).toBeInTheDocument()
+  }, 10_000)
 })

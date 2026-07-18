@@ -848,6 +848,24 @@ export default function App() {
     }
   }
 
+  const changeSelectedUnitsFaction = (factionId: string) => {
+    const faction = activeScenario?.factions.find(
+      (candidate) => candidate.id === factionId,
+    )
+    if (selectedUnits.length < 2 || !faction) return
+    const changed = safelyCommit({
+      type: 'updateUnits',
+      unitIds: selectedUnits.map((unit) => unit.id),
+      changes: { factionId },
+    })
+    if (changed) {
+      notify(
+        `${selectedUnits.length} unités affectées à « ${faction.name} ».`,
+        'success',
+      )
+    }
+  }
+
   const rallySelectedUnits = () => {
     if (!ownFaction || !canRallySelectedUnits) return
     const changed = safelyCommit({
@@ -1185,6 +1203,7 @@ export default function App() {
               canNeutralizeSelectedUnits ? neutralizeSelectedUnits : undefined
             }
             onRallyUnits={canRallySelectedUnits ? rallySelectedUnits : undefined}
+            onUpdateUnitsFaction={changeSelectedUnitsFaction}
             onUpdateUnitsStatus={changeSelectedUnitsStatus}
             onUpdateAnnotation={updateAnnotation}
             onUpdateUnit={updateUnit}
