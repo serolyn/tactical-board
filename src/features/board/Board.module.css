@@ -248,6 +248,7 @@
 }
 
 .iconFrame svg,
+.iconFrame img,
 .iconImage {
   width: 68%;
   height: 68%;

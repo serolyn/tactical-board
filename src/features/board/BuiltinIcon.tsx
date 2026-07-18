@@ -24,6 +24,7 @@ import {
   Warehouse,
   Wrench,
 } from 'lucide-react'
+import { resolveBuiltinUnitIconImage } from '../../components/builtinUnitIconImages'
 
 type SvgComponent = ComponentType<SVGProps<SVGSVGElement>>
 
@@ -85,11 +86,17 @@ function ArtilleryIcon(props: SVGProps<SVGSVGElement>) {
   )
 }
 
-export interface BuiltinIconProps extends SVGProps<SVGSVGElement> {
+export interface BuiltinIconProps {
+  'aria-hidden'?: boolean
+  className?: string
   iconKey: string
 }
 
 export function BuiltinIcon({ iconKey, ...props }: BuiltinIconProps) {
+  const imageUrl = resolveBuiltinUnitIconImage(iconKey)
+  if (imageUrl) {
+    return <img alt="" draggable={false} src={imageUrl} {...props} />
+  }
   if (iconKey === 'tank') return <TankIcon {...props} />
   if (iconKey === 'cavalry' || iconKey === 'horse') return <CavalryIcon {...props} />
   if (iconKey === 'artillery') return <ArtilleryIcon {...props} />

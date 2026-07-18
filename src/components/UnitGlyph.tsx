@@ -31,6 +31,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 
+import { resolveBuiltinUnitIconImage } from './builtinUnitIconImages'
 import styles from './UnitGlyph.module.css'
 
 const ICONS: Record<string, LucideIcon> = {
@@ -87,13 +88,15 @@ export function UnitGlyph({
   iconKey = '',
   imageUrl,
 }: UnitGlyphProps) {
-  if (imageUrl) {
+  const resolvedImageUrl = imageUrl ?? resolveBuiltinUnitIconImage(iconKey)
+
+  if (resolvedImageUrl) {
     return (
       <img
         alt={alt}
         className={`${styles.image} ${className}`}
         draggable={false}
-        src={imageUrl}
+        src={resolvedImageUrl}
       />
     )
   }
