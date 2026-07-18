@@ -1,0 +1,176 @@
+.toolbar {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #151d1b;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.group {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.group + .group {
+  padding-left: 9px;
+  border-left: 1px solid var(--border);
+}
+
+.toolButton {
+  position: relative;
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-soft);
+  background: transparent;
+}
+
+.toolButton:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.toolButtonActive {
+  border-color: transparent;
+  border-bottom-color: var(--accent);
+  color: var(--accent-strong);
+  background: #222d29;
+}
+
+.toolButton svg {
+  width: 18px;
+  height: 18px;
+}
+
+.toolLabel {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.context {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.arrowPalette {
+  background: #19221f;
+  border: 0;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+  gap: 4px;
+  padding: 0 0 0 10px;
+}
+
+.arrowPreset {
+  align-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-soft);
+  display: inline-flex;
+  gap: 6px;
+  min-height: 44px;
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+
+.arrowPreset::before {
+  border-top: 2px dashed var(--arrow-preset-color);
+  content: '';
+  width: 16px;
+}
+
+.arrowPreset:last-child::before {
+  border-top-style: solid;
+}
+
+.arrowPreset:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.arrowPreset:focus-visible {
+  outline: 2px solid var(--focus, #58a6ff);
+  outline-offset: 1px;
+}
+
+.arrowPresetActive {
+  background: #26312d;
+  border-color: transparent;
+  border-bottom-color: var(--arrow-preset-color);
+  color: var(--text);
+}
+
+.arrowPreset svg {
+  color: var(--arrow-preset-color);
+  height: 15px;
+  width: 15px;
+}
+
+.select,
+.color {
+  width: auto;
+  min-height: 44px;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+
+.color {
+  width: 44px;
+  padding: 3px;
+}
+
+@media (max-width: 767px) {
+  .toolbar {
+    gap: 8px;
+    padding: 7px 8px;
+  }
+
+  .toolButton {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .toolLabel {
+    display: none;
+  }
+
+  .context {
+    margin-left: 4px;
+  }
+
+  .arrowPalette {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    padding-right: 4px;
+  }
+
+  .arrowPreset {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 5px;
+  }
+
+  .arrowPreset::before,
+  .arrowPreset span {
+    display: none;
+  }
+}

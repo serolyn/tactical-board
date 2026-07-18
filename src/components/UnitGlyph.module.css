@@ -1,0 +1,12 @@
+.icon,
+.image {
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  width: 100%;
+}
+
+.image {
+  object-position: center;
+}

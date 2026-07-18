@@ -1,0 +1,346 @@
+.viewport {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  background: #0e1413;
+  touch-action: pan-x pan-y;
+}
+
+.viewport[data-tool='arrow'],
+.viewport[data-tool='marker'],
+.viewport[data-tool='erase'] {
+  cursor: crosshair;
+}
+
+.viewport[data-tool='place'] .unit,
+.viewport[data-tool='arrow'] .unit,
+.viewport[data-tool='marker'] .unit,
+.viewport[data-tool='erase'] .unit {
+  pointer-events: none;
+}
+
+.stage {
+  display: grid;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  place-items: center;
+  padding: 64px;
+}
+
+.boardFrame {
+  position: relative;
+  isolation: isolate;
+  border: 2px solid #56655d;
+  border-radius: 2px;
+  background: #46534e;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 30%);
+  user-select: none;
+}
+
+.boardFrame::before {
+  display: none;
+}
+
+.grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  min-width: 28px;
+  min-height: 28px;
+  appearance: none;
+  place-items: center;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid rgb(198 207 197 / 12%);
+  border-bottom: 1px solid rgb(198 207 197 / 12%);
+  border-radius: 0;
+  color: var(--text);
+  transition: filter 100ms ease, outline-color 100ms ease;
+}
+
+.cellLight {
+  background: #526158;
+}
+
+.cellDark {
+  background: #44534e;
+}
+
+.cell:hover,
+.cell:focus-visible {
+  z-index: 4;
+  filter: brightness(1.12);
+  outline: 2px solid #c3ceb5;
+  outline-offset: -2px;
+}
+
+.cellTarget {
+  z-index: 4;
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.cellBlocked {
+  outline: 3px solid var(--danger);
+  outline-offset: -3px;
+}
+
+.coordinate {
+  position: absolute;
+  z-index: 2;
+  top: 3px;
+  left: 4px;
+  color: rgb(227 233 222 / 48%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: max(7px, calc(var(--cell-size) * 0.13));
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  pointer-events: none;
+}
+
+.unitLayer {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.unit {
+  position: absolute;
+  display: flex;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: calc(var(--cell-size) * 0.08) calc(var(--cell-size) * 0.08) 3px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  transition: transform 110ms ease, opacity 110ms ease, background 110ms ease;
+}
+
+.unit:hover {
+  background: rgb(238 241 232 / 6%);
+  transform: translateY(-1px);
+}
+
+.unitSelected {
+  z-index: 6;
+  background: rgb(164 181 139 / 13%);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.unitDestroyed {
+  opacity: 0.52;
+  filter: grayscale(0.8);
+}
+
+.unitNeutralized {
+  filter: grayscale(0.65);
+  opacity: 0.5;
+}
+
+.unitHidden {
+  opacity: 0.42;
+}
+
+.iconFrame {
+  position: relative;
+  display: grid;
+  width: calc(var(--cell-size) * 0.58);
+  height: calc(var(--cell-size) * 0.58);
+  max-width: 48px;
+  max-height: 48px;
+  min-width: 17px;
+  min-height: 17px;
+  place-items: center;
+  border: max(2px, calc(var(--cell-size) * 0.04)) solid var(--faction-color);
+  border-radius: 50%;
+  color: var(--unit-color);
+  background: #17201d;
+}
+
+.iconFrame svg,
+.iconImage {
+  width: 68%;
+  height: 68%;
+}
+
+.iconImage {
+  display: block;
+  object-fit: contain;
+}
+
+.unitLabel {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: #eef1e9;
+  background: rgb(12 17 15 / 72%);
+  font-size: max(7px, calc(var(--cell-size) * 0.12));
+  font-weight: 600;
+  line-height: 1.05;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 1px #000;
+  white-space: nowrap;
+}
+
+.factionBadge,
+.statusBadge {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: max(12px, calc(var(--cell-size) * 0.2));
+  height: max(12px, calc(var(--cell-size) * 0.2));
+  place-items: center;
+  border: 1px solid rgb(238 241 232 / 28%);
+  border-radius: 999px;
+  color: #fff;
+  font-size: max(7px, calc(var(--cell-size) * 0.1));
+  font-weight: 800;
+  line-height: 1;
+}
+
+.factionBadge {
+  right: -4px;
+  bottom: -2px;
+  background: var(--faction-color);
+}
+
+.statusBadge {
+  top: -4px;
+  left: -4px;
+  background: #273743;
+}
+
+.statusWounded {
+  color: #1b1000;
+  background: var(--warning);
+}
+
+.statusDestroyed {
+  background: var(--danger);
+}
+
+.statusNeutralized {
+  background: #53616c;
+  border-style: dashed;
+}
+
+.statusHidden {
+  background: #657783;
+}
+
+.annotationLayer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.arrow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.marker {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  width: calc(var(--cell-size) * 0.32);
+  height: calc(var(--cell-size) * 0.32);
+  min-width: 15px;
+  min-height: 15px;
+  place-items: center;
+  transform: translate(calc(var(--cell-size) * 0.64), calc(var(--cell-size) * 0.05));
+  border: 1px solid rgb(245 246 239 / 58%);
+  border-radius: 50% 50% 50% 15%;
+  color: #071016;
+  background: var(--marker-color);
+  pointer-events: none;
+}
+
+.marker svg {
+  width: 65%;
+  height: 65%;
+}
+
+.markerLabel {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 50%;
+  max-width: calc(var(--cell-size) * 0.92);
+  transform: translateX(-50%);
+  overflow: hidden;
+  padding: 1px 4px;
+  border-radius: 2px;
+  color: #f5fafc;
+  background: rgb(15 20 18 / 88%);
+  font-size: max(7px, calc(var(--cell-size) * 0.11));
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markerSelected {
+  outline: 2px solid #e7eadf;
+  outline-offset: 1px;
+}
+
+.emptyHint {
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  left: 50%;
+  max-width: min(300px, 78vw);
+  transform: translate(-50%, -50%);
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-soft);
+  background: #19211f;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.previewLine {
+  opacity: 0.72;
+}
+
+@media (max-width: 767px) {
+  .stage {
+    padding: 36px;
+  }
+
+  .boardFrame {
+    box-shadow: 0 8px 18px rgb(0 0 0 / 26%);
+  }
+}

@@ -1,0 +1,117 @@
+.field,
+.fieldset {
+  border: 0;
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.label,
+.legend {
+  color: var(--tb-text-muted, #91a1b3);
+  font: 650 0.72rem/1.25 var(--tb-font, Inter, system-ui, sans-serif);
+  letter-spacing: 0.025em;
+}
+
+.legend {
+  margin-bottom: 0.45rem;
+}
+
+.input,
+.select,
+.textarea {
+  background: color-mix(in srgb, var(--tb-input, #0b131c) 88%, var(--tb-surface-raised, #172331));
+  border: 1px solid color-mix(in srgb, var(--tb-border, #2a3b4f) 72%, transparent);
+  border-radius: 0.5rem;
+  box-sizing: border-box;
+  color: var(--tb-text, #e6edf5);
+  font: 500 0.82rem/1.35 var(--tb-font, Inter, system-ui, sans-serif);
+  min-height: 2.75rem;
+  padding: 0.68rem 0.78rem;
+  width: 100%;
+}
+
+.textarea {
+  min-height: 5.4rem;
+  resize: vertical;
+}
+
+.input:hover,
+.select:hover,
+.textarea:hover {
+  border-color: var(--tb-border-strong, #3c536d);
+}
+
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--tb-focus, #58a6ff);
+  box-shadow: none;
+  outline: 2px solid var(--tb-focus, #58a6ff);
+  outline-offset: 1px;
+}
+
+.input:disabled,
+.select:disabled,
+.textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+.colorRow {
+  align-items: center;
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: 2.75rem 1fr;
+}
+
+.color {
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--tb-border, #2a3b4f) 72%, transparent);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  height: 2.75rem;
+  padding: 0.22rem;
+  width: 2.75rem;
+}
+
+.hint,
+.error {
+  color: var(--tb-text-muted, #91a1b3);
+  font: 400 0.7rem/1.35 var(--tb-font, Inter, system-ui, sans-serif);
+  margin: 0;
+}
+
+.error {
+  color: var(--tb-danger-text, #ffb8b8);
+}
+
+.row {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.checkRow {
+  align-items: center;
+  color: var(--tb-text, #e6edf5);
+  cursor: pointer;
+  display: flex;
+  font: 500 0.8rem/1.3 var(--tb-font, Inter, system-ui, sans-serif);
+  gap: 0.55rem;
+  min-height: 2.75rem;
+}
+
+.checkRow input {
+  accent-color: var(--tb-accent, #1976d2);
+  height: 1.05rem;
+  width: 1.05rem;
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,101 @@
+.button {
+  --button-color: var(--tb-text, #e6edf5);
+  align-items: center;
+  background: var(--tb-surface-raised, #172331);
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  color: var(--button-color);
+  cursor: pointer;
+  display: inline-flex;
+  font: 600 0.82rem/1 var(--tb-font, Inter, system-ui, sans-serif);
+  gap: 0.5rem;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 100ms ease;
+}
+
+.button svg {
+  flex: 0 0 auto;
+  height: 1.05rem;
+  width: 1.05rem;
+}
+
+.button:hover:not(:disabled) {
+  background: var(--tb-surface-hover, #203144);
+}
+
+.button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--tb-focus, #58a6ff);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
+.primary {
+  background: var(--tb-accent, #1976d2);
+  color: #10150f;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--tb-accent-hover, #2388eb);
+}
+
+.ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.danger {
+  --button-color: var(--tb-danger-text, #ffb8b8);
+  background: color-mix(in srgb, var(--tb-danger, #ef5350) 12%, transparent);
+}
+
+.danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--tb-danger, #ef5350) 20%, transparent);
+}
+
+.iconOnly {
+  min-width: 2.75rem;
+  padding: 0;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.spinner {
+  animation: spin 800ms linear infinite;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  height: 0.9rem;
+  width: 0.9rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .spinner {
+    animation-duration: 1ms;
+    transition: none;
+  }
+}

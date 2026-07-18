@@ -1,0 +1,54 @@
+.stack {
+  display: grid;
+  gap: 22px;
+}
+
+.dimensions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.field input {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.toggle input {
+  width: 18px;
+  min-height: 18px;
+  accent-color: var(--accent);
+}
+
+.info {
+  margin: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-left: 2px solid var(--border);
+  border-radius: 0 6px 6px 0;
+  color: var(--text-dim);
+  background: var(--surface-0);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.spacer {
+  flex: 1;
+}

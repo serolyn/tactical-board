@@ -1,0 +1,78 @@
+.choiceGrid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.choice {
+  display: grid;
+  min-height: 5rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1.05rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  color: var(--tb-text, #e6edf5);
+  background: var(--tb-surface-raised, #172331);
+  text-align: left;
+}
+
+.choice:hover {
+  background: var(--tb-surface-hover, #203144);
+}
+
+.choice:focus-visible {
+  outline: 2px solid var(--tb-focus, #58a6ff);
+  outline-offset: 2px;
+}
+
+.choice svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  color: var(--tb-accent, #42d6b4);
+}
+
+.choice span {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.choice strong {
+  font-size: 0.85rem;
+}
+
+.choice small,
+.reachedText {
+  color: var(--tb-text-muted, #91a1b3);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.progressField {
+  display: grid;
+  gap: 0.45rem;
+  color: var(--tb-text-muted, #91a1b3);
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.footerSpacer {
+  flex: 1;
+}
+
+.detailsStack {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.dateGrid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 440px) {
+  .dateGrid {
+    grid-template-columns: 1fr;
+  }
+}

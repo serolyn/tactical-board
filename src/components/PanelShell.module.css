@@ -1,0 +1,114 @@
+.panel {
+  background: var(--tb-surface, #101923);
+  border-color: var(--tb-border, #2a3b4f);
+  color: var(--tb-text, #e6edf5);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  width: var(--tb-panel-width, 18rem);
+}
+
+.left {
+  border-right-style: solid;
+  border-right-width: 1px;
+}
+
+.right {
+  border-left-style: solid;
+  border-left-width: 1px;
+}
+
+.header {
+  align-items: flex-start;
+  border-bottom: 1px solid var(--tb-border, #2a3b4f);
+  display: flex;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1.2rem 1.15rem 1.05rem;
+}
+
+.header h2 {
+  color: inherit;
+  font: 700 0.95rem/1.3 var(--tb-font, Inter, system-ui, sans-serif);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.header p {
+  color: var(--tb-text-muted, #91a1b3);
+  font: 400 0.75rem/1.4 var(--tb-font, Inter, system-ui, sans-serif);
+  margin: 0.3rem 0 0;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.backdrop {
+  display: none;
+}
+
+@media (max-width: 1179px) {
+  .panel {
+    bottom: 0;
+    height: auto;
+    box-shadow: 0.75rem 0 2rem rgb(0 0 0 / 28%);
+    max-width: min(88vw, 22rem);
+    position: fixed;
+    top: var(--tb-topbar-height, 4rem);
+    transition: transform 180ms ease;
+    width: 22rem;
+    z-index: 55;
+  }
+
+  .left {
+    left: 0;
+    transform: translateX(-105%);
+  }
+
+  .right {
+    right: 0;
+    box-shadow: -0.75rem 0 2rem rgb(0 0 0 / 28%);
+    transform: translateX(105%);
+  }
+
+  .open {
+    transform: translateX(0);
+  }
+
+  .backdrop {
+    background: rgb(2 8 14 / 58%);
+    border: 0;
+    bottom: 0;
+    display: block;
+    inset-inline: 0;
+    position: fixed;
+    top: var(--tb-topbar-height, 4rem);
+    z-index: 50;
+  }
+}
+
+@media (max-width: 767px) {
+  .panel {
+    border: 0;
+    border-top: 1px solid var(--tb-border, #2a3b4f);
+    border-bottom: 0;
+    bottom: 3.625rem;
+    border-radius: 1rem 1rem 0 0;
+    box-shadow: 0 -0.75rem 2rem rgb(0 0 0 / 28%);
+    left: 0;
+    max-height: calc(78svh - 3.625rem);
+    max-width: none;
+    right: 0;
+    top: auto;
+    transform: translateY(105%);
+    width: 100%;
+  }
+
+  .open {
+    transform: translateY(0);
+  }
+}

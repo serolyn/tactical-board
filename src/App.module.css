@@ -1,0 +1,370 @@
+.app {
+  --tb-surface: var(--surface-1);
+  --tb-surface-raised: var(--surface-2);
+  --tb-surface-hover: var(--surface-3);
+  --tb-input: #111816;
+  --tb-border: var(--border);
+  --tb-border-strong: var(--border-strong);
+  --tb-text: var(--text);
+  --tb-text-muted: var(--text-soft);
+  --tb-accent: var(--accent);
+  --tb-accent-hover: var(--accent-strong);
+  --tb-accent-soft: var(--accent-soft);
+  --tb-focus: var(--accent);
+  --tb-danger: var(--danger);
+  --tb-warning: var(--warning);
+  --tb-topbar-height: 64px;
+  display: grid;
+  width: 100vw;
+  height: 100dvh;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  color: var(--text);
+}
+
+.workspace {
+  display: grid;
+  min-width: 0;
+  min-height: 0;
+  grid-template-columns: 282px minmax(0, 1fr) 326px;
+  background: var(--surface-0);
+}
+
+.leftPanel,
+.rightPanel {
+  --tb-panel-width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: #151d1b;
+}
+
+.leftPanel {
+  border-right: 1px solid var(--border);
+}
+
+.rightPanel {
+  border-left: 1px solid var(--border);
+}
+
+.center {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  background: #0d1312;
+}
+
+.boardMeta {
+  display: flex;
+  min-height: 62px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-dim);
+  background: #141c1a;
+  font-size: 12px;
+}
+
+.scenarioSummary {
+  display: grid;
+  min-width: 0;
+  max-width: min(520px, 42vw);
+  gap: 5px;
+}
+
+.scenarioHeading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.scenarioPulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-soft);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.scenarioPulse::before {
+  width: 3px;
+  height: 14px;
+  border-radius: 1px;
+  background: var(--accent);
+  content: '';
+}
+
+.scenarioPeriod {
+  overflow: hidden;
+  color: var(--text-dim);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scenarioObjective {
+  overflow: hidden;
+  color: #c2c9bf;
+  font-size: 12px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archivedBadge {
+  padding: 2px 6px;
+  border: 0;
+  border-radius: 3px;
+  color: #c2c9bf;
+  background: #29332f;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.metaSpacer {
+  flex: 1;
+}
+
+.zoomGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 0 0 8px;
+  border: 0;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.zoomGroup button {
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 4px;
+  color: var(--text-soft);
+  background: transparent;
+}
+
+.zoomGroup button:hover {
+  color: var(--text);
+  background: var(--surface-3);
+}
+
+.zoomValue {
+  min-width: 48px;
+  color: var(--text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-align: center;
+}
+
+.metaAction {
+  display: inline-flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text-soft);
+  background: transparent;
+  font-size: 12px;
+}
+
+.metaAction:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.metaAction svg {
+  width: 15px;
+  height: 15px;
+}
+
+.loading {
+  display: grid;
+  width: 100vw;
+  height: 100dvh;
+  place-items: center;
+  color: var(--text-soft);
+  background: var(--bg);
+}
+
+.loadingCard {
+  display: grid;
+  place-items: center;
+  gap: 16px;
+}
+
+.loadingMark {
+  display: grid;
+  width: 58px;
+  height: 58px;
+  place-items: center;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.loadingMark svg {
+  width: 28px;
+  height: 28px;
+}
+
+.errorBanner {
+  position: absolute;
+  z-index: 50;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  max-width: 720px;
+  align-items: center;
+  gap: 12px;
+  margin-inline: auto;
+  padding: 12px 14px;
+  border: 0;
+  border-left: 3px solid var(--danger);
+  border-radius: 3px;
+  color: #ffe2e4;
+  background: #382122;
+}
+
+.errorBanner p {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+}
+
+.errorBanner button {
+  min-height: 44px;
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.toast {
+  position: fixed;
+  z-index: 100;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  max-width: min(420px, calc(100vw - 36px));
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 0;
+  border-left: 3px solid var(--border-strong);
+  border-radius: 4px;
+  color: var(--text);
+  background: #202a27;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 24%);
+  font-size: 13px;
+}
+
+.toastSuccess {
+  border-color: var(--accent);
+}
+
+.toastError {
+  border-color: var(--danger);
+}
+
+.toast button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.mobileBottomBar {
+  display: none;
+}
+
+@media (max-width: 1179px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .leftPanel,
+  .rightPanel {
+    display: contents;
+  }
+
+  .scenarioSummary {
+    max-width: 34vw;
+  }
+}
+
+@media (max-width: 767px) {
+  .workspace {
+    padding-bottom: 58px;
+  }
+
+  .boardMeta {
+    gap: 6px;
+    min-height: 40px;
+    padding: 4px 7px;
+  }
+
+  .scenarioSummary,
+  .metaAction span,
+  .metaDesktop {
+    display: none;
+  }
+
+  .metaSpacer {
+    display: none;
+  }
+
+  .zoomGroup {
+    margin-left: auto;
+  }
+
+  .mobileBottomBar {
+    position: fixed;
+    z-index: 55;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    height: 58px;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 4px max(6px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+    border-top: 1px solid var(--border);
+    background: #131a18;
+  }
+
+  .mobileBottomBar button {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 4px;
+    border: 0;
+    border-radius: 4px;
+    color: var(--text-soft);
+    background: transparent;
+    font-size: 10px;
+  }
+
+  .mobileBottomBar svg {
+    width: 18px;
+    height: 18px;
+  }
+}

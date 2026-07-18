@@ -1,0 +1,38 @@
+.stack {
+  display: grid;
+  gap: 18px;
+}
+
+.dimensions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.optional {
+  color: var(--text-dim);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.period {
+  border: 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  margin: 2px 0 0;
+  padding: 18px 0 0;
+}
+
+.period legend {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 0 8px 0 0;
+}
