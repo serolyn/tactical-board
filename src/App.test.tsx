@@ -3,7 +3,12 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import App from './App'
-import { OBJECTIVE_CAMPAIGN_VERSION } from './data'
+import {
+  OBJECTIVE_CAMPAIGN_NAME,
+  OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING,
+  OBJECTIVE_CAMPAIGN_VERSION,
+  OBJECTIVE_CAMPAIGN_VERSION_SETTING,
+} from './data'
 import { applyCommand, createDefaultScenario } from './domain'
 import {
   deleteTacticalBoardDatabase,
@@ -72,6 +77,185 @@ function scenarioWithTwoUnits(factionId = 'own') {
     name: 'Bravo',
   }).document
 }
+
+function historicalCampaignV2() {
+  let document = createDefaultScenario(OBJECTIVE_CAMPAIGN_NAME, {
+    id: 'historical-campaign',
+    now: '2026-07-18T10:00:00.000Z',
+  })
+  document = { ...document, grid: { ...document.grid, rows: 20, columns: 20 } }
+  const ownFaction = document.factions.find((faction) => faction.role === 'own')!.id
+  const rallyFaction = document.factions.find((faction) => faction.role === 'rally')!.id
+  const objectiveFaction = document.factions.find((faction) => faction.role === 'objective')!.id
+  document = applyCommand(document, {
+    type: 'placeUnit',
+    unitId: 'objective-campaign-v1-unit-walid',
+    typeId: 'commander',
+    factionId: ownFaction,
+    position: { row: 18, column: 1 },
+    name: 'Walid',
+  }).document
+  document = applyCommand(document, {
+    type: 'placeUnit',
+    unitId: 'objective-campaign-v1-unit-city-lille',
+    typeId: 'fortress',
+    factionId: rallyFaction,
+    position: { row: 13, column: 5 },
+    name: 'Lille',
+  }).document
+  return applyCommand(document, {
+    type: 'placeUnit',
+    unitId: 'objective-campaign-v1-unit-final-objective',
+    typeId: 'objective',
+    factionId: objectiveFaction,
+    position: { row: 1, column: 18 },
+    name: 'Départ en L2 stabilisé — septembre 2026',
+  }).document
+}
+
+describe('App — migration de la campagne initiale', () => {
+  it('amorce une base vierge avec un unique seed suivi par son identité', async () => {
+    render(<App />)
+
+    await waitFor(() => {
+      expect(useAppStore.getState().hydrated).toBe(true)
+      expect(useAppStore.getState().documents).toHaveLength(1)
+    })
+
+    const [campaign] = await tacticalBoardRepository.listScenarios()
+    expect(campaign).toBeDefined()
+    expect(campaign?.name).toBe(OBJECTIVE_CAMPAIGN_NAME)
+    expect(campaign?.formatVersion).toBe(2)
+    expect(campaign?.units.some((unit) => unit.name === 'LIBRE')).toBe(true)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_VERSION_SETTING),
+    ).resolves.toBe(OBJECTIVE_CAMPAIGN_VERSION)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING),
+    ).resolves.toBe(campaign?.id)
+  })
+
+  it('migre le seed V2 vers V3 sans changer son ID ni les autres scénarios', async () => {
+    const legacyCampaign = {
+      ...createDefaultScenario('L’objectif', {
+        id: 'campaign-stable',
+        now: '2026-07-18T10:00:00.000Z',
+      }),
+      objective: 'Ancien objectif été 2026',
+      period: {
+        start: '2026-07-18',
+        current: '2026-07-18',
+        target: '2026-09-01',
+      },
+    }
+    const personalActive = createDefaultScenario('Projet personnel actif', {
+      id: 'personal-active',
+      now: '2026-07-19T10:00:00.000Z',
+    })
+    const personalArchived = createDefaultScenario('Archive personnelle', {
+      id: 'personal-archived',
+      now: '2026-06-01T10:00:00.000Z',
+      status: 'archived',
+    })
+    await tacticalBoardRepository.saveScenario(legacyCampaign)
+    await tacticalBoardRepository.saveScenario(personalActive)
+    await tacticalBoardRepository.saveScenario(personalArchived)
+    await tacticalBoardRepository.setSetting('activeScenarioId', personalActive.id)
+    await tacticalBoardRepository.setSetting(OBJECTIVE_CAMPAIGN_VERSION_SETTING, 2)
+    await tacticalBoardRepository.setSetting(
+      OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING,
+      legacyCampaign.id,
+    )
+
+    render(<App />)
+    await waitFor(() => {
+      expect(useAppStore.getState().hydrated).toBe(true)
+      expect(useAppStore.getState().documents).toHaveLength(3)
+    })
+
+    const stored = await tacticalBoardRepository.listScenarios()
+    expect(stored.map((scenario) => scenario.id).sort()).toEqual([
+      'campaign-stable',
+      'personal-active',
+      'personal-archived',
+    ])
+    expect(await tacticalBoardRepository.getScenario(personalActive.id)).toEqual(personalActive)
+    expect(await tacticalBoardRepository.getScenario(personalArchived.id)).toEqual(
+      personalArchived,
+    )
+    const migrated = await tacticalBoardRepository.getScenario(legacyCampaign.id)
+    expect(migrated?.id).toBe(legacyCampaign.id)
+    expect(migrated?.createdAt).toBe(legacyCampaign.createdAt)
+    expect(migrated?.units.some((unit) => unit.name === 'LIBRE')).toBe(true)
+    expect(useAppStore.getState().history?.present.id).toBe(personalActive.id)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_VERSION_SETTING),
+    ).resolves.toBe(OBJECTIVE_CAMPAIGN_VERSION)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING),
+    ).resolves.toBe(legacyCampaign.id)
+  })
+
+  it('retrouve et suit une installation V2 historique dépourvue d’ID de seed', async () => {
+    const historical = historicalCampaignV2()
+    const personal = createDefaultScenario('Scénario personnel', {
+      id: 'personal-existing',
+      now: '2026-07-19T10:00:00.000Z',
+    })
+    await tacticalBoardRepository.saveScenario(historical)
+    await tacticalBoardRepository.saveScenario(personal)
+    await tacticalBoardRepository.setSetting('activeScenarioId', personal.id)
+    await tacticalBoardRepository.setSetting(OBJECTIVE_CAMPAIGN_VERSION_SETTING, 2)
+
+    render(<App />)
+    await waitFor(() => {
+      expect(useAppStore.getState().hydrated).toBe(true)
+      expect(useAppStore.getState().documents).toHaveLength(2)
+    })
+
+    const migrated = await tacticalBoardRepository.getScenario(historical.id)
+    expect(migrated?.id).toBe(historical.id)
+    expect(migrated?.units).toHaveLength(36)
+    expect(migrated?.annotations).toHaveLength(12)
+    expect(migrated?.units.some((unit) => unit.name === 'LIBRE')).toBe(true)
+    await expect(tacticalBoardRepository.getScenario(personal.id)).resolves.toEqual(personal)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING),
+    ).resolves.toBe(historical.id)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_VERSION_SETTING),
+    ).resolves.toBe(OBJECTIVE_CAMPAIGN_VERSION)
+  })
+
+  it('respecte un seed supprimé et ne détourne aucun scénario utilisateur', async () => {
+    const personal = createDefaultScenario('Nouveau scénario', {
+      id: 'personal-only',
+      now: '2026-07-20T10:00:00.000Z',
+    })
+    await tacticalBoardRepository.saveScenario(personal)
+    await tacticalBoardRepository.setSetting('activeScenarioId', personal.id)
+    await tacticalBoardRepository.setSetting(OBJECTIVE_CAMPAIGN_VERSION_SETTING, 2)
+    await tacticalBoardRepository.setSetting(
+      OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING,
+      'deleted-campaign',
+    )
+
+    render(<App />)
+    await waitFor(() => {
+      expect(useAppStore.getState().hydrated).toBe(true)
+      expect(useAppStore.getState().documents).toHaveLength(1)
+    })
+
+    await expect(tacticalBoardRepository.listScenarios()).resolves.toEqual([personal])
+    expect(useAppStore.getState().history?.present.id).toBe(personal.id)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_VERSION_SETTING),
+    ).resolves.toBe(OBJECTIVE_CAMPAIGN_VERSION)
+    await expect(
+      tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING),
+    ).resolves.toBe('deleted-campaign')
+  })
+})
 
 describe('App — sélection multiple', () => {
   it('ouvre les actions au relâchement de Shift et applique un statut en une action', async () => {

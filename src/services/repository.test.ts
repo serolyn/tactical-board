@@ -1,5 +1,5 @@
 import 'fake-indexeddb/auto'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   createDefaultScenario,
   type LegacyScenarioDocumentV1,
@@ -67,6 +67,7 @@ function asset(id: string): ImageAssetRecord {
 
 describe('TacticalBoardRepository', () => {
   afterEach(async () => {
+    vi.restoreAllMocks()
     await deleteTacticalBoardDatabase()
   })
 
@@ -108,6 +109,41 @@ describe('TacticalBoardRepository', () => {
     const repository = new TacticalBoardRepository()
     await repository.setSetting('activeScenarioId', 'alpha')
     await expect(repository.getSetting('activeScenarioId')).resolves.toBe('alpha')
+  })
+
+  it('enregistre atomiquement un scénario et plusieurs réglages', async () => {
+    const repository = new TacticalBoardRepository()
+    const document = scenario('campaign-stable', '2026-07-18T12:00:00.000Z')
+
+    await repository.saveScenarioWithSettings(document, {
+      activeScenarioId: 'scenario-personnel',
+      objectiveCampaignScenarioId: document.id,
+      objectiveCampaignVersion: 3,
+    })
+
+    await expect(repository.getScenario(document.id)).resolves.toEqual(document)
+    await expect(repository.getSetting('activeScenarioId')).resolves.toBe(
+      'scenario-personnel',
+    )
+    await expect(repository.getSetting('objectiveCampaignScenarioId')).resolves.toBe(
+      document.id,
+    )
+    await expect(repository.getSetting('objectiveCampaignVersion')).resolves.toBe(3)
+  })
+
+  it('utilise une unique transaction readwrite couvrant scénarios et réglages', async () => {
+    const repository = new TacticalBoardRepository()
+    const database = await openTacticalBoardDatabase()
+    const transaction = vi.spyOn(database, 'transaction')
+    const document = scenario('campaign-stable', '2026-07-18T12:00:00.000Z')
+
+    await repository.saveScenarioWithSettings(document, {
+      objectiveCampaignScenarioId: document.id,
+      objectiveCampaignVersion: 3,
+    })
+
+    expect(transaction).toHaveBeenCalledTimes(1)
+    expect(transaction).toHaveBeenCalledWith(['scenarios', 'settings'], 'readwrite')
   })
 
   it('migre atomiquement les documents V1 lors du chargement sans perdre le plateau', async () => {

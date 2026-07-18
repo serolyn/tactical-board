@@ -160,6 +160,37 @@ export class TacticalBoardRepository {
     await (await openTacticalBoardDatabase()).put('scenarios', scenario)
   }
 
+  async saveScenarioWithSettings(
+    scenario: ScenarioDocumentV1,
+    settings: Readonly<Record<string, unknown>>,
+  ): Promise<void> {
+    const database = await openTacticalBoardDatabase()
+    const transaction = database.transaction(['scenarios', 'settings'], 'readwrite')
+    const transactionDone = transaction.done
+    void transactionDone.catch(() => undefined)
+    const writes: Promise<unknown>[] = []
+    const enqueue = (write: Promise<unknown>) => {
+      writes.push(write)
+      void write.catch(() => undefined)
+    }
+    try {
+      enqueue(transaction.objectStore('scenarios').put(scenario))
+      for (const [key, value] of Object.entries(settings)) {
+        enqueue(transaction.objectStore('settings').put({ key, value }))
+      }
+      await Promise.all([...writes, transactionDone])
+    } catch (error) {
+      try {
+        transaction.abort()
+      } catch {
+        // The browser may already have aborted/closed the transaction.
+      }
+      await Promise.allSettled(writes)
+      await transactionDone.catch(() => undefined)
+      throw error
+    }
+  }
+
   async deleteScenario(id: string): Promise<void> {
     await (await openTacticalBoardDatabase()).delete('scenarios', id)
   }

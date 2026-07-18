@@ -35,7 +35,9 @@ import {
   applyObjectiveCampaign,
   createNextScenario,
   findObjectiveCampaignCandidate,
+  OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING,
   OBJECTIVE_CAMPAIGN_VERSION,
+  OBJECTIVE_CAMPAIGN_VERSION_SETTING,
 } from './data'
 import {
   InspectorPanel,
@@ -83,6 +85,7 @@ let initialDataPromise: Promise<InitialData> | null = null
 async function loadInitialData(): Promise<InitialData> {
   initialDataPromise ??= (async () => {
     let documents = await tacticalBoardRepository.listScenarios()
+    let createdInitial: ScenarioDocumentV1 | null = null
     let recoveryNeedsSaving = false
     let recovery: ScenarioDocumentV1 | null = null
     try {
@@ -112,23 +115,37 @@ async function loadInitialData(): Promise<InitialData> {
       }
     }
     if (!documents.length) {
-      const initial = createDefaultScenario()
-      await tacticalBoardRepository.saveScenario(initial)
-      documents = [initial]
+      createdInitial = createDefaultScenario()
+      documents = [createdInitial]
     }
-    const seededCampaignVersion =
-      await tacticalBoardRepository.getSetting<number>('objectiveCampaignVersion')
+    const [seededCampaignVersion, trackedCampaignScenarioId] = await Promise.all([
+      tacticalBoardRepository.getSetting<number>(OBJECTIVE_CAMPAIGN_VERSION_SETTING),
+      tacticalBoardRepository.getSetting<string>(OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING),
+    ])
     if ((seededCampaignVersion ?? 0) < OBJECTIVE_CAMPAIGN_VERSION) {
-      const candidate = findObjectiveCampaignCandidate(documents)
-      const campaign = applyObjectiveCampaign(candidate ?? createDefaultScenario())
-      await tacticalBoardRepository.saveScenario(campaign)
-      documents = candidate
-        ? documents.map((document) => (document.id === campaign.id ? campaign : document))
-        : [campaign, ...documents]
-      await tacticalBoardRepository.setSetting(
-        'objectiveCampaignVersion',
-        OBJECTIVE_CAMPAIGN_VERSION,
-      )
+      const firstSeed = (seededCampaignVersion ?? 0) === 0
+      const candidate =
+        firstSeed && createdInitial
+          ? createdInitial
+          : findObjectiveCampaignCandidate(documents, trackedCampaignScenarioId)
+      if (candidate) {
+        const campaign = applyObjectiveCampaign(candidate)
+        await tacticalBoardRepository.saveScenarioWithSettings(campaign, {
+          [OBJECTIVE_CAMPAIGN_VERSION_SETTING]: OBJECTIVE_CAMPAIGN_VERSION,
+          [OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING]: campaign.id,
+        })
+        documents = documents.map((document) =>
+          document.id === campaign.id ? campaign : document,
+        )
+      } else {
+        if (createdInitial) await tacticalBoardRepository.saveScenario(createdInitial)
+        await tacticalBoardRepository.setSetting(
+          OBJECTIVE_CAMPAIGN_VERSION_SETTING,
+          OBJECTIVE_CAMPAIGN_VERSION,
+        )
+      }
+    } else if (createdInitial) {
+      await tacticalBoardRepository.saveScenario(createdInitial)
     }
     if (!recoveryNeedsSaving) await tacticalBoardRepository.cleanupOrphanAssets()
     const [activeScenarioId, assets] = await Promise.all([

@@ -1,10 +1,8 @@
 import {
   BUILT_IN_UNIT_TYPE_BY_ID,
   createDefaultScenario,
-  createEntityId,
   type ArrowAnnotation,
-  type Faction,
-  type FactionRole,
+  type IconRef,
   type Position,
   type ScenarioDocumentV2,
   type TacticalUnit,
@@ -13,20 +11,20 @@ import {
   OBJECTIVE_CAMPAIGN_ARROWS,
   OBJECTIVE_CAMPAIGN_NAME,
   OBJECTIVE_CAMPAIGN_OBJECTIVE,
-  OBJECTIVE_CAMPAIGN_PERIOD,
   OBJECTIVE_CAMPAIGN_UNITS,
 } from './objectiveCampaignSpec'
 
 const GRID_SIZE = 20
 const CAMPAIGN_ID_PREFIX = 'objective-campaign-v1'
+const LEGACY_CAMPAIGN_SIGNATURE_IDS = [
+  `${CAMPAIGN_ID_PREFIX}-unit-walid`,
+  `${CAMPAIGN_ID_PREFIX}-unit-city-lille`,
+  `${CAMPAIGN_ID_PREFIX}-unit-final-objective`,
+  `${CAMPAIGN_ID_PREFIX}-marker-lille-priority`,
+] as const
 
-const roleOrder: readonly Exclude<FactionRole, 'custom'>[] = [
-  'own',
-  'obstacle',
-  'rally',
-  'uncertain',
-  'objective',
-]
+export const OBJECTIVE_CAMPAIGN_VERSION_SETTING = 'objectiveCampaignVersion'
+export const OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING = 'objectiveCampaignScenarioId'
 
 function cellKey(position: Position) {
   return `${position.row}:${position.column}`
@@ -73,35 +71,6 @@ function findFreePosition(preferred: Position, occupied: ReadonlySet<string>): P
   throw new Error('Le plateau de campagne ne contient plus de case libre.')
 }
 
-function campaignFactionDefaults(): ReadonlyMap<FactionRole, Faction> {
-  return new Map(createDefaultScenario().factions.map((faction) => [faction.role, faction]))
-}
-
-function ensureCampaignFactions(source: ScenarioDocumentV2): readonly Faction[] {
-  const defaults = campaignFactionDefaults()
-  const usedIds = new Set(source.factions.map((faction) => faction.id))
-  const factions = source.factions.map((faction) => {
-    if (faction.role === 'own' && normalizeName(faction.name) === 'bleu') {
-      return { ...faction, name: 'Mes forces' }
-    }
-    if (faction.role === 'obstacle' && normalizeName(faction.name) === 'rouge') {
-      return { ...faction, name: 'Obstacles' }
-    }
-    return faction
-  })
-
-  for (const role of roleOrder) {
-    if (factions.some((faction) => faction.role === role)) continue
-    const fallback = defaults.get(role)
-    if (!fallback) continue
-    let id = fallback.id
-    if (usedIds.has(id)) id = createEntityId(`faction-${role}`)
-    usedIds.add(id)
-    factions.push({ ...fallback, id })
-  }
-  return factions
-}
-
 function createCampaignUnit(
   key: string,
   name: string,
@@ -109,10 +78,13 @@ function createCampaignUnit(
   factionId: string,
   position: Position,
   status: TacticalUnit['status'],
+  iconName?: string,
 ): TacticalUnit {
   const unitType = BUILT_IN_UNIT_TYPE_BY_ID.get(typeId)
   if (!unitType) throw new Error(`Le type intégré « ${typeId} » est introuvable.`)
-  const icon = { ...unitType.icon }
+  const icon: IconRef = iconName
+    ? { kind: 'catalog', name: iconName }
+    : { ...unitType.icon }
   return {
     id: `${CAMPAIGN_ID_PREFIX}-unit-${key}`,
     name,
@@ -134,36 +106,30 @@ function createCampaignUnit(
 }
 
 /**
- * Builds the requested summer-2026 campaign without replacing pre-existing board data.
- * Stable campaign identifiers make the operation idempotent; the caller still records a
- * setting after the first successful write so user deletions are respected afterwards.
+ * Rebuilds only the predefined campaign. Its durable scenario identity and compatible
+ * custom types survive the replacement, while all seeded board data is recreated exactly
+ * from the current specification.
  */
 export function applyObjectiveCampaign(
   source: ScenarioDocumentV2,
   now = new Date().toISOString(),
 ): ScenarioDocumentV2 {
-  const factions = ensureCampaignFactions(source)
+  const template = createDefaultScenario(OBJECTIVE_CAMPAIGN_NAME, {
+    id: source.id,
+    now,
+    objective: OBJECTIVE_CAMPAIGN_OBJECTIVE,
+    status: 'active',
+    ...(source.previousScenarioId === undefined
+      ? {}
+      : { previousScenarioId: source.previousScenarioId }),
+  })
+  const factions = template.factions
   const factionByRole = new Map(factions.map((faction) => [faction.role, faction]))
-  const occupied = new Set(source.units.map((unit) => cellKey(unit.position)))
-  const adoptedUnitIds = new Set<string>()
+  const occupied = new Set<string>()
   const unitByCampaignKey = new Map<string, TacticalUnit>()
-  const units = [...source.units]
+  const units: TacticalUnit[] = []
 
   for (const specification of OBJECTIVE_CAMPAIGN_UNITS) {
-    const stableId = `${CAMPAIGN_ID_PREFIX}-unit-${specification.key}`
-    const existing =
-      units.find((unit) => unit.id === stableId) ??
-      units.find(
-        (unit) =>
-          !adoptedUnitIds.has(unit.id) &&
-          normalizeName(unit.name) === normalizeName(specification.name),
-      )
-    if (existing) {
-      adoptedUnitIds.add(existing.id)
-      unitByCampaignKey.set(specification.key, existing)
-      continue
-    }
-
     const faction = factionByRole.get(specification.factionRole)
     if (!faction) throw new Error(`La faction de campagne « ${specification.factionRole} » manque.`)
     const position = findFreePosition(
@@ -177,17 +143,16 @@ export function applyObjectiveCampaign(
       faction.id,
       position,
       specification.status ?? 'active',
+      specification.iconName,
     )
     occupied.add(cellKey(position))
-    adoptedUnitIds.add(unit.id)
     unitByCampaignKey.set(specification.key, unit)
     units.push(unit)
   }
 
-  const annotations = [...source.annotations]
+  const annotations: ArrowAnnotation[] = []
   for (const specification of OBJECTIVE_CAMPAIGN_ARROWS) {
     const id = `${CAMPAIGN_ID_PREFIX}-arrow-${specification.key}`
-    if (annotations.some((annotation) => annotation.id === id)) continue
     const from = unitByCampaignKey.get(specification.from)
     const to = unitByCampaignKey.get(specification.to)
     if (!from || !to) continue
@@ -202,39 +167,47 @@ export function applyObjectiveCampaign(
     annotations.push(annotation)
   }
 
-  const priorityMarkerId = `${CAMPAIGN_ID_PREFIX}-marker-lille-priority`
-  const lille = unitByCampaignKey.get('city-lille')
-  if (lille && !annotations.some((annotation) => annotation.id === priorityMarkerId)) {
-    annotations.push({
-      id: priorityMarkerId,
-      kind: 'marker',
-      position: { ...lille.position },
-      markerType: 'rally',
-      color: '#f59e0b',
-      label: 'Route prioritaire conditionnelle',
-    })
-  }
+  const customUnitTypes = source.customUnitTypes
+    .filter((unitType) => !BUILT_IN_UNIT_TYPE_BY_ID.has(unitType.id))
+    .map((unitType) => structuredClone(unitType))
 
   return {
-    ...source,
-    name: OBJECTIVE_CAMPAIGN_NAME,
-    objective: OBJECTIVE_CAMPAIGN_OBJECTIVE,
-    period: { ...OBJECTIVE_CAMPAIGN_PERIOD },
-    status: 'active',
+    ...template,
+    createdAt: source.createdAt,
     updatedAt: now,
-    grid: { ...source.grid, rows: GRID_SIZE, columns: GRID_SIZE },
+    grid: {
+      ...template.grid,
+      rows: GRID_SIZE,
+      columns: GRID_SIZE,
+      showCoordinates: false,
+    },
     factions,
+    customUnitTypes,
     units,
     annotations,
   }
 }
 
+function hasHistoricalCampaignSignature(document: ScenarioDocumentV2): boolean {
+  const entityIds = new Set([
+    ...document.units.map((unit) => unit.id),
+    ...document.annotations.map((annotation) => annotation.id),
+  ])
+  return LEGACY_CAMPAIGN_SIGNATURE_IDS.filter((id) => entityIds.has(id)).length >= 3
+}
+
 export function findObjectiveCampaignCandidate(
   documents: readonly ScenarioDocumentV2[],
+  trackedScenarioId?: string,
 ): ScenarioDocumentV2 | undefined {
+  if (trackedScenarioId !== undefined) {
+    return documents.find((document) => document.id === trackedScenarioId)
+  }
   const objectiveName = normalizeName(OBJECTIVE_CAMPAIGN_NAME)
-  return (
-    documents.find((document) => normalizeName(document.name) === objectiveName) ??
-    documents.find((document) => normalizeName(document.name) === 'nouveau scénario')
+  const historicalCandidates = documents.filter(
+    (document) =>
+      normalizeName(document.name) === objectiveName &&
+      hasHistoricalCampaignSignature(document),
   )
+  return historicalCandidates.length === 1 ? historicalCandidates[0] : undefined
 }
