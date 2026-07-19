@@ -3,13 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.22.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "postbuild": "node scripts/copy-spa-fallback.mjs",
+    "postbuild": "node scripts/copy-spa-fallback.mjs && node scripts/copy-art-direction.mjs",
     "lint": "oxlint",
     "typecheck": "tsc -b --pretty false",
-    "test": "vitest run",
+    "test": "node --test scripts/copy-art-direction.node-check.mjs && vitest run",
     "test:watch": "vitest",
     "preview": "vite preview"
   },

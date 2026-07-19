@@ -4,12 +4,14 @@ import { getRouteMetadata, routeMetadata } from './routeMetadata'
 
 describe('routeMetadata', () => {
   it.each([
-    ['/', 'SEROLYN — Code, image et musique'],
+    ['/', 'SEROLYN — Entre plusieurs vies'],
     ['/projects', 'Projets — SEROLYN'],
-    ['/projects/tactical-board', 'Tactical Board — SEROLYN'],
+    ['/projects/tactical-board', 'Tactical Board — Lab SEROLYN'],
     ['/board', 'Tactical Board — Éditeur tactique'],
-    ['/music', 'Musique — SEROLYN'],
-    ['/lab', 'Laboratoire — SEROLYN'],
+    ['/music', 'Scènes sonores — SEROLYN'],
+    ['/lab', 'Lab — SEROLYN'],
+    ['/lab/tactical-board', 'Tactical Board — Lab SEROLYN'],
+    ['/lab/signal-fantome', 'Signal fantôme — Lab SEROLYN'],
     ['/about', 'À propos — SEROLYN'],
   ])('associe %s à son titre et à une description', (pathname, title) => {
     expect(getRouteMetadata(pathname)).toEqual({
@@ -21,15 +23,15 @@ describe('routeMetadata', () => {
 
   it('normalise les barres obliques finales', () => {
     expect(getRouteMetadata('/board///')).toEqual(routeMetadata['/board'])
-    expect(getRouteMetadata('/projects/tactical-board/')).toEqual(
-      routeMetadata['/projects/tactical-board'],
+    expect(getRouteMetadata('/lab/signal-fantome/')).toEqual(
+      routeMetadata['/lab/signal-fantome'],
     )
   })
 
   it('retourne les métadonnées 404 pour une route inconnue', () => {
-    expect(getRouteMetadata('/route-inconnue')).toEqual({
+    expect(getRouteMetadata('/projects/project-template')).toEqual({
       title: 'Page introuvable — SEROLYN',
-      description: "Cette trajectoire n'existe pas encore dans la cartographie de SEROLYN.",
+      description: 'Cette entrée est introuvable, non publiée ou encore en cours de documentation.',
     })
   })
 })

@@ -1,7 +1,8 @@
 # Manifeste d’assets — SEROLYN / Signal fantôme
 
 - **Date de constitution :** 19 juillet 2026
-- **Périmètre :** planche autonome `docs/art-direction/`
+- **Périmètre :** planche autonome `docs/art-direction/` et copies runtime du
+  portfolio ajoutées en phase 3B
 - **Politique :** fichiers locaux uniquement, aucune hotlink, aucune image générée par IA
 
 ## Budget
@@ -17,6 +18,30 @@
 Le total reste sous la cible d’environ 1,5 Mio, même en comptant les captures qui
 ne sont pas chargées par la page. Le rouge diffus, les lignes, la grille du seul
 aperçu Tactical Board et le grain visuel sont produits en CSS/SVG.
+
+## Intégration runtime — phase 3B
+
+La phase 3B réutilise exclusivement les fichiers déjà documentés dans la planche
+3A. Les huit fichiers sous `src/assets/portfolio/` sont des copies binaires
+strictement identiques à leurs sources canoniques sous `docs/art-direction/` :
+aucun nouvel asset externe, téléchargement ou régime de licence n'a été
+introduit. L'ensemble des copies runtime pèse **1 151 391 octets (1,10 Mio)**.
+
+| Source canonique | Copie runtime | Usage dans le portfolio | Poids | SHA-256 |
+| --- | --- | --- | ---: | --- |
+| `docs/art-direction/assets/signal-horizon.webp` | `src/assets/portfolio/signal-horizon.webp` | Hero de l'accueil, étude Signal fantôme et couverture du modèle de projet non publié | 17 818 octets | `c1f0c5e877fbc848d3a496d07b4c151949db89b56e4e66a24c59d8c8cd1fab3e` |
+| `docs/art-direction/assets/fog-reflections.webp` | `src/assets/portfolio/fog-reflections.webp` | Atmosphère de Scènes sonores et étude Signal fantôme | 25 364 octets | `34b4be7a0772b1275dc59e2498b7c7496c7750e581ca6387ba5bda15edef997d` |
+| `docs/art-direction/assets/moonlit-harbor.webp` | `src/assets/portfolio/moonlit-harbor.webp` | Couverture et étude Signal fantôme | 134 260 octets | `c6c4a3ba1264a359dbad7e7efcad2adf9dbe2ff919b1e2b5819025910ef43aea` |
+| `docs/art-direction/assets/fonts/Manrope-Variable-400-700-latin.woff2` | `src/assets/portfolio/fonts/Manrope-Variable-400-700-latin.woff2` | Titres, navigation et texte courant du portfolio | 24 836 octets | `a30ddcd349703aff7464c34bef3fffdff405ee50c113440d7c8693c02d210972` |
+| `docs/art-direction/assets/fonts/Newsreader-Italic-400-latin.woff2` | `src/assets/portfolio/fonts/Newsreader-Italic-400-latin.woff2` | Fragments éditoriaux en italique | 24 340 octets | `fa9b900403949d9a723106752a5c8ad2797012a0c9057427b1da2db72d552148` |
+| `docs/art-direction/assets/fonts/IBMPlexMono-Regular-400-latin.woff2` | `src/assets/portfolio/fonts/IBMPlexMono-Regular-400-latin.woff2` | Dates, index et métadonnées techniques | 14 708 octets | `08949f728dc52d528e69b1667d15c89a5686a4ee9a296ff90983985f99c380f7` |
+| `docs/art-direction/preview-desktop.png` | `src/assets/portfolio/signal-preview-desktop.png` | Illustration éditoriale desktop de l'étude Signal fantôme | 701 577 octets | `88b3cca1bf3a6135882b0257f23cbf6ead5892d4075064eb3dda30366d60c3f0` |
+| `docs/art-direction/preview-mobile.png` | `src/assets/portfolio/signal-preview-mobile.png` | Illustration éditoriale mobile de l'étude Signal fantôme | 208 488 octets | `d058fc00f050042a1c45e64ebba2977d8b767314cfe438424f7749f289429688` |
+
+Les deux PNG renommés ci-dessus sont les captures de validation **de la planche
+3A**, désormais réemployées comme contenu éditorial. Ils ne doivent pas être
+confondus avec les captures de recette du portfolio de phase 3B, documentées
+séparément dans [`portfolio-previews/README.md`](./portfolio-previews/README.md).
 
 ## Visuels
 

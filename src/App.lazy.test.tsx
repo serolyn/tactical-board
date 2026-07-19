@@ -38,7 +38,7 @@ beforeEach(async () => {
   cleanup()
   autosaveModuleEvaluated.mockClear()
   localStorage.clear()
-  window.history.replaceState({}, '', `${BASE_PATH}/projects/tactical-board`)
+  window.history.replaceState({}, '', `${BASE_PATH}/lab/tactical-board`)
   Object.defineProperty(window, 'matchMedia', {
     configurable: true,
     value: (query: string) => ({
@@ -67,7 +67,40 @@ afterEach(async () => {
 })
 
 describe('App — frontière lazy de Tactical Board', () => {
-  it("n'ouvre pas IndexedDB et ne déclenche pas d'autosauvegarde hors de /board", async () => {
+  it.each([
+    ['/', 'ENTRE PLUSIEURS VIES'],
+    ['/projects', 'PROJETS'],
+    ['/music', 'SCÈNES SONORES'],
+    ['/lab', 'FORMES EN COURS'],
+    ['/about', 'ENTRE CODE, SON ET IMAGE'],
+    ['/lab/tactical-board', 'TACTICAL BOARD'],
+    ['/lab/signal-fantome', 'SIGNAL FANTÔME'],
+    ['/lab/entree-inconnue', 'ENTRÉE INTROUVABLE'],
+  ])(
+    "n'initialise ni IndexedDB, ni store, ni autosauvegarde sur %s",
+    async (route, expectedHeading) => {
+      window.history.replaceState({}, '', `${BASE_PATH}${route}`)
+      const openDatabase = vi.spyOn(indexedDB, 'open')
+
+      render(<App basename={`${BASE_PATH}/`} />)
+
+      expect(
+        await screen.findByRole('heading', { level: 1, name: expectedHeading }),
+      ).toBeInTheDocument()
+
+      await act(waitForAutosaveWindow)
+
+      expect(openDatabase).not.toHaveBeenCalled()
+      expect(autosaveModuleEvaluated).not.toHaveBeenCalled()
+      expect(useAppStore.getState()).toMatchObject({
+        documents: [],
+        hydrated: false,
+      })
+    },
+  )
+
+  it("n'ouvre pas IndexedDB via la redirection historique hors de /board", async () => {
+    window.history.replaceState({}, '', `${BASE_PATH}/projects/tactical-board`)
     const openDatabase = vi.spyOn(indexedDB, 'open')
 
     render(<App basename={`${BASE_PATH}/`} />)
@@ -75,9 +108,10 @@ describe('App — frontière lazy de Tactical Board', () => {
     expect(
       await screen.findByRole('heading', {
         level: 1,
-        name: 'Cartographier une guerre intérieure.',
+        name: 'TACTICAL BOARD',
       }),
     ).toBeInTheDocument()
+    expect(window.location.pathname).toBe(`${BASE_PATH}/lab/tactical-board`)
 
     await act(waitForAutosaveWindow)
 
@@ -91,7 +125,7 @@ describe('App — frontière lazy de Tactical Board', () => {
     const openDatabase = vi.spyOn(indexedDB, 'open')
 
     render(<App basename={`${BASE_PATH}/`} />)
-    const cta = await screen.findByRole('link', { name: 'Ouvrir Tactical Board' })
+    const cta = await screen.findByRole('link', { name: 'Ouvrir le tableau' })
     expect(cta).toHaveAttribute('href', `${BASE_PATH}/board`)
     expect(openDatabase).not.toHaveBeenCalled()
 

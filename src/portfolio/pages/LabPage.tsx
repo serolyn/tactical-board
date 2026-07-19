@@ -1,23 +1,33 @@
-import styles from '../PortfolioShell.module.css'
+import { EntryIndex } from '../components/EntryIndex'
+import { SectionHeading } from '../components/SectionHeading'
+import { publishedLab } from '../content'
 
 export function LabPage() {
   return (
-    <section className={styles.page} aria-labelledby="lab-title">
-      <p className={styles.eyebrow}>Laboratoire</p>
-      <h1 className={styles.pageTitle} id="lab-title" tabIndex={-1}>
-        Essais, erreurs et passages ouverts.
-      </h1>
-      <p className={styles.lead}>
-        Le laboratoire rassemble les apprentissages en cours : idées incomplètes, prototypes et
-        techniques éprouvées au contact du réel.
-      </p>
-      <section className={styles.section} aria-labelledby="lab-method">
-        <h2 id="lab-method">Apprendre en construisant</h2>
-        <p>
-          Chaque expérience cherche moins la certitude qu’une nouvelle façon de voir, d’entendre
-          ou d’agir.
-        </p>
+    <article className="editorial-page">
+      <header className="page-boundary page-intro">
+        <div className="page-intro__copy">
+          <p className="portfolio-meta">LAB / INDEX / {String(publishedLab.length).padStart(2, '0')}</p>
+          <h1 tabIndex={-1}>FORMES EN COURS</h1>
+          <p className="page-intro__lead">
+            Études, erreurs et expériences construites au fil de l’apprentissage.
+          </p>
+        </div>
+        <div className="index-atmosphere index-atmosphere--lab" aria-hidden="true">
+          <p>EXPÉRIENCES / SYSTÈMES / PROTOTYPES</p>
+        </div>
+      </header>
+
+      <section className="page-boundary page-index-content" aria-labelledby="lab-index-title">
+        <SectionHeading
+          eyebrow="ENTRÉES ACTIVES"
+          id="lab-index-title"
+          index="01 / INDEX"
+          introduction="Des outils vivants et des systèmes personnels, conservés avec leur contexte."
+          title="LAB ACTIF"
+        />
+        <EntryIndex entries={publishedLab} routeBase="/lab" />
       </section>
-    </section>
+    </article>
   )
 }

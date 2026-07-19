@@ -1,22 +1,27 @@
 import { Link } from 'react-router'
-import styles from '../PortfolioShell.module.css'
 
-export function NotFoundPage() {
+interface NotFoundPageProps {
+  detail?: boolean
+}
+
+export function NotFoundPage({ detail = false }: NotFoundPageProps) {
   return (
-    <section className={styles.page} aria-labelledby="not-found-title">
-      <p className={styles.eyebrow}>Erreur 404</p>
-      <h1 className={styles.pageTitle} id="not-found-title" tabIndex={-1}>
-        Cette trajectoire ne mène nulle part.
+    <section className="page-boundary not-found" aria-labelledby="not-found-title">
+      <p className="portfolio-meta">ERREUR / 404</p>
+      <h1 id="not-found-title" tabIndex={-1}>
+        {detail ? 'ENTRÉE INTROUVABLE' : 'SIGNAL INTROUVABLE'}
       </h1>
-      <p className={styles.lead}>
-        La page demandée n’existe pas, ou sa position a changé dans la cartographie.
+      <p>
+        {detail
+          ? 'Cette entrée n’existe pas, reste en brouillon ou n’est plus publiée.'
+          : 'La page demandée n’existe pas ou sa position a changé.'}
       </p>
-      <div className={styles.actions}>
-        <Link className={styles.primaryLink} to="/">
+      <div className="not-found__actions">
+        <Link className="portfolio-action portfolio-action--primary" to="/">
           Revenir à l’accueil
         </Link>
-        <Link className={styles.secondaryLink} to="/projects">
-          Voir les projets
+        <Link className="portfolio-action portfolio-action--secondary" to="/lab">
+          Explorer le Lab
         </Link>
       </div>
     </section>

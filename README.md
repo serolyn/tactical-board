@@ -1,21 +1,29 @@
-# Tactical Board
+# SEROLYN — Portfolio & Tactical Board
 
-Tactical Board est un éditeur de scénarios tactiques sur grille. Il reprend la lisibilité d’un plateau d’échecs sans appliquer aucune règle d’échecs : les unités sont placées et déplacées librement pour construire une carte opérationnelle.
+Ce dépôt réunit le portfolio éditorial SEROLYN et Tactical Board, une expérience
+interactive du Lab. L’accueil présente les projets, scènes sonores et recherches
+visuelles ; le plateau reste une application plein écran indépendante sur
+`/board`.
 
-**Version en ligne :** [https://serolyn.github.io/tactical-board/](https://serolyn.github.io/tactical-board/)
+**Portfolio en ligne :** [https://serolyn.github.io/tactical-board/](https://serolyn.github.io/tactical-board/)
 
-L’application fonctionne entièrement dans le navigateur. Elle n’utilise ni compte, ni serveur, ni backend ; scénarios et images sont enregistrés dans IndexedDB.
+**Plateau en ligne :** [https://serolyn.github.io/tactical-board/board](https://serolyn.github.io/tactical-board/board)
+
+Tout fonctionne dans le navigateur, sans compte, serveur ni backend. Le
+portfolio n’ouvre aucune base locale ; seuls les scénarios et images de Tactical
+Board sont enregistrés dans IndexedDB.
 
 ## Installation
 
-Prérequis : Node.js 22 ou une version récente compatible avec Vite 8.
+Prérequis : Node.js 22.22.0 ou une version ultérieure compatible.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Vite affiche ensuite l’adresse locale, généralement `http://localhost:5173`.
+Vite affiche ensuite l’adresse locale, généralement
+`http://localhost:5173/tactical-board/`.
 
 ## Commandes
 
@@ -30,6 +38,27 @@ npm run preview    # aperçu du build
 ```
 
 Chaque envoi sur la branche `main` publie automatiquement la version de production sur GitHub Pages.
+
+## Portfolio
+
+Les routes `/projects`, `/music`, `/lab` et `/about` partagent le shell
+éditorial. Les détails utilisent `/projects/:slug`, `/music/:slug` et
+`/lab/:slug`. Les deux entrées actuellement publiées sont Tactical Board et
+Signal fantôme dans le Lab ; les modèles Projet et Musique restent masqués tant
+que `published` vaut `false`.
+
+Le contenu se modifie dans `src/portfolio/content/` avec de simples objets
+TypeScript. Le guide [docs/content-authoring.md](./docs/content-authoring.md)
+explique comment ajouter une entrée, une image, un fichier audio, un lien ou une
+section. La planche visuelle canonique reste dans `docs/art-direction/` et est
+copiée automatiquement dans le build de production.
+
+## Tactical Board
+
+Tactical Board est un éditeur de scénarios tactiques sur grille. Il reprend la
+lisibilité d’un plateau d’échecs sans appliquer aucune règle d’échecs : les
+unités sont placées et déplacées librement pour construire une carte
+opérationnelle.
 
 ## Utilisation
 
@@ -78,6 +107,7 @@ Les raccourcis de suppression et d’historique global sont neutralisés pendant
 
 ## Architecture
 
+- `src/portfolio` : shell éditorial, routes, pages, composants, contenus typés et styles.
 - `src/domain` : contrats TypeScript, catalogue, invariants, reducer pur et historique.
 - `src/store` : état applicatif Zustand et état d’interaction.
 - `src/features` : plateau, bibliothèque, scénarios et inspecteur.

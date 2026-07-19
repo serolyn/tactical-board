@@ -1,0 +1,17 @@
+.portfolio-shell {
+  --portfolio-void: #07080d;
+  --portfolio-deep: #11121c;
+  --portfolio-mist: #dddde5;
+  --portfolio-ash: #8d8e9c;
+  --portfolio-signal: #6964c7;
+  --portfolio-ember: #cf4b46;
+  --portfolio-warmth: #c99b70;
+  --portfolio-hairline: rgba(221, 221, 229, 0.14);
+  --portfolio-hairline-strong: rgba(221, 221, 229, 0.26);
+  --portfolio-font-main: "Manrope", "Helvetica Neue", Arial, sans-serif;
+  --portfolio-font-ghost: "Newsreader", Georgia, serif;
+  --portfolio-font-meta: "IBM Plex Mono", "Courier New", monospace;
+  --portfolio-content-width: 87.5rem;
+  --portfolio-gutter: clamp(1rem, 3.5vw, 3.5rem);
+  --portfolio-section-space: clamp(5.5rem, 11vw, 10rem);
+}

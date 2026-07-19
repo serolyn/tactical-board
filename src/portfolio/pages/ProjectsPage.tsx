@@ -1,31 +1,38 @@
-import { Link } from 'react-router'
-import styles from '../PortfolioShell.module.css'
+import { EmptyState } from '../components/EmptyState'
+import { EntryIndex } from '../components/EntryIndex'
+import { SectionHeading } from '../components/SectionHeading'
+import { publishedProjects, siteContent } from '../content'
 
 export function ProjectsPage() {
   return (
-    <section className={styles.page} aria-labelledby="projects-title">
-      <p className={styles.eyebrow}>Projets</p>
-      <h1 className={styles.pageTitle} id="projects-title" tabIndex={-1}>
-        Des outils pour lire le terrain autrement.
-      </h1>
-      <p className={styles.lead}>
-        Chaque projet transforme une tension abstraite en espace sensible, manipulable et
-        partageable.
-      </p>
-
-      <ul className={styles.projectList}>
-        <li className={styles.projectCard}>
-          <p className={styles.eyebrow}>Application interactive</p>
-          <h2>Tactical Board</h2>
-          <p>
-            Projets, obstacles, ressources et objectifs deviennent forces, fronts et
-            trajectoires sur un plateau vivant.
+    <article className="editorial-page">
+      <header className="page-boundary page-intro">
+        <div className="page-intro__copy">
+          <p className="portfolio-meta">INDEX / PROJETS / 00</p>
+          <h1 tabIndex={-1}>{siteContent.projects.title}</h1>
+          <p className="page-intro__lead">
+            Réalisations suffisamment construites ou documentées pour être parcourues.
           </p>
-          <Link className={styles.textLink} to="/projects/tactical-board">
-            Découvrir le projet
-          </Link>
-        </li>
-      </ul>
-    </section>
+        </div>
+        <div className="index-atmosphere" aria-hidden="true">
+          <p>ARCHIVE / EN CONSTRUCTION</p>
+        </div>
+      </header>
+
+      <section className="page-boundary page-index-content" aria-labelledby="projects-index-title">
+        <SectionHeading
+          eyebrow="ARCHIVE PUBLIQUE"
+          id="projects-index-title"
+          index="01 / INDEX"
+          introduction="Chaque entrée conserve un contexte, un rôle, une pile technique et une documentation extensible."
+          title="SYSTÈMES DOCUMENTÉS"
+        />
+        {publishedProjects.length ? (
+          <EntryIndex entries={publishedProjects} routeBase="/projects" />
+        ) : (
+          <EmptyState label="PROJETS / 00" message={siteContent.projects.emptyState} />
+        )}
+      </section>
+    </article>
   )
 }

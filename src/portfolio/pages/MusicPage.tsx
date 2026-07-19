@@ -1,20 +1,41 @@
-import styles from '../PortfolioShell.module.css'
+import { EmptyState } from '../components/EmptyState'
+import { EntryIndex } from '../components/EntryIndex'
+import { SectionHeading } from '../components/SectionHeading'
+import { publishedMusic, siteContent } from '../content'
 
 export function MusicPage() {
   return (
-    <section className={styles.page} aria-labelledby="music-title">
-      <p className={styles.eyebrow}>Musique</p>
-      <h1 className={styles.pageTitle} id="music-title" tabIndex={-1}>
-        Écouter ce qui résiste aux mots.
-      </h1>
-      <p className={styles.lead}>
-        Rythmes, textures et silences forment une autre carte : moins précise, peut-être, mais
-        capable de révéler ce qui demeure sous la surface.
-      </p>
-      <section className={styles.section} aria-labelledby="music-coming">
-        <h2 id="music-coming">Fragments à venir</h2>
-        <p>Cet espace accueillera des pièces, des recherches sonores et leurs traces de création.</p>
+    <article className="editorial-page">
+      <header className="page-boundary page-intro">
+        <div className="page-intro__copy">
+          <p className="portfolio-meta">MUSIQUE / INDEX / 00</p>
+          <h1 tabIndex={-1}>{siteContent.music.title}</h1>
+          <p className="page-intro__lead">{siteContent.music.introduction}</p>
+        </div>
+        <figure className="page-intro__visual">
+          <img
+            alt={siteContent.music.atmosphere.alt}
+            decoding="async"
+            src={siteContent.music.atmosphere.src}
+          />
+          <span>REFLET / BRUME / CC0</span>
+        </figure>
+      </header>
+
+      <section className="page-boundary page-index-content" aria-labelledby="music-index-title">
+        <SectionHeading
+          eyebrow="SCÈNES PUBLIÉES"
+          id="music-index-title"
+          index="01 / INDEX"
+          introduction="Covers, crédits, notes et audio restent facultatifs jusqu’à la publication d’une scène réelle."
+          title="LIEUX À HABITER"
+        />
+        {publishedMusic.length ? (
+          <EntryIndex entries={publishedMusic} routeBase="/music" />
+        ) : (
+          <EmptyState label="SCÈNES / 00" message={siteContent.music.emptyState} />
+        )}
       </section>
-    </section>
+    </article>
   )
 }
