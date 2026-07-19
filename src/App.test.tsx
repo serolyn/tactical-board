@@ -1,6 +1,6 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import App from './App'
 import {
@@ -12,7 +12,9 @@ import {
 import { applyCommand, createDefaultScenario } from './domain'
 import {
   deleteTacticalBoardDatabase,
+  RECOVERY_JOURNAL_KEY,
   tacticalBoardRepository,
+  writeRecoveryJournal,
 } from './services'
 import { useAppStore } from './store/appStore'
 
@@ -49,6 +51,7 @@ beforeEach(async () => {
 afterEach(async () => {
   await new Promise((resolve) => window.setTimeout(resolve, 400))
   cleanup()
+  vi.restoreAllMocks()
   localStorage.clear()
   await deleteTacticalBoardDatabase()
 })
@@ -255,6 +258,204 @@ describe('App — migration de la campagne initiale', () => {
       tacticalBoardRepository.getSetting(OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING),
     ).resolves.toBe('deleted-campaign')
   })
+})
+
+describe('App — caractérisation du cycle navigateur', () => {
+  it('restaure le scénario actif mémorisé même s’il n’est pas le plus récent', async () => {
+    const remembered = createDefaultScenario('Scénario mémorisé', {
+      id: 'remembered-scenario',
+      now: '2026-01-01T10:00:00.000Z',
+    })
+    const newest = createDefaultScenario('Scénario plus récent', {
+      id: 'newest-scenario',
+      now: '2026-07-19T10:00:00.000Z',
+    })
+    await tacticalBoardRepository.saveScenario(remembered)
+    await tacticalBoardRepository.saveScenario(newest)
+    await tacticalBoardRepository.setSetting('activeScenarioId', remembered.id)
+    await tacticalBoardRepository.setSetting(
+      OBJECTIVE_CAMPAIGN_VERSION_SETTING,
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(useAppStore.getState().history?.present.id).toBe(remembered.id)
+    })
+    expect(screen.getAllByText('Scénario mémorisé')).not.toHaveLength(0)
+    expect(useAppStore.getState().documents.map((document) => document.id)).toEqual([
+      newest.id,
+      remembered.id,
+    ])
+  })
+
+  it('journalise immédiatement une mutation puis la persiste après le debounce', async () => {
+    const scenario = createDefaultScenario('Avant mutation', {
+      id: 'autosave-scenario',
+      now: '2026-07-19T10:00:00.000Z',
+    })
+    await tacticalBoardRepository.saveScenario(scenario)
+    await tacticalBoardRepository.setSetting('activeScenarioId', scenario.id)
+    await tacticalBoardRepository.setSetting(
+      OBJECTIVE_CAMPAIGN_VERSION_SETTING,
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+    render(<App />)
+    await waitFor(() => expect(useAppStore.getState().hydrated).toBe(true))
+
+    act(() => {
+      useAppStore.getState().commit({
+        type: 'renameScenario',
+        name: 'Après mutation',
+        at: '2026-07-19T10:01:00.000Z',
+      })
+    })
+
+    expect(localStorage.getItem(RECOVERY_JOURNAL_KEY)).toContain('Après mutation')
+    await waitFor(async () => {
+      expect((await tacticalBoardRepository.getScenario(scenario.id))?.name).toBe(
+        'Après mutation',
+      )
+      expect(localStorage.getItem(RECOVERY_JOURNAL_KEY)).toBeNull()
+    })
+  })
+
+  it('hydrate la reprise locale plus récente, la sauvegarde et nettoie le journal', async () => {
+    const stored = createDefaultScenario('Version IndexedDB', {
+      id: 'recovered-scenario',
+      now: '2026-07-19T10:00:00.000Z',
+    })
+    const recovered = {
+      ...stored,
+      name: 'Version récupérée',
+      updatedAt: '2026-07-19T10:05:00.000Z',
+    }
+    await tacticalBoardRepository.saveScenario(stored)
+    await tacticalBoardRepository.setSetting('activeScenarioId', stored.id)
+    await tacticalBoardRepository.setSetting(
+      OBJECTIVE_CAMPAIGN_VERSION_SETTING,
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+    writeRecoveryJournal(recovered)
+
+    render(<App />)
+
+    await waitFor(() => {
+      expect(useAppStore.getState().history?.present.name).toBe('Version récupérée')
+    })
+    await expect(tacticalBoardRepository.getScenario(stored.id)).resolves.toEqual(recovered)
+    await waitFor(() => {
+      expect(localStorage.getItem(RECOVERY_JOURNAL_KEY)).toBeNull()
+    })
+  })
+
+  it('préserve les priorités et les gardes des raccourcis globaux', async () => {
+    const scenario = scenarioWithTwoUnits()
+    await tacticalBoardRepository.saveScenario(scenario)
+    await tacticalBoardRepository.setSetting('activeScenarioId', scenario.id)
+    await tacticalBoardRepository.setSetting(
+      OBJECTIVE_CAMPAIGN_VERSION_SETTING,
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+    const user = userEvent.setup()
+    render(<App />)
+    await screen.findByRole('button', {
+      name: 'Alpha, faction Mes forces, active',
+    })
+
+    act(() => {
+      useAppStore.getState().commit({ type: 'renameScenario', name: 'Renommé' })
+    })
+    await user.keyboard('{Control>}z{/Control}')
+    expect(useAppStore.getState().history?.present.name).toBe('Sélection Shift')
+    await user.keyboard('{Control>}{Shift>}z{/Shift}{/Control}')
+    expect(useAppStore.getState().history?.present.name).toBe('Renommé')
+
+    act(() => {
+      useAppStore.getState().setSelection({ kind: 'unit', id: 'alpha' })
+      useAppStore.getState().setTool('delete')
+      useAppStore.getState().setLeftPanelOpen(true)
+    })
+    await user.keyboard('{Escape}')
+    expect(useAppStore.getState()).toMatchObject({
+      selection: null,
+      tool: 'select',
+      leftPanelOpen: false,
+      rightPanelOpen: false,
+    })
+
+    act(() => {
+      useAppStore.getState().setSelection({ kind: 'unit', id: 'alpha' })
+    })
+    await user.keyboard('{Delete}')
+    expect(useAppStore.getState().history?.present.units.map((unit) => unit.id)).toEqual([
+      'bravo',
+    ])
+
+    const input = document.createElement('input')
+    document.body.append(input)
+    input.focus()
+    const historyBeforeInput = useAppStore.getState().history
+    fireEvent.keyDown(input, { key: 'z', ctrlKey: true })
+    fireEvent.keyDown(input, { key: 'Delete' })
+    fireEvent.keyDown(input, { key: 'Escape' })
+    expect(useAppStore.getState().history).toBe(historyBeforeInput)
+
+    const saveEvent = new KeyboardEvent('keydown', {
+      bubbles: true,
+      cancelable: true,
+      ctrlKey: true,
+      key: 's',
+    })
+    expect(input.dispatchEvent(saveEvent)).toBe(false)
+    expect(
+      await screen.findByText('Scénario enregistré sur cet appareil.'),
+    ).toBeInTheDocument()
+    input.remove()
+  }, 10_000)
+
+  it('confirme une réduction destructive avant une unique action annulable', async () => {
+    const base = createDefaultScenario('Redimensionnement', {
+      id: 'resize-scenario',
+      now: '2026-07-19T10:00:00.000Z',
+    })
+    const scenario = applyCommand(base, {
+      type: 'placeUnit',
+      unitId: 'outside-unit',
+      typeId: 'infantry',
+      factionId: base.factions[0]!.id,
+      position: { row: 7, column: 7 },
+      name: 'Hors limite',
+    }).document
+    await tacticalBoardRepository.saveScenario(scenario)
+    await tacticalBoardRepository.setSetting('activeScenarioId', scenario.id)
+    await tacticalBoardRepository.setSetting(
+      OBJECTIVE_CAMPAIGN_VERSION_SETTING,
+      OBJECTIVE_CAMPAIGN_VERSION,
+    )
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByRole('button', { name: 'Plateau' }))
+    await user.clear(screen.getByLabelText('Lignes'))
+    await user.type(screen.getByLabelText('Lignes'), '5')
+    await user.clear(screen.getByLabelText('Colonnes'))
+    await user.type(screen.getByLabelText('Colonnes'), '5')
+
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    await user.click(screen.getByRole('button', { name: 'Appliquer' }))
+    expect(confirm).toHaveBeenCalledTimes(1)
+    expect(useAppStore.getState().history?.present.grid).toMatchObject({ rows: 8, columns: 8 })
+    expect(useAppStore.getState().history?.present.units).toHaveLength(1)
+
+    confirm.mockReturnValue(true)
+    await user.click(screen.getByRole('button', { name: 'Appliquer' }))
+    expect(useAppStore.getState().history?.present.grid).toMatchObject({ rows: 5, columns: 5 })
+    expect(useAppStore.getState().history?.present.units).toHaveLength(0)
+    expect(useAppStore.getState().history?.past).toHaveLength(1)
+    act(() => useAppStore.getState().undo())
+    expect(useAppStore.getState().history?.present.units[0]?.id).toBe('outside-unit')
+  }, 10_000)
 })
 
 describe('App — sélection multiple', () => {

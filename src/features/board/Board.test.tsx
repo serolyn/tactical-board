@@ -469,6 +469,66 @@ describe('Board', () => {
     )
   })
 
+  it('place un marqueur avec le type et la couleur actifs', async () => {
+    const user = userEvent.setup()
+    const props = boardProps({
+      markerColor: '#0ea5e9',
+      markerKind: 'warning',
+      tool: 'marker',
+    })
+    render(<Board {...props} />)
+
+    await user.click(screen.getByRole('gridcell', { name: 'Case C2, vide' }))
+
+    expect(props.onAddMarker).toHaveBeenCalledWith(
+      { column: 2, row: 1 },
+      'danger',
+      '#0ea5e9',
+    )
+  })
+
+  it('crée une flèche par glissement Pointer Events', () => {
+    const props = boardProps({
+      arrowColor: '#a855f7',
+      arrowStyle: 'movement',
+      tool: 'arrow',
+    })
+    render(<Board {...props} />)
+    mockGridBounds(props.scenario)
+    const start = screen.getByRole('gridcell', { name: 'Case A1, vide' })
+    const end = screen.getByRole('gridcell', { name: 'Case C2, vide' })
+
+    fireEvent.pointerDown(start, {
+      ...cellCenter({ column: 0, row: 0 }),
+      button: 0,
+      buttons: 1,
+      isPrimary: true,
+      pointerId: 31,
+      pointerType: 'touch',
+    })
+    fireEvent.pointerMove(end, {
+      ...cellCenter({ column: 2, row: 1 }),
+      buttons: 1,
+      isPrimary: true,
+      pointerId: 31,
+      pointerType: 'touch',
+    })
+    fireEvent.pointerUp(end, {
+      ...cellCenter({ column: 2, row: 1 }),
+      buttons: 0,
+      isPrimary: true,
+      pointerId: 31,
+      pointerType: 'touch',
+    })
+
+    expect(props.onAddArrow).toHaveBeenCalledWith(
+      { column: 0, row: 0 },
+      { column: 2, row: 1 },
+      'movement',
+      '#a855f7',
+    )
+  })
+
   it('efface une annotation trouvée sur la case', async () => {
     const user = userEvent.setup()
     const base = createDefaultScenario('Test', {

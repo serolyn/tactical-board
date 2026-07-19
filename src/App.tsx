@@ -15,6 +15,13 @@ import {
   X,
 } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { loadAppInitialData } from './app/bootstrap/loadAppInitialData'
+import { useAssetUrls } from './app/persistence/useAssetUrls'
+import { useScenarioAutosave } from './app/persistence/useScenarioAutosave'
+import { deriveSelectionModel } from './app/selectionModel'
+import { sortScenarios, uniqueScenarioName } from './app/scenarioUtils'
+import { useGlobalShortcuts } from './app/shortcuts/useGlobalShortcuts'
+import { useBoardOnlyMode } from './app/useBoardOnlyMode'
 import { Button, type SaveState as UiSaveState } from './components'
 import {
   BUILT_IN_UNIT_TYPES,
@@ -31,14 +38,7 @@ import {
   type UnitStatus,
   type UnitType,
 } from './domain'
-import {
-  applyObjectiveCampaign,
-  createNextScenario,
-  findObjectiveCampaignCandidate,
-  OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING,
-  OBJECTIVE_CAMPAIGN_VERSION,
-  OBJECTIVE_CAMPAIGN_VERSION_SETTING,
-} from './data'
+import { createNextScenario } from './data'
 import {
   InspectorPanel,
   LibraryPanel,
@@ -58,144 +58,17 @@ import {
   ScenarioDetailsModal,
 } from './features/scenarios/ScenarioFlowModals'
 import {
-  createAutosaveController,
   createImageAsset,
-  clearRecoveryJournal,
   exportAllScenariosJson,
   exportBoardToPng,
   exportScenarioJson,
   importScenario,
-  readRecoveryJournal,
   tacticalBoardRepository,
-  writeRecoveryJournal,
-  type AutosaveSnapshot,
-  type ImageAssetRecord,
 } from './services'
 import { selectActiveScenario, useAppStore } from './store/appStore'
 import styles from './App.module.css'
 
-interface InitialData {
-  activeScenarioId?: string
-  assets: ImageAssetRecord[]
-  documents: ScenarioDocumentV1[]
-}
-
-let initialDataPromise: Promise<InitialData> | null = null
-
-async function loadInitialData(): Promise<InitialData> {
-  initialDataPromise ??= (async () => {
-    let documents = await tacticalBoardRepository.listScenarios()
-    let createdInitial: ScenarioDocumentV1 | null = null
-    let recoveryNeedsSaving = false
-    let recovery: ScenarioDocumentV1 | null = null
-    try {
-      recovery = readRecoveryJournal()
-    } catch {
-      // The journal is a best-effort bridge for the IndexedDB debounce window.
-    }
-    if (recovery) {
-      const storedIndex = documents.findIndex((document) => document.id === recovery.id)
-      const stored = documents[storedIndex]
-      if (!stored || recovery.updatedAt >= stored.updatedAt) {
-        documents = stored
-          ? documents.map((document) => (document.id === recovery.id ? recovery : document))
-          : [recovery, ...documents]
-        try {
-          await tacticalBoardRepository.saveScenario(recovery)
-          clearRecoveryJournal(recovery)
-        } catch {
-          recoveryNeedsSaving = true
-        }
-      } else {
-        try {
-          clearRecoveryJournal(recovery)
-        } catch {
-          // IndexedDB already contains a newer valid document.
-        }
-      }
-    }
-    if (!documents.length) {
-      createdInitial = createDefaultScenario()
-      documents = [createdInitial]
-    }
-    const [seededCampaignVersion, trackedCampaignScenarioId] = await Promise.all([
-      tacticalBoardRepository.getSetting<number>(OBJECTIVE_CAMPAIGN_VERSION_SETTING),
-      tacticalBoardRepository.getSetting<string>(OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING),
-    ])
-    if ((seededCampaignVersion ?? 0) < OBJECTIVE_CAMPAIGN_VERSION) {
-      const firstSeed = (seededCampaignVersion ?? 0) === 0
-      const candidate =
-        firstSeed && createdInitial
-          ? createdInitial
-          : findObjectiveCampaignCandidate(documents, trackedCampaignScenarioId)
-      if (candidate) {
-        const campaign = applyObjectiveCampaign(candidate)
-        await tacticalBoardRepository.saveScenarioWithSettings(campaign, {
-          [OBJECTIVE_CAMPAIGN_VERSION_SETTING]: OBJECTIVE_CAMPAIGN_VERSION,
-          [OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING]: campaign.id,
-        })
-        documents = documents.map((document) =>
-          document.id === campaign.id ? campaign : document,
-        )
-      } else {
-        if (createdInitial) await tacticalBoardRepository.saveScenario(createdInitial)
-        await tacticalBoardRepository.setSetting(
-          OBJECTIVE_CAMPAIGN_VERSION_SETTING,
-          OBJECTIVE_CAMPAIGN_VERSION,
-        )
-      }
-    } else if (createdInitial) {
-      await tacticalBoardRepository.saveScenario(createdInitial)
-    }
-    if (!recoveryNeedsSaving) await tacticalBoardRepository.cleanupOrphanAssets()
-    const [activeScenarioId, assets] = await Promise.all([
-      tacticalBoardRepository.getSetting<string>('activeScenarioId'),
-      tacticalBoardRepository.listAssets(),
-    ])
-    return { activeScenarioId, assets, documents }
-  })()
-  const pending = initialDataPromise
-  void pending.then(
-    () => {
-      if (initialDataPromise === pending) initialDataPromise = null
-    },
-    () => {
-      if (initialDataPromise === pending) initialDataPromise = null
-    },
-  )
-  return pending
-}
-
-function makeAssetUrlMap(assets: readonly ImageAssetRecord[]) {
-  return Object.fromEntries(assets.map((asset) => [asset.id, URL.createObjectURL(asset.blob)]))
-}
-
-function uniqueScenarioName(
-  baseName: string,
-  documents: readonly ScenarioDocumentV1[],
-  suffix = 'copie',
-) {
-  const names = new Set(documents.map((document) => document.name.toLocaleLowerCase('fr')))
-  if (!names.has(baseName.toLocaleLowerCase('fr'))) return baseName
-  let index = 1
-  let candidate = `${baseName} (${suffix})`
-  while (names.has(candidate.toLocaleLowerCase('fr'))) {
-    index += 1
-    candidate = `${baseName} (${suffix} ${index})`
-  }
-  return candidate
-}
-
-function isEditableTarget(target: EventTarget | null) {
-  return (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement ||
-    (target instanceof HTMLElement && target.isContentEditable)
-  )
-}
-
-function saveStateFor(snapshot: AutosaveSnapshot): UiSaveState {
+function saveStateFor(snapshot: ReturnType<typeof useScenarioAutosave>['saveSnapshot']): UiSaveState {
   if (snapshot.state === 'error') return 'error'
   if (snapshot.state === 'saving' || snapshot.state === 'pending') return 'saving'
   return 'saved'
@@ -276,8 +149,6 @@ export default function App() {
   const notify = useAppStore((state) => state.notify)
   const clearNotification = useAppStore((state) => state.clearNotification)
 
-  const [assetUrls, setAssetUrls] = useState<Record<string, string>>({})
-  const assetUrlsRef = useRef<Record<string, string>>({})
   const [initialError, setInitialError] = useState<string | null>(null)
   const [newScenarioOpen, setNewScenarioOpen] = useState(false)
   const [nextScenarioSourceId, setNextScenarioSourceId] = useState<string | null>(null)
@@ -286,136 +157,51 @@ export default function App() {
   const [scenarioDetailsOpen, setScenarioDetailsOpen] = useState(false)
   const [boardSettingsOpen, setBoardSettingsOpen] = useState(false)
   const [multiSelectionOpen, setMultiSelectionOpen] = useState(false)
-  const [boardOnlyMode, setBoardOnlyMode] = useState(false)
-  const [saveSnapshot, setSaveSnapshot] = useState<AutosaveSnapshot>({
-    state: 'idle',
-    error: null,
-    lastSavedAt: null,
-  })
   const boardRef = useRef<HTMLDivElement>(null)
-  const appRef = useRef<HTMLDivElement>(null)
-  const boardOnlyExitRef = useRef<HTMLButtonElement>(null)
-  const boardOnlyModeRef = useRef(false)
-  const ownsBrowserFullscreenRef = useRef(false)
   const viewportRef = useRef<HTMLDivElement>(null)
   const lastFittedScenarioId = useRef<string | null>(null)
-  const shiftSelectionRef = useRef(false)
+  const { assetUrls, loadAssets, refreshAssetUrls } = useAssetUrls()
+  const {
+    saveSnapshot,
+    flushAutosaveOrThrow,
+    forceSave: persistActiveScenario,
+    retry: retryAutosave,
+  } = useScenarioAutosave(activeScenario, hydrated)
 
-  const leaveBoardOnlyMode = useCallback(() => {
-    boardOnlyModeRef.current = false
-    setBoardOnlyMode(false)
-    const ownsCurrentFullscreen = document.fullscreenElement === appRef.current
-    ownsBrowserFullscreenRef.current = false
-    if (ownsCurrentFullscreen && document.exitFullscreen) {
-      void document.exitFullscreen().catch(() => undefined)
-    }
-  }, [])
-
-  const enterBoardOnlyMode = useCallback(() => {
+  const prepareBoardOnlyMode = useCallback(() => {
     setLeftPanelOpen(false)
     setRightPanelOpen(false)
     setMultiSelectionOpen(false)
     setTool('select')
-    boardOnlyModeRef.current = true
-    setBoardOnlyMode(true)
-
-    const target = appRef.current
-    if (!target?.requestFullscreen || document.fullscreenElement) return
-    void target.requestFullscreen().then(
-      () => {
-        ownsBrowserFullscreenRef.current = true
-        if (
-          !boardOnlyModeRef.current &&
-          document.fullscreenElement === target &&
-          document.exitFullscreen
-        ) {
-          ownsBrowserFullscreenRef.current = false
-          void document.exitFullscreen().catch(() => undefined)
-        }
-      },
-      () => {
-        ownsBrowserFullscreenRef.current = false
-      },
-    )
   }, [setLeftPanelOpen, setRightPanelOpen, setTool])
 
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      if (document.fullscreenElement === appRef.current) {
-        ownsBrowserFullscreenRef.current = true
-        if (!boardOnlyModeRef.current && document.exitFullscreen) {
-          ownsBrowserFullscreenRef.current = false
-          void document.exitFullscreen().catch(() => undefined)
-        }
-        return
-      }
-      if (!ownsBrowserFullscreenRef.current) return
-      ownsBrowserFullscreenRef.current = false
-      boardOnlyModeRef.current = false
-      setBoardOnlyMode(false)
-    }
-    document.addEventListener('fullscreenchange', handleFullscreenChange)
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange)
-  }, [])
-
-  useEffect(() => {
-    if (!boardOnlyMode) return
-    const frame = requestAnimationFrame(() => boardOnlyExitRef.current?.focus())
-    return () => cancelAnimationFrame(frame)
-  }, [boardOnlyMode])
-
-  const autosave = useMemo(
-    () =>
-      createAutosaveController<ScenarioDocumentV1>(async (document) => {
-        await tacticalBoardRepository.saveScenario(document)
-        try {
-          clearRecoveryJournal(document)
-        } catch {
-          // IndexedDB remains the source of truth when localStorage is unavailable.
-        }
-      }),
-    [],
-  )
-
-  const refreshAssetUrls = useCallback(async () => {
-    const assets = await tacticalBoardRepository.listAssets()
-    const previous = assetUrlsRef.current
-    const next: Record<string, string> = {}
-    for (const asset of assets) {
-      next[asset.id] = previous[asset.id] ?? URL.createObjectURL(asset.blob)
-    }
-    for (const [id, url] of Object.entries(previous)) {
-      if (!next[id]) URL.revokeObjectURL(url)
-    }
-    assetUrlsRef.current = next
-    setAssetUrls(next)
-  }, [])
-
-  useEffect(() => autosave.subscribe(setSaveSnapshot), [autosave])
-
-  useEffect(
-    () =>
-      useAppStore.subscribe((state, previousState) => {
-        const document = state.history?.present
-        if (!document || document === previousState.history?.present) return
-        try {
-          writeRecoveryJournal(document)
-        } catch {
-          // Quota or privacy settings may disable this best-effort recovery journal.
-        }
-      }),
-    [],
-  )
+  const interfaceRequired =
+    multiSelectionOpen ||
+    newScenarioOpen ||
+    Boolean(nextScenarioSourceId) ||
+    objectiveReachedOpen ||
+    progressOpen ||
+    scenarioDetailsOpen ||
+    boardSettingsOpen ||
+    saveSnapshot.state === 'error'
+  const {
+    boardOnlyMode,
+    appRef,
+    boardOnlyExitRef,
+    enterBoardOnlyMode,
+    leaveBoardOnlyMode,
+  } = useBoardOnlyMode({
+    onEnter: prepareBoardOnlyMode,
+    shouldExit: interfaceRequired,
+  })
 
   useEffect(() => {
     let cancelled = false
-    void loadInitialData()
+    void loadAppInitialData()
       .then(async ({ activeScenarioId, assets, documents: storedDocuments }) => {
         if (cancelled) return
         const initial = hydrate(storedDocuments, activeScenarioId)
-        const urls = makeAssetUrlMap(assets)
-        assetUrlsRef.current = urls
-        setAssetUrls(urls)
+        loadAssets(assets)
         await tacticalBoardRepository.setSetting('activeScenarioId', initial.id)
       })
       .catch((error: unknown) => {
@@ -424,35 +210,7 @@ export default function App() {
     return () => {
       cancelled = true
     }
-  }, [hydrate])
-
-  useEffect(() => {
-    if (hydrated && activeScenario) autosave.schedule(activeScenario)
-  }, [activeScenario, autosave, hydrated])
-
-  useEffect(() => {
-    const flushPendingSave = () => {
-      const latestDocument = selectActiveScenario(useAppStore.getState())
-      if (latestDocument) autosave.schedule(latestDocument)
-      void autosave.flush()
-    }
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') flushPendingSave()
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('pagehide', flushPendingSave)
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('pagehide', flushPendingSave)
-    }
-  }, [autosave])
-
-  useEffect(
-    () => () => {
-      for (const url of Object.values(assetUrlsRef.current)) URL.revokeObjectURL(url)
-    },
-    [],
-  )
+  }, [hydrate, loadAssets])
 
   useEffect(() => {
     if (!notification) return
@@ -460,29 +218,6 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [clearNotification, notification])
 
-  useEffect(() => {
-    const interfaceRequired =
-      multiSelectionOpen ||
-      newScenarioOpen ||
-      Boolean(nextScenarioSourceId) ||
-      objectiveReachedOpen ||
-      progressOpen ||
-      scenarioDetailsOpen ||
-      boardSettingsOpen ||
-      saveSnapshot.state === 'error'
-    if (boardOnlyMode && interfaceRequired) leaveBoardOnlyMode()
-  }, [
-    boardOnlyMode,
-    boardSettingsOpen,
-    leaveBoardOnlyMode,
-    multiSelectionOpen,
-    newScenarioOpen,
-    nextScenarioSourceId,
-    objectiveReachedOpen,
-    progressOpen,
-    saveSnapshot.state,
-    scenarioDetailsOpen,
-  ])
 
   const unitTypes = useMemo<readonly UnitType[]>(
     () => [...BUILT_IN_UNIT_TYPES, ...(activeScenario?.customUnitTypes ?? [])],
@@ -494,48 +229,18 @@ export default function App() {
     activeScenario?.factions.find((faction) => faction.id === activeFactionId) ??
     activeScenario?.factions[0] ??
     null
-  const selectedUnit =
-    selection?.kind === 'unit'
-      ? activeScenario?.units.find((unit) => unit.id === selection.id) ?? null
-      : null
-  const selectedUnits = useMemo(() => {
-    if (selection?.kind !== 'units' || !activeScenario) return []
-    const unitById = new Map(activeScenario.units.map((unit) => [unit.id, unit]))
-    return selection.ids
-      .map((unitId) => unitById.get(unitId))
-      .filter((unit): unit is NonNullable<typeof unit> => Boolean(unit))
-  }, [activeScenario, selection])
-  const selectedAnnotation =
-    selection?.kind === 'annotation'
-      ? activeScenario?.annotations.find((annotation) => annotation.id === selection.id) ?? null
-      : null
-  const ownFaction = activeScenario?.factions.find((faction) => faction.role === 'own')
-  const selectedFactionRoles = selectedUnits.map(
-    (unit) =>
-      activeScenario?.factions.find((faction) => faction.id === unit.factionId)?.role,
+  const {
+    selectedUnit,
+    selectedUnits,
+    selectedAnnotation,
+    ownFaction,
+    canRallySelectedUnits,
+    canNeutralizeSelectedUnits,
+  } = useMemo(
+    () => deriveSelectionModel(activeScenario, selection),
+    [activeScenario, selection],
   )
-  const canRallySelectedUnits = Boolean(
-    ownFaction &&
-      selectedUnits.length >= 2 &&
-      selectedFactionRoles.every((role) => role === 'rally'),
-  )
-  const canNeutralizeSelectedUnits =
-    selectedUnits.length >= 2 &&
-    selectedFactionRoles.every((role) => role === 'obstacle') &&
-    selectedUnits.every((unit) => unit.status !== 'neutralized')
-  const orderedDocuments = useMemo(
-    () =>
-      [...documents].sort((left, right) => {
-        const leftDate = left.period?.start ?? left.createdAt
-        const rightDate = right.period?.start ?? right.createdAt
-        return (
-          leftDate.localeCompare(rightDate) ||
-          left.createdAt.localeCompare(right.createdAt) ||
-          left.name.localeCompare(right.name, 'fr')
-        )
-      }),
-    [documents],
-  )
+  const orderedDocuments = useMemo(() => sortScenarios(documents), [documents])
   const nextScenarioSource =
     documents.find((document) => document.id === nextScenarioSourceId) ?? activeScenario
 
@@ -551,19 +256,10 @@ export default function App() {
     [commit, notify],
   )
 
-  const flushAutosaveOrThrow = useCallback(async () => {
-    await autosave.flush()
-    const snapshot = autosave.getSnapshot()
-    if (snapshot.state === 'error') {
-      throw snapshot.error ?? new Error('Échec de la sauvegarde.')
-    }
-  }, [autosave])
-
   const forceSave = useCallback(async () => {
-    if (activeScenario) autosave.schedule(activeScenario)
-    await flushAutosaveOrThrow()
+    await persistActiveScenario()
     notify('Scénario enregistré sur cet appareil.', 'success')
-  }, [activeScenario, autosave, flushAutosaveOrThrow, notify])
+  }, [notify, persistActiveScenario])
 
   const deleteSelection = useCallback(() => {
     if (!selection) return
@@ -579,7 +275,6 @@ export default function App() {
   }, [safelyCommit, selection, setSelection])
 
   const finishMultiSelection = useCallback(() => {
-    shiftSelectionRef.current = false
     const currentSelection = useAppStore.getState().selection
     if (currentSelection?.kind !== 'units') {
       setMultiSelectionOpen(false)
@@ -597,60 +292,33 @@ export default function App() {
     notify(`${ids.length} unités sélectionnées.`)
   }, [leaveBoardOnlyMode, notify, setRightPanelOpen, setSelection])
 
-  useEffect(() => {
-    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Escape' && boardOnlyMode) {
-        event.preventDefault()
-        leaveBoardOnlyMode()
-        return
-      }
-      const modifier = event.ctrlKey || event.metaKey
-      if (modifier && event.key.toLowerCase() === 's') {
-        event.preventDefault()
-        void forceSave().catch((error: unknown) => notify(errorMessage(error), 'error'))
-        return
-      }
-      if (isEditableTarget(event.target)) return
-      if (event.key === 'Shift' && !event.repeat) {
-        shiftSelectionRef.current = true
-        setMultiSelectionOpen(false)
-        return
-      }
-      if (modifier && event.key.toLowerCase() === 'z') {
-        event.preventDefault()
-        if (event.shiftKey) redo()
-        else undo()
-        return
-      }
-      if (event.key === 'Delete' || event.key === 'Backspace') {
-        event.preventDefault()
-        deleteSelection()
-        return
-      }
-      if (event.key === 'Escape') {
-        shiftSelectionRef.current = false
-        setMultiSelectionOpen(false)
-        setSelection(null)
-        setTool('select')
-        setLeftPanelOpen(false)
-        setRightPanelOpen(false)
-      }
-    }
-    const handleKeyUp = (event: globalThis.KeyboardEvent) => {
-      if (event.key === 'Shift' && shiftSelectionRef.current) finishMultiSelection()
-    }
-    const handleWindowBlur = () => {
-      if (shiftSelectionRef.current) finishMultiSelection()
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    window.addEventListener('blur', handleWindowBlur)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-      window.removeEventListener('blur', handleWindowBlur)
-    }
-  }, [boardOnlyMode, deleteSelection, finishMultiSelection, forceSave, leaveBoardOnlyMode, notify, redo, setLeftPanelOpen, setRightPanelOpen, setSelection, setTool, undo])
+  const cancelGlobalInteraction = useCallback(() => {
+    setMultiSelectionOpen(false)
+    setSelection(null)
+    setTool('select')
+    setLeftPanelOpen(false)
+    setRightPanelOpen(false)
+  }, [setLeftPanelOpen, setRightPanelOpen, setSelection, setTool])
+
+  const requestForceSave = useCallback(() => {
+    void forceSave().catch((error: unknown) => notify(errorMessage(error), 'error'))
+  }, [forceSave, notify])
+
+  const startMultiSelection = useCallback(() => {
+    setMultiSelectionOpen(false)
+  }, [])
+
+  useGlobalShortcuts({
+    boardOnlyMode,
+    onCancel: cancelGlobalInteraction,
+    onDelete: deleteSelection,
+    onExitBoardOnly: leaveBoardOnlyMode,
+    onForceSave: requestForceSave,
+    onRedo: redo,
+    onShiftEnd: finishMultiSelection,
+    onShiftStart: startMultiSelection,
+    onUndo: undo,
+  })
 
   useEffect(() => {
     if (selection?.kind !== 'units') setMultiSelectionOpen(false)
@@ -1158,9 +826,7 @@ export default function App() {
           }
         }}
         onExportPng={handleExportPng}
-        onForceSave={() =>
-          forceSave().catch((error: unknown) => notify(errorMessage(error), 'error'))
-        }
+        onForceSave={requestForceSave}
         onImportScenario={handleImport}
         onOpenInspector={() => setRightPanelOpen(true)}
         onOpenLibrary={() => setLeftPanelOpen(true)}
@@ -1453,7 +1119,7 @@ export default function App() {
       {saveSnapshot.state === 'error' && (
         <div className={styles.errorBanner} role="alert">
           <p>La sauvegarde locale a échoué : {saveSnapshot.error?.message}</p>
-          <button type="button" onClick={() => void autosave.retry()}>Réessayer</button>
+          <button type="button" onClick={() => void retryAutosave()}>Réessayer</button>
           <button
             type="button"
             onClick={() =>

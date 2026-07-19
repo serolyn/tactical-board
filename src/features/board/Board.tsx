@@ -1,10 +1,7 @@
 import {
   CircleOff,
   EyeOff,
-  Flag,
-  MapPin,
   ShieldAlert,
-  TriangleAlert,
   X,
 } from 'lucide-react'
 import {
@@ -20,23 +17,37 @@ import {
 } from 'react'
 import type {
   ArrowAnnotation,
-  BoardAnnotation,
   Faction,
   MarkerAnnotation,
-  MoveUnitsPreview,
   Position,
   ScenarioDocumentV1,
   TacticalUnit,
   UnitType,
 } from '../../domain'
-import { previewMoveUnits } from '../../domain'
+import {
+  cellKey,
+  coordinateLabel,
+  getAnnotationAt,
+  isPositionInGrid,
+  positionFromClientPoint as positionFromClientPointInBounds,
+  samePosition,
+} from './boardGeometry'
+import { ArrowLayer } from './ArrowLayer'
 import type { ArrowStyle, BoardTool, MarkerKind } from './BoardToolbar'
-import { BuiltinIcon } from './BuiltinIcon'
+import { DragGhostLayer } from './DragGhostLayer'
+import {
+  calculateDragPreview as calculateUnitDragPreview,
+  type DragPreviewState,
+} from './dragPreview'
+import { MarkerLayer } from './MarkerLayer'
 import {
   selectedUnitIds,
   toggleUnitSelection,
   type BoardSelection,
 } from './selection'
+import { UnitVisual } from './UnitVisual'
+import { statusDetails, unitClassName } from './unitVisualModel'
+import { useArrowDrawing } from './useArrowDrawing'
 import styles from './Board.module.css'
 
 export type { BoardSelection } from './selection'
@@ -82,145 +93,10 @@ interface DragState {
   selectionChanged: boolean
 }
 
-interface DragPreviewState {
-  unitIds: readonly string[]
-  translateX: number
-  translateY: number
-  delta: Position | null
-  moves: MoveUnitsPreview['moves']
-  valid: boolean
-  changed: boolean
-  message?: string
-  objectiveTargetId?: string
-}
-
-interface ArrowPointerState {
-  start: Position
-  clientX: number
-  clientY: number
-  moved: boolean
-}
-
-const samePosition = (left: Position, right: Position) =>
-  left.row === right.row && left.column === right.column
-
-const cellKey = (position: Position) => `${position.row}:${position.column}`
-
-function coordinateLabel(position: Position) {
-  return `${String.fromCharCode(65 + position.column)}${position.row + 1}`
-}
-
-function isPositionInGrid(position: Position, scenario: ScenarioDocumentV1) {
-  return (
-    position.row >= 0 &&
-    position.column >= 0 &&
-    position.row < scenario.grid.rows &&
-    position.column < scenario.grid.columns
-  )
-}
-
-function distanceToSegment(point: Position, start: Position, end: Position) {
-  const px = point.column + 0.5
-  const py = point.row + 0.5
-  const x1 = start.column + 0.5
-  const y1 = start.row + 0.5
-  const x2 = end.column + 0.5
-  const y2 = end.row + 0.5
-  const dx = x2 - x1
-  const dy = y2 - y1
-  const lengthSquared = dx * dx + dy * dy
-  if (!lengthSquared) return Math.hypot(px - x1, py - y1)
-  const factor = Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lengthSquared))
-  return Math.hypot(px - (x1 + factor * dx), py - (y1 + factor * dy))
-}
-
-function getAnnotationAt(
-  annotations: readonly BoardAnnotation[],
-  position: Position,
-): BoardAnnotation | undefined {
-  const marker = annotations.find(
-    (annotation) => annotation.kind === 'marker' && samePosition(annotation.position, position),
-  )
-  if (marker) return marker
-  return annotations
-    .filter((annotation): annotation is ArrowAnnotation => annotation.kind === 'arrow')
-    .map((annotation) => ({ annotation, distance: distanceToSegment(position, annotation.start, annotation.end) }))
-    .filter(({ distance }) => distance <= 0.42)
-    .sort((left, right) => left.distance - right.distance)[0]?.annotation
-}
-
-function markerIcon(markerType: MarkerAnnotation['markerType']) {
-  if (markerType === 'danger') return TriangleAlert
-  if (markerType === 'rally') return MapPin
-  return Flag
-}
-
 function markerTypeFromToolbar(kind: MarkerKind): MarkerAnnotation['markerType'] {
   if (kind === 'warning') return 'danger'
   if (kind === 'rally-point') return 'rally'
   return 'objective'
-}
-
-function statusDetails(status: TacticalUnit['status']) {
-  if (status === 'wounded') return { symbol: '+', className: styles.statusWounded, label: 'blessée' }
-  if (status === 'neutralized') return { symbol: '−', className: styles.statusNeutralized, label: 'neutralisée' }
-  if (status === 'destroyed') return { symbol: '×', className: styles.statusDestroyed, label: 'détruite' }
-  if (status === 'hidden') return { symbol: '◌', className: styles.statusHidden, label: 'cachée' }
-  return null
-}
-
-function unitClassName(unit: TacticalUnit, selected: boolean) {
-  return [
-    styles.unit,
-    selected ? styles.unitSelected : '',
-    unit.status === 'neutralized' ? styles.unitNeutralized : '',
-    unit.status === 'destroyed' ? styles.unitDestroyed : '',
-    unit.status === 'hidden' ? styles.unitHidden : '',
-  ]
-    .filter(Boolean)
-    .join(' ')
-}
-
-interface UnitVisualProps {
-  assetUrl?: string
-  faction?: Faction
-  unit: TacticalUnit
-}
-
-function UnitVisual({ assetUrl, faction, unit }: UnitVisualProps) {
-  const status = statusDetails(unit.status)
-  return (
-    <>
-      <span className={styles.iconFrame}>
-        {unit.icon.kind === 'asset' && assetUrl ? (
-          <img className={styles.iconImage} src={assetUrl} alt="" draggable={false} />
-        ) : (
-          <BuiltinIcon
-            iconKey={unit.icon.kind === 'catalog' ? unit.icon.name : 'target'}
-            aria-hidden
-          />
-        )}
-        <span className={styles.factionBadge} aria-hidden>
-          {faction?.name.charAt(0).toUpperCase() ?? '?'}
-        </span>
-        {status ? (
-          <span className={`${styles.statusBadge} ${status.className}`} aria-hidden>
-            {status.symbol}
-          </span>
-        ) : null}
-      </span>
-      <span className={styles.unitLabel}>{unit.name}</span>
-      {unit.status === 'destroyed' ? (
-        <span
-          aria-hidden="true"
-          className={styles.destroyedOverlay}
-          data-destroyed-overlay
-        >
-          <X />
-        </span>
-      ) : null}
-    </>
-  )
 }
 
 export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
@@ -251,11 +127,8 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   boardRef,
 ) {
   const [dragPreview, setDragPreview] = useState<DragPreviewState | null>(null)
-  const [arrowStart, setArrowStart] = useState<Position | null>(null)
-  const [arrowPreview, setArrowPreview] = useState<Position | null>(null)
   const dragRef = useRef<DragState | null>(null)
   const gridRef = useRef<HTMLDivElement>(null)
-  const arrowPointerRef = useRef<ArrowPointerState | null>(null)
   const suppressClickRef = useRef(false)
   const suppressClickTimerRef = useRef<number | null>(null)
 
@@ -322,25 +195,25 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
     const grid = gridRef.current
     if (!grid) return null
     const bounds = grid.getBoundingClientRect()
-    if (
-      bounds.width <= 0 ||
-      bounds.height <= 0 ||
-      clientX < bounds.left ||
-      clientX >= bounds.right ||
-      clientY < bounds.top ||
-      clientY >= bounds.bottom
-    ) return null
-    const column = Math.floor(
-      ((clientX - bounds.left) / bounds.width) * scenario.grid.columns,
-    )
-    const row = Math.floor(
-      ((clientY - bounds.top) / bounds.height) * scenario.grid.rows,
-    )
-    const position = { row, column }
-    return Number.isInteger(row) && Number.isInteger(column) && isPositionInGrid(position, scenario)
-      ? position
-      : null
+    return positionFromClientPointInBounds(bounds, scenario.grid, clientX, clientY)
   }
+
+  const {
+    arrowPreview,
+    arrowStart,
+    handleArrowCellClick,
+    handleCellPointerDown,
+    handleCellPointerMove,
+    handleCellPointerUp,
+    setArrowPreview,
+  } = useArrowDrawing({
+    arrowColor,
+    arrowStyle,
+    enabled: tool === 'arrow',
+    onAddArrow,
+    positionFromClientPoint,
+    suppressClickRef,
+  })
 
   const rememberDragPreview = (next: DragPreviewState | null) => {
     setDragPreview(next)
@@ -352,86 +225,19 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
     clientY: number,
   ): DragPreviewState => {
     const viewport = viewportRef.current
-    const translateX =
-      clientX - drag.clientX + (viewport?.scrollLeft ?? drag.scrollLeft) - drag.scrollLeft
-    const translateY =
-      clientY - drag.clientY + (viewport?.scrollTop ?? drag.scrollTop) - drag.scrollTop
     const target = positionFromClientPoint(clientX, clientY)
-    if (!target) {
-      return {
-        unitIds: drag.unitIds,
-        translateX,
-        translateY,
-        delta: null,
-        moves: [],
-        valid: false,
-        changed: false,
-        message: 'Relâchez la sélection à l’intérieur du plateau.',
-      }
-    }
-
-    const delta = {
-      row: target.row - drag.anchorPosition.row,
-      column: target.column - drag.anchorPosition.column,
-    }
-    const anchorUnit = unitById.get(drag.anchorUnitId)
-    const occupant = unitByCell.get(cellKey(target))
-    if (
-      drag.unitIds.length === 1 &&
-      anchorUnit &&
-      occupant &&
-      occupant.id !== anchorUnit.id &&
-      canReachObjective(anchorUnit, occupant)
-    ) {
-      return {
-        unitIds: drag.unitIds,
-        translateX,
-        translateY,
-        delta,
-        moves: [{ unitId: anchorUnit.id, from: anchorUnit.position, to: target }],
-        valid: true,
-        changed: true,
-        objectiveTargetId: occupant.id,
-      }
-    }
-
-    const rawMoves = drag.unitIds.flatMap((unitId) => {
-      const unit = unitById.get(unitId)
-      return unit
-        ? [{
-            unitId,
-            from: unit.position,
-            to: {
-              row: unit.position.row + delta.row,
-              column: unit.position.column + delta.column,
-            },
-          }]
-        : []
+    return calculateUnitDragPreview({
+      canReachObjective,
+      clientX,
+      clientY,
+      currentScrollLeft: viewport?.scrollLeft ?? drag.scrollLeft,
+      currentScrollTop: viewport?.scrollTop ?? drag.scrollTop,
+      drag,
+      scenario,
+      target,
+      unitByCell,
+      unitById,
     })
-
-    try {
-      const preview = previewMoveUnits(scenario, drag.unitIds, delta)
-      return {
-        unitIds: drag.unitIds,
-        translateX,
-        translateY,
-        delta,
-        moves: preview.moves,
-        valid: true,
-        changed: preview.changed,
-      }
-    } catch (error) {
-      return {
-        unitIds: drag.unitIds,
-        translateX,
-        translateY,
-        delta,
-        moves: rawMoves,
-        valid: false,
-        changed: false,
-        message: error instanceof Error ? error.message : 'Déplacement impossible.',
-      }
-    }
   }
 
   const moveSelectedUnit = (position: Position) => {
@@ -470,17 +276,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
     }
 
     if (tool === 'arrow') {
-      if (!arrowStart) {
-        setArrowStart(position)
-        setArrowPreview(position)
-      } else if (samePosition(arrowStart, position)) {
-        setArrowStart(null)
-        setArrowPreview(null)
-      } else {
-        onAddArrow(arrowStart, position, arrowStyle, arrowColor)
-        setArrowStart(null)
-        setArrowPreview(null)
-      }
+      handleArrowCellClick(position)
       return
     }
 
@@ -644,40 +440,6 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
     }
   }
 
-  const handleCellPointerDown = (event: PointerEvent<HTMLButtonElement>, position: Position) => {
-    if (tool !== 'arrow') return
-    arrowPointerRef.current = {
-      start: position,
-      clientX: event.clientX,
-      clientY: event.clientY,
-      moved: false,
-    }
-  }
-
-  const handleCellPointerMove = (event: PointerEvent<HTMLButtonElement>, position: Position) => {
-    if (tool !== 'arrow') return
-    setArrowPreview(position)
-    const pointer = arrowPointerRef.current
-    if (pointer && Math.hypot(event.clientX - pointer.clientX, event.clientY - pointer.clientY) >= 6) {
-      pointer.moved = true
-      setArrowStart(pointer.start)
-    }
-  }
-
-  const handleCellPointerUp = (event: PointerEvent<HTMLButtonElement>) => {
-    if (tool !== 'arrow') return
-    const pointer = arrowPointerRef.current
-    arrowPointerRef.current = null
-    if (!pointer?.moved) return
-    suppressClickRef.current = true
-    const end = positionFromClientPoint(event.clientX, event.clientY)
-    if (end && !samePosition(pointer.start, end)) {
-      onAddArrow(pointer.start, end, arrowStyle, arrowColor)
-    }
-    setArrowStart(null)
-    setArrowPreview(null)
-  }
-
   const handleCellKeyDown = (event: KeyboardEvent<HTMLButtonElement>, position: Position) => {
     let next: Position | null = null
     if (event.key === 'ArrowRight') next = { ...position, column: Math.min(scenario.grid.columns - 1, position.column + 1) }
@@ -693,7 +455,7 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
   const previewEnd = arrowPreview
   const dragDestinationKeys = new Set(
     (dragPreview?.moves ?? [])
-      .filter((move) => isPositionInGrid(move.to, scenario))
+      .filter((move) => isPositionInGrid(move.to, scenario.grid))
       .map((move) => cellKey(move.to)),
   )
   const dragSourceIds = new Set(dragPreview?.unitIds ?? [])
@@ -774,94 +536,26 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
             })}
           </div>
 
-          <svg
-            className={styles.annotationLayer}
-            viewBox={`0 0 ${scenario.grid.columns} ${scenario.grid.rows}`}
-            preserveAspectRatio="none"
-            aria-hidden="true"
-          >
-            <defs>
-              {scenario.annotations
-                .filter((annotation): annotation is ArrowAnnotation => annotation.kind === 'arrow')
-                .map((annotation) => (
-                  <marker
-                    key={annotation.id}
-                    id={`arrow-${annotation.id}`}
-                    viewBox="0 0 10 10"
-                    refX="8"
-                    refY="5"
-                    markerWidth="4"
-                    markerHeight="4"
-                    orient="auto-start-reverse"
-                  >
-                    <path d="M 0 0 L 10 5 L 0 10 z" fill={annotation.color} />
-                  </marker>
-                ))}
-              <marker id="preview-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill={arrowColor} />
-              </marker>
-            </defs>
-            {scenario.annotations
-              .filter((annotation): annotation is ArrowAnnotation => annotation.kind === 'arrow')
-              .map((annotation) => (
-                <line
-                  key={annotation.id}
-                  className={styles.arrow}
-                  data-png-opacity="0.84"
-                  data-png-stroke-width="3.5"
-                  x1={annotation.start.column + 0.5}
-                  y1={annotation.start.row + 0.5}
-                  x2={annotation.end.column + 0.5}
-                  y2={annotation.end.row + 0.5}
-                  stroke={annotation.color}
-                  strokeWidth={selectedAnnotationId === annotation.id ? 5 : 3.5}
-                  strokeDasharray={
-                    annotation.style === 'attack' ? '9 6' : annotation.style === 'support' ? '3 6' : undefined
-                  }
-                  markerEnd={`url(#arrow-${annotation.id})`}
-                  opacity={selectedAnnotationId === annotation.id ? 1 : 0.84}
-                />
-              ))}
-            {previewStart && previewEnd && !samePosition(previewStart, previewEnd) && (
-              <line
-                className={`${styles.arrow} ${styles.previewLine}`}
-                data-png-hide="true"
-                x1={previewStart.column + 0.5}
-                y1={previewStart.row + 0.5}
-                x2={previewEnd.column + 0.5}
-                y2={previewEnd.row + 0.5}
-                stroke={arrowColor}
-                strokeWidth={3.5}
-                strokeDasharray={arrowStyle === 'attack' ? '9 6' : arrowStyle === 'support' ? '3 6' : undefined}
-                markerEnd="url(#preview-arrow)"
-              />
+          <ArrowLayer
+            annotations={scenario.annotations.filter(
+              (annotation): annotation is ArrowAnnotation => annotation.kind === 'arrow',
             )}
-          </svg>
+            arrowColor={arrowColor}
+            arrowStyle={arrowStyle}
+            columns={scenario.grid.columns}
+            previewEnd={previewEnd}
+            previewStart={previewStart}
+            rows={scenario.grid.rows}
+            selectedAnnotationId={selectedAnnotationId}
+          />
 
           <div className={styles.unitLayer}>
-            {scenario.annotations
-              .filter((annotation): annotation is MarkerAnnotation => annotation.kind === 'marker')
-              .map((annotation) => {
-                const MarkerIcon = markerIcon(annotation.markerType)
-                return (
-                  <span
-                    key={annotation.id}
-                    aria-label={`${annotation.label || 'Marqueur'}, ${annotation.markerType}`}
-                    className={`${styles.marker} ${selectedAnnotationId === annotation.id ? styles.markerSelected : ''}`}
-                    data-png-remove-class={selectedAnnotationId === annotation.id ? styles.markerSelected : undefined}
-                    style={{
-                      left: `calc(${annotation.position.column} * var(--cell-size))`,
-                      top: `calc(${annotation.position.row} * var(--cell-size))`,
-                      '--marker-color': annotation.color,
-                    } as CSSProperties}
-                    title={annotation.label || annotation.markerType}
-                    role="img"
-                  >
-                    <MarkerIcon aria-hidden />
-                    <span className={styles.markerLabel}>{annotation.label}</span>
-                  </span>
-                )
-              })}
+            <MarkerLayer
+              annotations={scenario.annotations.filter(
+                (annotation): annotation is MarkerAnnotation => annotation.kind === 'marker',
+              )}
+              selectedAnnotationId={selectedAnnotationId}
+            />
 
             {scenario.units.map((unit) => {
               const faction = factionById.get(unit.factionId)
@@ -910,37 +604,14 @@ export const Board = forwardRef<HTMLDivElement, BoardProps>(function Board(
           </div>
 
           {dragPreview ? (
-            <div
-              aria-hidden="true"
-              className={styles.dragGhostLayer}
-              data-png-hide="true"
-            >
-              {draggedUnits.map((unit) => {
-                const faction = factionById.get(unit.factionId)
-                const assetUrl =
-                  unit.icon.kind === 'asset' ? assetUrls[unit.icon.assetId] : undefined
-                return (
-                  <div
-                    className={[
-                      styles.dragGhost,
-                      unit.status === 'destroyed' ? styles.unitDestroyed : '',
-                      dragPreview.valid ? '' : styles.dragGhostInvalid,
-                    ].filter(Boolean).join(' ')}
-                    data-drag-ghost={unit.id}
-                    key={unit.id}
-                    style={{
-                      left: `calc(${unit.position.column} * var(--cell-size))`,
-                      top: `calc(${unit.position.row} * var(--cell-size))`,
-                      transform: `translate(${dragPreview.translateX}px, ${dragPreview.translateY}px)`,
-                      '--unit-color': unit.color,
-                      '--faction-color': faction?.color ?? '#94a3b8',
-                    } as CSSProperties}
-                  >
-                    <UnitVisual assetUrl={assetUrl} faction={faction} unit={unit} />
-                  </div>
-                )
-              })}
-            </div>
+            <DragGhostLayer
+              assetUrls={assetUrls}
+              factionById={factionById}
+              translateX={dragPreview.translateX}
+              translateY={dragPreview.translateY}
+              units={draggedUnits}
+              valid={dragPreview.valid}
+            />
           ) : null}
 
           {!scenario.units.length && (
