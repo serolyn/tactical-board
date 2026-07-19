@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-07-19T23:03:22.821Z",
+  "chromium": "chromium",
+  "previewUrl": "http://127.0.0.1:4173/tactical-board/",
+  "captures": {
+    "desktop": {
+      "title": "SEROLYN — Entre plusieurs vies",
+      "webglState": "ready",
+      "webglActive": "true",
+      "canvas": {
+        "width": 892,
+        "height": 828
+      },
+      "resources": [
+        "http://127.0.0.1:4173/tactical-board/assets/index-BaojXr_4.js",
+        "http://127.0.0.1:4173/tactical-board/assets/react-Ca03aNmg.js",
+        "http://127.0.0.1:4173/tactical-board/assets/index-Brlwk3fw.css",
+        "http://127.0.0.1:4173/tactical-board/assets/signal-horizon-BzKd3NaG.webp",
+        "http://127.0.0.1:4173/tactical-board/assets/Manrope-Variable-400-700-latin-DHIcAJRg.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/IBMPlexMono-Regular-400-latin-DMJ8VG8y.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/Newsreader-Italic-400-latin-CEihAR-f.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/tactical-terrain-dZKR1O_s.webp",
+        "http://127.0.0.1:4173/tactical-board/assets/moonlit-harbor-ccqEX2FE.webp",
+        "http://127.0.0.1:4173/tactical-board/assets/motionFeatures-D_CTHCXD.js",
+        "http://127.0.0.1:4173/tactical-board/assets/GhostSignalCanvas-DY1Sbcsd.js",
+        "http://127.0.0.1:4173/tactical-board/assets/vanilla-DZJGj1NY.js",
+        "http://127.0.0.1:4173/tactical-board/favicon.svg"
+      ]
+    },
+    "mobile": {
+      "title": "SEROLYN — Entre plusieurs vies",
+      "webglState": "ready",
+      "webglActive": "true",
+      "canvas": {
+        "width": 390,
+        "height": 732
+      },
+      "resources": [
+        "http://127.0.0.1:4173/tactical-board/assets/index-BaojXr_4.js",
+        "http://127.0.0.1:4173/tactical-board/assets/react-Ca03aNmg.js",
+        "http://127.0.0.1:4173/tactical-board/assets/index-Brlwk3fw.css",
+        "http://127.0.0.1:4173/tactical-board/assets/Manrope-Variable-400-700-latin-DHIcAJRg.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/Newsreader-Italic-400-latin-CEihAR-f.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/IBMPlexMono-Regular-400-latin-DMJ8VG8y.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/signal-horizon-BzKd3NaG.webp",
+        "http://127.0.0.1:4173/tactical-board/assets/tactical-terrain-dZKR1O_s.webp",
+        "http://127.0.0.1:4173/tactical-board/assets/moonlit-harbor-ccqEX2FE.webp",
+        "data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E",
+        "http://127.0.0.1:4173/tactical-board/assets/motionFeatures-D_CTHCXD.js",
+        "http://127.0.0.1:4173/tactical-board/assets/GhostSignalCanvas-DY1Sbcsd.js",
+        "http://127.0.0.1:4173/tactical-board/assets/vanilla-DZJGj1NY.js"
+      ]
+    },
+    "reducedMotion": {
+      "title": "SEROLYN — Entre plusieurs vies",
+      "webglState": "fallback",
+      "webglActive": "false",
+      "canvas": null,
+      "resources": [
+        "http://127.0.0.1:4173/tactical-board/assets/index-BaojXr_4.js",
+        "http://127.0.0.1:4173/tactical-board/assets/react-Ca03aNmg.js",
+        "http://127.0.0.1:4173/tactical-board/assets/index-Brlwk3fw.css",
+        "http://127.0.0.1:4173/tactical-board/assets/Manrope-Variable-400-700-latin-DHIcAJRg.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/Newsreader-Italic-400-latin-CEihAR-f.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/IBMPlexMono-Regular-400-latin-DMJ8VG8y.woff2",
+        "http://127.0.0.1:4173/tactical-board/assets/signal-horizon-BzKd3NaG.webp",
+        "http://127.0.0.1:4173/tactical-board/assets/tactical-terrain-dZKR1O_s.webp",
+        "http://127.0.0.1:4173/tactical-board/assets/moonlit-harbor-ccqEX2FE.webp",
+        "data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E",
+        "http://127.0.0.1:4173/tactical-board/assets/motionFeatures-D_CTHCXD.js"
+      ]
+    }
+  },
+  "videos": {
+    "heroFrames": 50,
+    "transitionFrames": 25
+  },
+  "lifecycle": {
+    "activityPause": true,
+    "contextRecovery": "restored"
+  },
+  "consoleErrors": [],
+  "consoleWarnings": [
+    "THREE.Clock: This module has been deprecated. Please use THREE.Timer instead."
+  ]
+}

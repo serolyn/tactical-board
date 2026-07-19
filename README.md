@@ -35,6 +35,7 @@ npm run typecheck  # vérification TypeScript
 npm run lint       # analyse Oxlint
 npm run build      # build de production dans dist/
 npm run preview    # aperçu du build
+npm run capture:portfolio # recette Chromium Phase 3C + captures/vidéos
 ```
 
 Chaque envoi sur la branche `main` publie automatiquement la version de production sur GitHub Pages.
@@ -52,6 +53,15 @@ TypeScript. Le guide [docs/content-authoring.md](./docs/content-authoring.md)
 explique comment ajouter une entrée, une image, un fichier audio, un lien ou une
 section. La planche visuelle canonique reste dans `docs/art-direction/` et est
 copiée automatiquement dans le build de production.
+
+Le hero d’accueil superpose désormais **Ghost Signal**, une scène WebGL
+procédurale, au ciel statique qui reste toujours présent. Three.js et React
+Three Fiber sont chargés uniquement sur l’accueil et dans un chunk séparé. Le
+Canvas se met en pause hors écran ou lorsque l’onglet est masqué, adapte sa
+qualité, puis revient silencieusement à l’image seule si WebGL échoue, si
+`prefers-reduced-motion` est actif ou si le navigateur demande l’économie de
+données. Les transitions, révélations au scroll et micro-interactions utilisent
+un vocabulaire Motion centralisé ; le plateau `/board` reste hors de ce shell.
 
 ## Tactical Board
 
@@ -108,6 +118,10 @@ Les raccourcis de suppression et d’historique global sont neutralisés pendant
 ## Architecture
 
 - `src/portfolio` : shell éditorial, routes, pages, composants, contenus typés et styles.
+- `src/portfolio/motion` : provider Motion différé, transitions de routes,
+  révélations accessibles, liens animés et tokens partagés.
+- `src/portfolio/three` : scène Ghost Signal, shaders GLSL, qualité adaptative,
+  détection WebGL et gestion du cycle de vie du contexte.
 - `src/domain` : contrats TypeScript, catalogue, invariants, reducer pur et historique.
 - `src/store` : état applicatif Zustand et état d’interaction.
 - `src/features` : plateau, bibliothèque, scénarios et inspecteur.

@@ -4,7 +4,7 @@ import { getRouteMetadata } from './routeMetadata'
 
 const DESCRIPTION_SELECTOR = 'meta[name="description"]'
 
-/** Applies route metadata everywhere, and portfolio-only scroll/focus effects. */
+/** Applies route metadata everywhere; the animated shell owns portfolio arrival effects. */
 export function RouteEffects() {
   const { pathname } = useLocation()
   const initialMetadata = useRef<{ title: string; description?: string } | null>(null)
@@ -36,37 +36,6 @@ export function RouteEffects() {
     document.title = metadata.title
     description.content = metadata.description
 
-    if (pathname === '/board') return
-
-    const scrollContainer = document.querySelector<HTMLElement>('[data-portfolio-scroll]')
-    if (scrollContainer) scrollContainer.scrollTop = 0
-    document.documentElement.scrollTop = 0
-    document.body.scrollTop = 0
-
-    const main = document.querySelector<HTMLElement>('#portfolio-main')
-    let focusFrame = 0
-    let observer: MutationObserver | null = null
-
-    const focusHeading = () => {
-      const heading = main?.querySelector<HTMLElement>('h1')
-      if (!heading) return
-      heading.focus({ preventScroll: true })
-      observer?.disconnect()
-    }
-
-    focusFrame = window.requestAnimationFrame(focusHeading)
-    if (main && !main.querySelector('h1')) {
-      observer = new MutationObserver(() => {
-        window.cancelAnimationFrame(focusFrame)
-        focusFrame = window.requestAnimationFrame(focusHeading)
-      })
-      observer.observe(main, { childList: true, subtree: true })
-    }
-
-    return () => {
-      window.cancelAnimationFrame(focusFrame)
-      observer?.disconnect()
-    }
   }, [pathname])
 
   return null

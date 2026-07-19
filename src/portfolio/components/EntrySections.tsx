@@ -1,4 +1,5 @@
 import type { ContentLink, ContentSection, MetadataSection } from '../content'
+import { Reveal } from '../motion'
 import { ContentLinkAction, EntryLinks } from './EntryLinks'
 
 function SignalPalette({ section }: { section: MetadataSection }) {
@@ -47,7 +48,7 @@ export function EntrySections({ sections, links = [] }: EntrySectionsProps) {
         const className = `entry-section entry-section--${section.type} entry-section--${section.id}`
 
         return (
-          <section className={className} id={section.id} key={section.id}>
+          <Reveal as="section" className={className} id={section.id} key={section.id}>
             <p className="entry-section__index">{sectionNumber} / {section.type.toUpperCase()}</p>
 
             {section.type === 'text' ? (
@@ -111,7 +112,7 @@ export function EntrySections({ sections, links = [] }: EntrySectionsProps) {
                 </div>
               </div>
             ) : null}
-          </section>
+          </Reveal>
         )
       })}
       <EntryLinks links={links} />

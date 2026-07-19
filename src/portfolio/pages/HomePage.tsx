@@ -1,8 +1,15 @@
-import { Link } from 'react-router'
+import { useCallback, useState } from 'react'
+import { m, useReducedMotion } from 'motion/react'
 import { EmptyState } from '../components/EmptyState'
 import { EntryIndex } from '../components/EntryIndex'
 import { HeroVisualSlot } from '../components/HeroVisualSlot'
 import { SectionHeading } from '../components/SectionHeading'
+import {
+  AnimatedLink,
+  getHeroArrivalVariants,
+  getHeroSignalVariants,
+  Reveal,
+} from '../motion'
 import {
   publishedLab,
   publishedMusic,
@@ -11,30 +18,75 @@ import {
 } from '../content'
 
 export function HomePage() {
+  const [ghostSignalActive, setGhostSignalActive] = useState(false)
+  const reducedMotion = Boolean(useReducedMotion())
+  const handleGhostSignalChange = useCallback((active: boolean) => {
+    setGhostSignalActive(active)
+  }, [])
+
   return (
     <article className="home-page">
       <section className="home-hero" aria-labelledby="home-title">
-        <HeroVisualSlot alt={siteContent.home.visual.alt} src={siteContent.home.visual.src} />
+        <HeroVisualSlot
+          alt={siteContent.home.visual.alt}
+          onSignalChange={handleGhostSignalChange}
+          src={siteContent.home.visual.src}
+        />
 
         <div className="home-hero__inner">
           <div className="home-hero__copy">
-            <p className="portfolio-meta">{siteContent.home.overline}</p>
+            <m.p
+              animate="visible"
+              className="portfolio-meta"
+              initial="hidden"
+              variants={getHeroArrivalVariants(reducedMotion, 0)}
+            >
+              {siteContent.home.overline}
+            </m.p>
             <h1 aria-label={siteContent.home.title} id="home-title" tabIndex={-1}>
-              ENTRE<br />PLUSIEURS<br />VIES
+              {['ENTRE', 'PLUSIEURS', 'VIES'].map((line, index) => (
+                <m.span
+                  animate="visible"
+                  aria-hidden="true"
+                  initial="hidden"
+                  key={line}
+                  variants={getHeroArrivalVariants(reducedMotion, index + 1)}
+                >
+                  {line}
+                </m.span>
+              ))}
             </h1>
-            <p className="home-hero__lead">{siteContent.home.introduction}</p>
-            <div className="home-hero__actions">
-              <Link className="portfolio-action portfolio-action--primary" to="/projects">
+            <m.p
+              animate="visible"
+              className="home-hero__lead"
+              initial="hidden"
+              variants={getHeroArrivalVariants(reducedMotion, 4)}
+            >
+              {siteContent.home.introduction}
+            </m.p>
+            <m.div
+              animate="visible"
+              className="home-hero__actions"
+              initial="hidden"
+              variants={getHeroArrivalVariants(reducedMotion, 5)}
+            >
+              <AnimatedLink className="portfolio-action portfolio-action--primary" to="/projects">
                 Explorer les projets
-              </Link>
-              <Link className="text-action" to="/music">
-                Écouter les scènes <span aria-hidden="true">↘</span>
-              </Link>
-            </div>
+              </AnimatedLink>
+              <AnimatedLink className="text-action" indicator="arrow" to="/music">
+                Écouter les scènes
+              </AnimatedLink>
+            </m.div>
           </div>
 
           <p aria-hidden="true" className="portfolio-ghost home-hero__ghost">ce qui flotte.</p>
-          <span aria-hidden="true" className="home-hero__signal" />
+          <m.span
+            animate="visible"
+            aria-hidden="true"
+            className={`home-hero__signal${ghostSignalActive ? ' home-hero__signal--active' : ''}`}
+            initial="hidden"
+            variants={getHeroSignalVariants(reducedMotion)}
+          />
         </div>
       </section>
 
@@ -85,7 +137,7 @@ export function HomePage() {
             {publishedMusic.length ? (
               <EntryIndex entries={publishedMusic} routeBase="/music" />
             ) : (
-              <div className="home-music-atmosphere">
+              <Reveal className="home-music-atmosphere">
                 <figure>
                   <img
                     alt={siteContent.music.atmosphere.alt}
@@ -99,28 +151,28 @@ export function HomePage() {
                   <p>{siteContent.music.introduction}</p>
                   <div>
                     <p className="music-empty-message">{siteContent.music.emptyState}</p>
-                    <Link className="text-action" to="/music">
-                      Ouvrir les scènes <span aria-hidden="true">↘</span>
-                    </Link>
+                    <AnimatedLink className="text-action" indicator="arrow" to="/music">
+                      Ouvrir les scènes
+                    </AnimatedLink>
                   </div>
                 </div>
-              </div>
+              </Reveal>
             )}
           </div>
         </div>
       </section>
 
       <section className="editorial-section" aria-labelledby="home-about-title">
-        <div className="page-boundary home-about-fragment">
+        <Reveal className="page-boundary home-about-fragment">
           <p className="portfolio-meta">04 / À PROPOS</p>
           <blockquote id="home-about-title">Je construis entre code, son et image.</blockquote>
           <div className="home-about-fragment__aside">
             <p>{siteContent.home.aboutFragment}</p>
-            <Link className="text-action" to="/about">
-              Lire la suite <span aria-hidden="true">↘</span>
-            </Link>
+            <AnimatedLink className="text-action" indicator="arrow" to="/about">
+              Lire la suite
+            </AnimatedLink>
           </div>
-        </div>
+        </Reveal>
       </section>
     </article>
   )

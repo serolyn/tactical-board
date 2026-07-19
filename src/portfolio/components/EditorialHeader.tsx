@@ -1,4 +1,6 @@
+import { m } from 'motion/react'
 import { Link, NavLink } from 'react-router'
+import { motionTransitions } from '../motion'
 
 const navigation = [
   { to: '/projects', label: 'Projets' },
@@ -27,7 +29,19 @@ export function EditorialHeader() {
                   }
                   to={item.to}
                 >
-                  {item.label}
+                  {({ isActive }) => (
+                    <>
+                      {item.label}
+                      {isActive ? (
+                        <m.span
+                          aria-hidden="true"
+                          className="portfolio-navigation__active-line"
+                          layoutId="portfolio-navigation-active"
+                          transition={motionTransitions.interface}
+                        />
+                      ) : null}
+                    </>
+                  )}
                 </NavLink>
               </li>
             ))}

@@ -1,4 +1,5 @@
 import { siteContent } from '../content'
+import { Reveal } from '../motion'
 
 export function AboutPage() {
   const optionalLinks = [...siteContent.socialLinks, ...siteContent.contactLinks]
@@ -18,17 +19,17 @@ export function AboutPage() {
 
       <section className="editorial-section">
         <div className="page-boundary about-grid">
-          <section className="about-block" aria-labelledby="about-approach-title">
+          <Reveal as="section" className="about-block" aria-labelledby="about-approach-title">
             <p className="portfolio-meta">01 / APPROCHE</p>
             <h2 id="about-approach-title">Approche</h2>
             <p>{siteContent.about.approach}</p>
-          </section>
-          <section className="about-block" aria-labelledby="about-now-title">
+          </Reveal>
+          <Reveal as="section" className="about-block" aria-labelledby="about-now-title">
             <p className="portfolio-meta">02 / EN CE MOMENT</p>
             <h2 id="about-now-title">En ce moment</h2>
             <p>{siteContent.about.current}</p>
-          </section>
-          <section className="about-block" aria-labelledby="about-tech-title">
+          </Reveal>
+          <Reveal as="section" className="about-block" aria-labelledby="about-tech-title">
             <p className="portfolio-meta">03 / TECHNOLOGIES</p>
             <h2 id="about-tech-title">Technologies</h2>
             <ul className="technology-list">
@@ -36,9 +37,9 @@ export function AboutPage() {
                 <li key={technology}>{technology}</li>
               ))}
             </ul>
-          </section>
+          </Reveal>
           {optionalLinks.length ? (
-            <section className="about-block" aria-labelledby="about-links-title">
+            <Reveal as="section" className="about-block" aria-labelledby="about-links-title">
               <p className="portfolio-meta">04 / LIENS</p>
               <h2 id="about-links-title">Contact</h2>
               <ul className="optional-links">
@@ -46,7 +47,7 @@ export function AboutPage() {
                   <li key={link.href}><a href={link.href}>{link.label}</a></li>
                 ))}
               </ul>
-            </section>
+            </Reveal>
           ) : null}
         </div>
       </section>

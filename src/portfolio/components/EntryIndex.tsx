@@ -1,4 +1,5 @@
 import { EntryCard, type EntryCardData } from './EntryCard'
+import { StaggerGroup, StaggerItem } from '../motion'
 
 interface EntryIndexProps {
   entries: readonly EntryCardData[]
@@ -7,12 +8,12 @@ interface EntryIndexProps {
 
 export function EntryIndex({ entries, routeBase }: EntryIndexProps) {
   return (
-    <ol className="entry-index">
+    <StaggerGroup as="ol" className="entry-index">
       {entries.map((entry, index) => (
-        <li key={entry.slug}>
+        <StaggerItem as="li" key={entry.slug}>
           <EntryCard entry={entry} index={index} routeBase={routeBase} />
-        </li>
+        </StaggerItem>
       ))}
-    </ol>
+    </StaggerGroup>
   )
 }

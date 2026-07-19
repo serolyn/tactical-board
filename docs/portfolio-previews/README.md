@@ -25,3 +25,33 @@ La recette responsive complémentaire a couvert les largeurs 320, 390, 768,
 1 024 et 1 440 px sur les sept pages principales, soit 35 combinaisons. Aucun
 débordement horizontal, contenu coupé ou échec de chargement d’image n’a été
 observé après les corrections finales.
+
+## Phase 3C — Ghost Signal et mouvement
+
+La recette Phase 3C est conservée dans [`phase3c/`](./phase3c/). Elle est
+reproductible avec `npm run build`, puis `npm run capture:portfolio`. Le script
+utilise directement le protocole CDP de Chromium et FFmpeg déjà présents sur la
+machine ; aucune dépendance de navigateur supplémentaire n’est installée.
+
+- **Date :** 20 juillet 2026
+- **Navigateur :** Chromium 150.0.7871.124, SwiftShader WebGL2 en headless
+- **Viewport desktop :** 1 440 × 900, DPR 1
+- **Viewport mobile :** 390 × 844, DPR 1, profil Ghost Signal Low
+- **Reduced motion :** média émulé `prefers-reduced-motion: reduce`
+- **Poids total des preuves :** 1 971 571 octets (1,88 Mio)
+
+| Preuve | État vérifié | Dimensions / durée | Poids | SHA-256 |
+| --- | --- | ---: | ---: | --- |
+| [`ghost-signal-desktop.png`](./phase3c/ghost-signal-desktop.png) | WebGL High prêt, pointeur décalé | 1 440 × 900 | 812 054 octets | `7b2708d26ff2acb99f685c00042869f28ef46e981d70b24b8787b2f62f368e42` |
+| [`ghost-signal-mobile-low.png`](./phase3c/ghost-signal-mobile-low.png) | WebGL Low prêt | 390 × 844 | 221 291 octets | `7d4191e475bbca3aecec431d1915c8e406f536974df1d0eb8d2ee8535c2daed4` |
+| [`ghost-signal-reduced-motion.png`](./phase3c/ghost-signal-reduced-motion.png) | fallback statique, aucun Canvas | 1 440 × 900 | 782 980 octets | `71b9ead42921b3bb58f08b19bcf6eae5dc67d84b734a214341d6fa80046cae24` |
+| [`ghost-signal-hero.webm`](./phase3c/ghost-signal-hero.webm) | profondeur et réponse amortie au pointeur | 3,334 s | 53 331 octets | `8ec6adf65edd9b28e2651a9fba845f92e7e53d4768f87ee619d6d5b451adb9cb` |
+| [`portfolio-route-transition.webm`](./phase3c/portfolio-route-transition.webm) | sortie accueil puis entrée Lab | 1,667 s | 97 259 octets | `b81a7d6f799e66218efe5fecd7fa65176482f3b5972c02c91ea99dcec7d88de2` |
+| [`browser-audit.json`](./phase3c/browser-audit.json) | ressources, Canvas, cycle de vie et console | — | 4 656 octets | `a4f63cc5ae87eff4425f98374c99df644b5d8bbb85f397b1caf40cdef4292252` |
+
+Le journal de recette confirme : état `ready` sur desktop et mobile, profil
+statique sans chargement du chunk Ghost en reduced-motion, pause lorsque le
+hero sort du viewport, restauration réussie après perte volontaire du contexte
+WebGL et aucune erreur console. Chromium remonte uniquement l’avertissement
+amont de dépréciation `THREE.Clock` émis par React Three Fiber avec Three
+0.185.1 ; aucun défaut de shader ou exception applicative n’est observé.
