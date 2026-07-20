@@ -1,0 +1,162 @@
+/*
+ * Calque narratif placé au-dessus du décor ou du Canvas.
+ * Il n'intercepte jamais le pointeur.
+ */
+.music-story {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.music-story__asset {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/*
+ * La rose est le sujet situé au fond.
+ */
+.music-story__rose-position {
+  position: absolute;
+  z-index: 1;
+  left: 82%;
+  top: 30%;
+  width: clamp(190px, 24vw, 390px);
+}
+
+.rose {
+  opacity: 0;
+  transform-origin: 50% 90%;
+  will-change: transform, opacity, filter;
+}
+
+.music-story__nuages-position {
+  position: absolute;
+  z-index: 1;
+  left: 20%;
+  top: 0.2%;
+  opacity: 20%;
+  width: clamp(420px, 68vw, 2020px);
+}
+
+.Nuages {
+  opacity: 0;
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+}
+
+/*
+ * La flèche est derrière le corbeau.
+ * Sa position actuelle correspond exactement à sa destination finale.
+ */
+.arrow-flight {
+  position: absolute;
+  z-index: 2;
+  top: 28.9%;
+  left: 56%;
+  width: clamp(140px, 32vw, 200px);
+  opacity: 0;
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+}
+
+.arrow {
+  width: 100%;
+}
+
+/*
+ * Si la pointe de ton PNG regarde vers la gauche, décommente cette règle.
+ */
+/*
+.arrow {
+  transform: scaleX(-1);
+}
+*/
+
+/*
+ * Le corbeau passe devant la flèche afin de cacher la partie qui traverse
+ * son corps.
+ */
+.music-story__crow-position {
+  position: absolute;
+  z-index: 3;
+  left: 57%;
+  top: 28%;
+  width: clamp(300px, 22vw, 200px);
+}
+
+.crow {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transform-origin: 52% 58%;
+  will-change: transform, opacity, filter;
+}
+
+/*
+ * Lumière placée sur le point d'impact.
+ * Modifie left et top si le corps du corbeau n'est pas centré dans son PNG.
+ */
+.crow-impact {
+  position: absolute;
+  z-index: 3;
+  top: 46%;
+  left: 42%;
+  width: 44%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: center;
+  background: radial-gradient(
+    circle,
+    rgb(255 235 225 / 100%) 0%,
+    rgb(239 100 85 / 90%) 12%,
+    rgb(207 75 70 / 48%) 34%,
+    rgb(207 75 70 / 8%) 62%,
+    transparent 76%
+  );
+  filter: blur(3px);
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+}
+
+@media (max-width: 720px) {
+  .music-story__rose-position {
+    left: 44%;
+    top: 18%;
+    width: 44vw;
+  }
+
+  .music-story__crow-position {
+    left: 48%;
+    top: 30%;
+    width: 40vw;
+  }
+
+  .arrow-flight {
+    top: 46%;
+    left: 34%;
+    width: 34vw;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .arrow-flight,
+  .crow-impact {
+    display: none;
+  }
+
+  .rose,
+  .crow {
+    will-change: auto;
+  }
+}

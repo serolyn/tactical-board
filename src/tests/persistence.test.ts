@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Tests automatiques du projet.
+ *
+ * Ce fichier vérifie un comportement précis pour éviter les régressions.
+ * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
+ * rester vrai.
+ */
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
@@ -33,6 +42,13 @@ import {
 } from '@/tactical-board/persistence/tacticalBoardRepository'
 
 const DATE = '2026-01-01T00:00:00.000Z'
+/**
+ * Cette fonction intervient sur le sujet “scenario” dans tests.
+ *
+ * Fichier: src/tests/persistence.test.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord scenario dans persistence.test.ts.
+ */
+
 
 function scenario(id: string, updatedAt = DATE, assetId?: string): ScenarioDocumentV1 {
   const source = createDefaultScenario(id, { id, now: updatedAt })
@@ -53,6 +69,13 @@ function scenario(id: string, updatedAt = DATE, assetId?: string): ScenarioDocum
       }
     : source
 }
+/**
+ * Cette fonction intervient sur le sujet “asset” dans tests.
+ *
+ * Fichier: src/tests/persistence.test.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord asset dans persistence.test.ts.
+ */
+
 
 function asset(id: string): ImageAssetRecord {
   return {
@@ -65,6 +88,13 @@ function asset(id: string): ImageAssetRecord {
     createdAt: DATE,
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “legacy Scenario” dans tests.
+ *
+ * Fichier: src/tests/persistence.test.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord legacyScenario dans persistence.test.ts.
+ */
+
 
 function legacyScenario(id = 'legacy'): LegacyScenarioDocumentV1 {
   const current = scenario(id)

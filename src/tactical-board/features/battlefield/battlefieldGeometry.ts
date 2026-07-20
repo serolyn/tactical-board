@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Interface du plateau tactique.
+ *
+ * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
+ * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
+ * ici qu'il faut commencer.
+ */
+
 import type {
   ArrowAnnotation,
   BoardAnnotation,
@@ -14,18 +23,46 @@ export interface BattlefieldBounds {
   readonly top: number
   readonly width: number
 }
+/**
+ * Cette fonction intervient sur le sujet “same Position” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/battlefieldGeometry.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord samePosition dans battlefieldGeometry.ts.
+ */
+
 
 export function samePosition(left: Position, right: Position): boolean {
   return left.row === right.row && left.column === right.column
 }
+/**
+ * Cette fonction intervient sur le sujet “cell Key” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/battlefieldGeometry.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord cellKey dans battlefieldGeometry.ts.
+ */
+
 
 export function cellKey(position: Position): string {
   return `${position.row}:${position.column}`
 }
+/**
+ * Cette fonction intervient sur le sujet “coordinate Label” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/battlefieldGeometry.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord coordinateLabel dans battlefieldGeometry.ts.
+ */
+
 
 export function coordinateLabel(position: Position): string {
   return `${String.fromCharCode(65 + position.column)}${position.row + 1}`
 }
+/**
+ * Cette fonction teste le sujet “position In Grid” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/battlefieldGeometry.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord isPositionInGrid dans battlefieldGeometry.ts.
+ */
+
 
 export function isPositionInGrid(
   position: Position,

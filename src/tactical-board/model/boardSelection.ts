@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Modèle métier pur de Tactical Board.
+ *
+ * Ce dossier décrit les règles du jeu de données: documents, sélection,
+ * historique, unités, campagnes et migrations. Il ne dépend pas de React.
+ */
+
 import type {
   BoardAnnotation,
   Faction,
@@ -14,12 +22,26 @@ export type BoardSelection =
   | { kind: 'units'; ids: readonly string[] }
   | { kind: 'annotation'; id: string }
   | null
+/**
+ * Cette fonction extrait le sujet “ed Unit Ids” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/boardSelection.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord selectedUnitIds dans boardSelection.ts.
+ */
+
 
 export function selectedUnitIds(selection: BoardSelection): readonly string[] {
   if (selection?.kind === 'unit') return [selection.id]
   if (selection?.kind === 'units') return selection.ids
   return []
 }
+/**
+ * Cette fonction bascule le sujet “unit Selection” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/boardSelection.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord toggleUnitSelection dans boardSelection.ts.
+ */
+
 
 export function toggleUnitSelection(
   selection: BoardSelection,

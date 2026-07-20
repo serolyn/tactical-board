@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Animation du portfolio.
+ *
+ * Ce fichier explique comment les éléments apparaissent, se déplacent ou se
+ * révèlent à l'écran. Lis-le pour comprendre pourquoi certaines transitions sont
+ * visibles et d'autres très discrètes.
+ */
+
 import type { Transition, Variants } from 'motion/react'
 
 export const motionDurations = {
@@ -85,6 +94,13 @@ export function getPageTransitionVariants(reducedMotion: boolean): Variants {
     },
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “get Reveal Variants” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/motionTokens.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getRevealVariants dans motionTokens.ts.
+ */
+
 
 export function getRevealVariants(reducedMotion: boolean): Variants {
   if (reducedMotion) {
@@ -103,6 +119,13 @@ export function getRevealVariants(reducedMotion: boolean): Variants {
     },
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “get Stagger Container Variants” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/motionTokens.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getStaggerContainerVariants dans motionTokens.ts.
+ */
+
 
 export function getStaggerContainerVariants(reducedMotion: boolean): Variants {
   return {
@@ -115,10 +138,24 @@ export function getStaggerContainerVariants(reducedMotion: boolean): Variants {
     },
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “get Stagger Item Variants” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/motionTokens.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getStaggerItemVariants dans motionTokens.ts.
+ */
+
 
 export function getStaggerItemVariants(reducedMotion: boolean): Variants {
   return getRevealVariants(reducedMotion)
 }
+/**
+ * Cette fonction intervient sur le sujet “get Hero Arrival Variants” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/motionTokens.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getHeroArrivalVariants dans motionTokens.ts.
+ */
+
 
 export function getHeroArrivalVariants(
   reducedMotion: boolean,
@@ -143,6 +180,13 @@ export function getHeroArrivalVariants(
     },
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “get Hero Signal Variants” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/motionTokens.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getHeroSignalVariants dans motionTokens.ts.
+ */
+
 
 export function getHeroSignalVariants(reducedMotion: boolean): Variants {
   if (reducedMotion) return getHeroArrivalVariants(true, 0)
@@ -159,6 +203,13 @@ export function getHeroSignalVariants(reducedMotion: boolean): Variants {
     },
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “get Link Variants” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/motionTokens.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getLinkVariants dans motionTokens.ts.
+ */
+
 
 export function getLinkVariants(reducedMotion: boolean): Variants {
   if (reducedMotion) {
@@ -175,6 +226,13 @@ export function getLinkVariants(reducedMotion: boolean): Variants {
     pressed: { opacity: 0.72, transition: motionTransitions.fast },
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “get Link Indicator Variants” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/motionTokens.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getLinkIndicatorVariants dans motionTokens.ts.
+ */
+
 
 export function getLinkIndicatorVariants(reducedMotion: boolean): Variants {
   if (reducedMotion) {

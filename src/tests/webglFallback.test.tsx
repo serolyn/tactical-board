@@ -1,8 +1,17 @@
+/**
+ * @packageDocumentation
+ * Tests automatiques du projet.
+ *
+ * Ce fichier vérifie un comportement précis pour éviter les régressions.
+ * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
+ * rester vrai.
+ */
+
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { useEffect } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { HeroVisualSlot } from '@/portfolio/components/HeroVisualSlot'
+import { HeroVisualSlot } from '@/portfolio/components/PortfolioHeroVisualSlot'
 import type { GhostSignalCanvasProps } from '@/portfolio/webgl/GhostSignalCanvas'
 import { evaluatePerformanceWindow } from '@/portfolio/webgl/ghostSignalQualityProfile'
 import { bindWebGLContextLifecycle } from '@/portfolio/webgl/webglContextLifecycle'
@@ -27,6 +36,13 @@ vi.mock('@/portfolio/webgl/GhostSignalCanvas', () => {
     },
   }
 })
+/**
+ * Cette fonction intervient sur le sujet “install Motion Preference” dans tests.
+ *
+ * Fichier: src/tests/webglFallback.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord installMotionPreference dans webglFallback.test.tsx.
+ */
+
 
 function installMotionPreference(reduced: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -38,6 +54,13 @@ function installMotionPreference(reduced: boolean) {
     })),
   })
 }
+/**
+ * Cette fonction intervient sur le sujet “install Web GL” dans tests.
+ *
+ * Fichier: src/tests/webglFallback.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord installWebGL dans webglFallback.test.tsx.
+ */
+
 
 function installWebGL(available: boolean, throws = false) {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((kind) => {

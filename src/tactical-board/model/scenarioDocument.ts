@@ -1,4 +1,11 @@
 /** Construit les documents par défaut et porte leurs migrations de format durables. */
+/**
+ * @packageDocumentation
+ * Gestion du document de scénario (création et migration).
+ *
+ * Ce module définit les valeurs par défaut d'un scénario, les identifiants
+ * métier et les migrations de formats historiques vers la version courante.
+ */
 import {
   LEGACY_SCENARIO_FORMAT_VERSION,
   SCENARIO_FORMAT_VERSION,
@@ -22,9 +29,11 @@ export const DEFAULT_FACTION_IDS = Object.freeze({
 export interface DefaultScenarioOptions {
   readonly id?: EntityId
   readonly now?: string
-  /** @deprecated Utiliser ownForcesFactionId. */
+  
+/** @deprecated Utiliser ownForcesFactionId. */
   readonly blueFactionId?: EntityId
-  /** @deprecated Utiliser obstacleFactionId. */
+  
+/** @deprecated Utiliser obstacleFactionId. */
   readonly redFactionId?: EntityId
   readonly ownForcesFactionId?: EntityId
   readonly obstacleFactionId?: EntityId
@@ -36,12 +45,23 @@ export interface DefaultScenarioOptions {
   readonly status?: ScenarioStatus
   readonly previousScenarioId?: EntityId
 }
+/**
+ * Cette fonction fabrique un identifiant unique pour un scénario, une unité ou une entité métier.
+ */
+
 
 export function createEntityId(prefix = 'entity'): EntityId {
   const randomUuid = globalThis.crypto?.randomUUID?.()
   if (randomUuid) return `${prefix}-${randomUuid}`
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`
 }
+/**
+ * Cette fonction intervient sur le sujet “default Factions” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/scenarioDocument.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord defaultFactions dans scenarioDocument.ts.
+ */
+
 
 function defaultFactions(options: DefaultScenarioOptions): readonly Faction[] {
   return [
@@ -77,6 +97,10 @@ function defaultFactions(options: DefaultScenarioOptions): readonly Faction[] {
     },
   ]
 }
+/**
+ * Cette fonction construit un scénario neuf avec ses valeurs de départ.
+ */
+
 
 export function createDefaultScenario(
   name = 'Nouveau scénario',
@@ -106,6 +130,13 @@ export function createDefaultScenario(
     annotations: [],
   }
 }
+/**
+ * Cette fonction nettoie le sujet “faction Name” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/scenarioDocument.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord normalizeFactionName dans scenarioDocument.ts.
+ */
+
 
 function normalizeFactionName(name: string): string {
   return name
@@ -114,6 +145,13 @@ function normalizeFactionName(name: string): string {
     .trim()
     .toLocaleLowerCase('fr')
 }
+/**
+ * Cette fonction intervient sur le sujet “infer Legacy Faction Role” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/scenarioDocument.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord inferLegacyFactionRole dans scenarioDocument.ts.
+ */
+
 
 function inferLegacyFactionRole(name: string, index: number): FactionRole {
   const normalizedName = normalizeFactionName(name)
@@ -174,6 +212,10 @@ export function migrateScenarioDocumentV1(
     factions,
   }
 }
+/**
+ * Cette fonction détecte si un document appartient à l’ancien format.
+ */
+
 
 export function isLegacyScenarioDocumentV1(value: unknown): value is LegacyScenarioDocumentV1 {
   return (

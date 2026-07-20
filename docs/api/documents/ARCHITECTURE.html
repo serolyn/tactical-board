@@ -1,0 +1,103 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>ARCHITECTURE | SEROLYN — Documentation technique</title><meta name="description" content="Documentation for SEROLYN — Documentation technique"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">SEROLYN — Documentation technique</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="" aria-current="page">ARCHITECTURE</a></li></ul></div>
+<div class="tsd-panel tsd-typography"><h1 id="architecture-technique-repère-rapide" class="tsd-anchor-link">Architecture technique (repère rapide)<a href="#architecture-technique-repère-rapide" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<p>Ce document complète la documentation API générée automatiquement et sert de
+plan de lecture du projet.</p>
+<h2 id="vue-densemble" class="tsd-anchor-link">Vue d’ensemble<a href="#vue-densemble" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Le dépôt contient deux applications React séparées, choisies uniquement par le
+routeur racine :</p>
+<ul>
+<li>Portfolio éditorial sur <code>/</code></li>
+<li>Tactical Board sur <code>/board</code></li>
+</ul>
+<p>Règle structurante : aucun import croisé direct entre <code>portfolio</code> et
+<code>tactical-board</code>.</p>
+<h2 id="points-dentrée" class="tsd-anchor-link">Points d’entrée<a href="#points-dentrée" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><code>src/main.tsx</code> : montage React</li>
+<li><code>src/app/SiteRouter.tsx</code> : choix entre Portfolio et Tactical Board</li>
+<li><code>src/app/SiteRouteEffects.tsx</code> : métadonnées de route</li>
+</ul>
+<h2 id="zone-portfolio-" class="tsd-anchor-link">Zone Portfolio (<code>src/portfolio</code>)<a href="#zone-portfolio-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><code>PortfolioShell.tsx</code> : shell global (header/main/footer)</li>
+<li><code>pages/</code> : pages routées</li>
+<li><code>components/</code> : composants éditoriaux</li>
+<li><code>content/</code> : contenu publié et validation</li>
+<li><code>motion/</code> : animations Motion</li>
+<li><code>webgl/</code> : effets Three.js réservés au portfolio</li>
+<li><code>styles/</code> : tokens, typo, layout</li>
+</ul>
+<h2 id="zone-tactical-board-" class="tsd-anchor-link">Zone Tactical Board (<code>src/tactical-board</code>)<a href="#zone-tactical-board-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><code>TacticalBoardApp.tsx</code> : racine applicative du board</li>
+<li><code>model/</code> : logique métier pure</li>
+<li><code>state/</code> : store applicatif</li>
+<li><code>features/</code> : UI métier (battlefield, inspector, library, scenarios)</li>
+<li><code>persistence/</code> : IndexedDB + autosauvegarde + migrations</li>
+<li><code>import-export/</code> : imports/exports de documents et assets</li>
+<li><code>ui/</code> : primitives visuelles réutilisables côté board</li>
+</ul>
+<h2 id="zone-shared-" class="tsd-anchor-link">Zone Shared (<code>src/shared</code>)<a href="#zone-shared-" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Contient uniquement les éléments réellement communs aux deux applications.</p>
+<h2 id="tests" class="tsd-anchor-link">Tests<a href="#tests" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Les tests sont dans <code>src/tests/</code> et valident notamment :</p>
+<ul>
+<li>l’isolation de routage portfolio/board</li>
+<li>la persistance</li>
+<li>le contenu publié</li>
+<li>les fallbacks WebGL</li>
+</ul>
+<h2 id="documentation-api-automatique-typedoc" class="tsd-anchor-link">Documentation API automatique (TypeDoc)<a href="#documentation-api-automatique-typedoc" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Une documentation type Doxygen est générée depuis TypeScript.</p>
+<p>Commandes :</p>
+<pre><code class="bash"><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:api</span><br/><span class="hl-0">npm</span><span class="hl-1"> </span><span class="hl-2">run</span><span class="hl-1"> </span><span class="hl-2">docs:api:open</span>
+</code><button type="button">Copy</button></pre>
+
+<p>Sortie : <code>docs/api/index.html</code></p>
+<h2 id="ordre-de-lecture-recommandé" class="tsd-anchor-link">Ordre de lecture recommandé<a href="#ordre-de-lecture-recommandé" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ol>
+<li><code>src/app/SiteRouter.tsx</code></li>
+<li><code>src/portfolio/PortfolioShell.tsx</code></li>
+<li><code>src/tactical-board/TacticalBoardApp.tsx</code></li>
+<li><code>src/tactical-board/model/</code></li>
+<li><code>src/tactical-board/persistence/</code></li>
+</ol>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details"><a href="#architecture-technique-repère-rapide"><span>Architecture technique (repère rapide)</span></a>
+<ul>
+<li><a href="#vue-densemble"><span>Vue d’ensemble</span></a></li>
+<li><a href="#points-dentrée"><span>Points d’entrée</span></a></li>
+<li><a href="#zone-portfolio-"><span>Zone <wbr/>Portfolio ()</span></a></li>
+<li><a href="#zone-tactical-board-"><span>Zone <wbr/>Tactical <wbr/>Board ()</span></a></li>
+<li><a href="#zone-shared-"><span>Zone <wbr/>Shared ()</span></a></li>
+<li><a href="#tests"><span>Tests</span></a></li>
+<li><a href="#documentation-api-automatique-typedoc"><span>Documentation <wbr/>API automatique (<wbr/>Type<wbr/>Doc)</span></a></li>
+<li><a href="#ordre-de-lecture-recommandé"><span>Ordre de lecture recommandé</span></a></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../index.html">SEROLYN — Documentation technique</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>

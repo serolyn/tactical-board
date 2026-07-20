@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Tests automatiques du projet.
+ *
+ * Ce fichier vérifie un comportement précis pour éviter les régressions.
+ * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
+ * rester vrai.
+ */
+
 import '@testing-library/jest-dom/vitest'
 import 'fake-indexeddb/auto'
 

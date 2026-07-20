@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Import et export des données Tactical Board.
+ *
+ * Ce dossier transforme les scénarios en fichiers JSON ou en images, puis les
+ * relit en vérifiant qu'ils sont encore valides avant de les réinjecter dans
+ * l'application.
+ */
+
 /** Valide, nettoie et normalise les images avant leur stockage durable. */
 import DOMPurify from 'dompurify'
 import type { ImageAssetRecord } from '@/tactical-board/persistence/imageAssetRecord'
@@ -31,14 +40,35 @@ export interface InspectedImage {
 }
 
 const IMAGE_EXTENSION_PATTERN = /\.(png|jpe?g|webp|svg)$/i
+/**
+ * Cette fonction nettoie le sujet “mime Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord normalizeMimeType dans imageAssets.ts.
+ */
+
 
 function normalizeMimeType(mimeType: string): string {
   return mimeType.toLowerCase().split(';', 1)[0]?.trim() ?? ''
 }
+/**
+ * Cette fonction teste le sujet “accepted Mime Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord isAcceptedMimeType dans imageAssets.ts.
+ */
+
 
 function isAcceptedMimeType(value: string): value is AcceptedImageType {
   return (ACCEPTED_IMAGE_TYPES as readonly string[]).includes(value)
 }
+/**
+ * Cette fonction vérifie le sujet “image File Metadata” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord validateImageFileMetadata dans imageAssets.ts.
+ */
+
 
 export function validateImageFileMetadata(file: File): void {
   if (file.size === 0) {
@@ -56,10 +86,24 @@ export function validateImageFileMetadata(file: File): void {
     throw new Error('Impossible de déterminer le format de l’image.')
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “looks Like Svg” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord looksLikeSvg dans imageAssets.ts.
+ */
+
 
 function looksLikeSvg(text: string): boolean {
   return /^\s*(?:<\?xml[^>]*>\s*)?(?:<!--[^]*?-->\s*)*<svg(?:\s|>)/i.test(text)
 }
+/**
+ * Cette fonction intervient sur le sujet “detect Image Mime Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord detectImageMimeType dans imageAssets.ts.
+ */
+
 
 export async function detectImageMimeType(blob: Blob): Promise<AcceptedImageType | null> {
   const header = new Uint8Array(await blob.slice(0, 16).arrayBuffer())
@@ -93,6 +137,13 @@ export async function detectImageMimeType(blob: Blob): Promise<AcceptedImageType
   const textSample = await blob.slice(0, Math.min(blob.size, 4096)).text()
   return looksLikeSvg(textSample) ? 'image/svg+xml' : null
 }
+/**
+ * Cette fonction vérifie le sujet “image Blob” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord validateImageBlob dans imageAssets.ts.
+ */
+
 
 export async function validateImageBlob(
   blob: Blob,
@@ -115,10 +166,24 @@ export async function validateImageBlob(
   await inspectImageBlob(blob, detected)
   return detected
 }
+/**
+ * Cette fonction intervient sur le sujet “uint24 Little Endian” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord uint24LittleEndian dans imageAssets.ts.
+ */
+
 
 function uint24LittleEndian(bytes: Uint8Array, offset: number): number {
   return bytes[offset]! | (bytes[offset + 1]! << 8) | (bytes[offset + 2]! << 16)
 }
+/**
+ * Cette fonction intervient sur le sujet “uint32 Big Endian” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord uint32BigEndian dans imageAssets.ts.
+ */
+
 
 function uint32BigEndian(bytes: Uint8Array, offset: number): number {
   return (
@@ -128,6 +193,13 @@ function uint32BigEndian(bytes: Uint8Array, offset: number): number {
     bytes[offset + 3]!
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “assert Sensible Dimensions” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord assertSensibleDimensions dans imageAssets.ts.
+ */
+
 
 function assertSensibleDimensions(width: number, height: number): void {
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1) {
@@ -137,6 +209,13 @@ function assertSensibleDimensions(width: number, height: number): void {
     throw new Error('Les dimensions de l’image sont trop importantes.')
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “inspect Png” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord inspectPng dans imageAssets.ts.
+ */
+
 
 function inspectPng(bytes: Uint8Array): { width: number; height: number } {
   if (
@@ -157,6 +236,13 @@ function inspectPng(bytes: Uint8Array): { width: number; height: number } {
   if (!hasEndChunk) throw new Error('Le fichier PNG est tronqué.')
   return { width, height }
 }
+/**
+ * Cette fonction intervient sur le sujet “inspect Jpeg” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord inspectJpeg dans imageAssets.ts.
+ */
+
 
 function inspectJpeg(bytes: Uint8Array): { width: number; height: number } {
   if (
@@ -194,6 +280,13 @@ function inspectJpeg(bytes: Uint8Array): { width: number; height: number } {
   }
   throw new Error('Les dimensions du JPEG sont introuvables.')
 }
+/**
+ * Cette fonction intervient sur le sujet “inspect Webp” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord inspectWebp dans imageAssets.ts.
+ */
+
 
 function inspectWebp(bytes: Uint8Array): { width: number; height: number } {
   if (bytes.length < 30) throw new Error('Le fichier WebP est incomplet.')
@@ -225,6 +318,13 @@ function inspectWebp(bytes: Uint8Array): { width: number; height: number } {
   }
   throw new Error('Le conteneur WebP est invalide.')
 }
+/**
+ * Cette fonction intervient sur le sujet “inspect Svg” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord inspectSvg dans imageAssets.ts.
+ */
+
 
 function inspectSvg(source: string): { width: number; height: number } {
   const document = new DOMParser().parseFromString(source, 'image/svg+xml')
@@ -240,6 +340,13 @@ function inspectSvg(source: string): { width: number; height: number } {
   if (!width || !height) throw new Error('Le SVG doit définir une taille ou une viewBox.')
   return { width: Math.round(width), height: Math.round(height) }
 }
+/**
+ * Cette fonction intervient sur le sujet “inspect Image Blob” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord inspectImageBlob dans imageAssets.ts.
+ */
+
 
 export async function inspectImageBlob(
   blob: Blob,
@@ -265,6 +372,13 @@ export async function inspectImageBlob(
   assertSensibleDimensions(resolved.width, resolved.height)
   return { mimeType, ...resolved }
 }
+/**
+ * Cette fonction intervient sur le sujet “sanitize Svg” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord sanitizeSvg dans imageAssets.ts.
+ */
+
 
 export function sanitizeSvg(source: string): string {
   const sanitized = DOMPurify.sanitize(source, {
@@ -295,6 +409,13 @@ export function sanitizeSvg(source: string): string {
 
   return new XMLSerializer().serializeToString(root)
 }
+/**
+ * Cette fonction charge le sujet “image” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord loadImage dans imageAssets.ts.
+ */
+
 
 function loadImage(blob: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
@@ -313,6 +434,13 @@ function loadImage(blob: Blob): Promise<HTMLImageElement> {
     image.src = url
   })
 }
+/**
+ * Cette fonction intervient sur le sujet “canvas To Blob” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/imageAssets.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord canvasToBlob dans imageAssets.ts.
+ */
+
 
 function canvasToBlob(canvas: HTMLCanvasElement, type: 'image/webp' | 'image/png'): Promise<Blob> {
   return new Promise((resolve, reject) => {

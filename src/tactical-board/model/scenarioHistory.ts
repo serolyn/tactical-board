@@ -1,4 +1,11 @@
-/** Encapsule le reducer pur dans un historique borné avec annulation et rétablissement. */
+/**
+ * @packageDocumentation
+ * Modèle métier pur de Tactical Board.
+ *
+ * Ce module décrit le mécanisme d'annulation/rétablissement du board.
+ * Il ne dépend pas de React: il ne manipule que des états de scénario.
+ */
+
 import { applyCommand } from './applyScenarioCommand'
 import type {
   CommandResult,
@@ -13,10 +20,23 @@ export interface HistoryState<T> {
   readonly present: T
   readonly future: readonly T[]
 }
+
+/**
+ * Crée un historique vide autour d'un état de départ.
+ *
+ * C'est le point de départ de l'undo/redo: aucun état n'est encore passé,
+ * le scénario courant est le seul présent, et rien n'est prêt à être refait.
+ */
 export function createHistory<T>(present: T): HistoryState<T> {
   return { past: [], present, future: [] }
 }
 
+/**
+ * Ajoute un nouvel état à l'historique sans perdre la trace des précédents.
+ *
+ * La limite empêche de garder une mémoire infinie: on conserve seulement les
+ * derniers états utiles pour l'utilisateur.
+ */
 export function pushHistory<T>(
   history: HistoryState<T>,
   next: T,
@@ -31,6 +51,11 @@ export function pushHistory<T>(
   return { past, present: next, future: [] }
 }
 
+/**
+ * Revient à l'état précédent quand l'utilisateur annule une action.
+ *
+ * L'état courant est déplacé vers le futur pour pouvoir être restauré ensuite.
+ */
 export function undoHistory<T>(history: HistoryState<T>): HistoryState<T> {
   const previous = history.past.at(-1)
   if (previous === undefined) return history
@@ -41,6 +66,12 @@ export function undoHistory<T>(history: HistoryState<T>): HistoryState<T> {
   }
 }
 
+/**
+ * Restaure l'état qui avait été annulé juste avant.
+ *
+ * Cette fonction fait l'opération inverse de `undoHistory` et remet l'état
+ * dans la pile des états passés.
+ */
 export function redoHistory<T>(history: HistoryState<T>): HistoryState<T> {
   const next = history.future[0]
   if (next === undefined) return history
@@ -56,7 +87,11 @@ export interface HistoryCommandResult {
   readonly commandResult: CommandResult
 }
 
-/** Ajoute à l’historique uniquement les commandes qui ont réellement modifié le document. */
+/**
+ * Applique une commande métier et n'enregistre l'état que si le document a changé.
+ *
+ * Cette fonction évite de remplir l'historique avec des actions sans effet.
+ */
 export function applyCommandToHistory(
   history: HistoryState<ScenarioDocumentV1>,
   command: ScenarioCommand,

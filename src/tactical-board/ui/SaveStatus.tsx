@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Petits composants visuels réutilisables du board.
+ *
+ * Ces fichiers ne portent pas la logique métier: ils dessinent des boutons,
+ * modales, infobulles ou panneaux prêts à être réutilisés dans l'interface.
+ */
+
 import { AlertTriangle, Check, CloudOff, LoaderCircle } from 'lucide-react'
 
 import styles from './SaveStatus.module.css'
@@ -16,6 +24,13 @@ export interface SaveStatusProps {
   detail?: string
   state: SaveState
 }
+/**
+ * Cette fonction intervient sur le sujet “save Status” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/ui/SaveStatus.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord SaveStatus dans SaveStatus.tsx.
+ */
+
 
 export function SaveStatus({ className = '', detail, state }: SaveStatusProps) {
   const Icon =
@@ -54,6 +69,13 @@ export interface ToastRegionProps {
   onDismiss: (id: string) => void
   toasts: ToastMessage[]
 }
+/**
+ * Cette fonction intervient sur le sujet “toast Region” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/ui/SaveStatus.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord ToastRegion dans SaveStatus.tsx.
+ */
+
 
 export function ToastRegion({ onAction, onDismiss, toasts }: ToastRegionProps) {
   return (
@@ -97,6 +119,13 @@ export interface LiveAnnouncementProps {
   message: string
   priority?: 'polite' | 'assertive'
 }
+/**
+ * Cette fonction intervient sur le sujet “live Announcement” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/ui/SaveStatus.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord LiveAnnouncement dans SaveStatus.tsx.
+ */
+
 
 export function LiveAnnouncement({
   message,

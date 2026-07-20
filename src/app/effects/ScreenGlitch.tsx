@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Effet visuel global utilisé par le routeur.
+ *
+ * Ce fichier contrôle une couche décorative partagée par le site. Lis-le si
+ * tu veux comprendre comment le portfolio ajoute un signal visuel sans toucher
+ * au contenu des pages.
+ */
+
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -103,14 +112,35 @@ const ROOT_PROPERTIES = [
   '--glitch-site-y',
   '--glitch-site-skew',
 ] as const
+/**
+ * Cette fonction intervient sur le sujet “clamp” dans app.
+ *
+ * Fichier: src/app/effects/ScreenGlitch.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord clamp dans ScreenGlitch.tsx.
+ */
+
 
 function clamp(value: number, minimum = 0, maximum = 1) {
   return Math.min(maximum, Math.max(minimum, value))
 }
+/**
+ * Cette fonction intervient sur le sujet “random Between” dans app.
+ *
+ * Fichier: src/app/effects/ScreenGlitch.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord randomBetween dans ScreenGlitch.tsx.
+ */
+
 
 function randomBetween(minimum: number, maximum: number) {
   return minimum + Math.random() * (maximum - minimum)
 }
+/**
+ * Cette fonction teste le sujet “editable Target” dans app.
+ *
+ * Fichier: src/app/effects/ScreenGlitch.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord isEditableTarget dans ScreenGlitch.tsx.
+ */
+
 
 function isEditableTarget(target: EventTarget | null) {
   if (!(target instanceof Element)) return false
@@ -124,6 +154,13 @@ function isEditableTarget(target: EventTarget | null) {
 export type ScreenGlitchProps = {
   enabled?: boolean
 }
+/**
+ * Cette fonction intervient sur le sujet “screen Glitch” dans app.
+ *
+ * Fichier: src/app/effects/ScreenGlitch.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord ScreenGlitch dans ScreenGlitch.tsx.
+ */
+
 
 export function ScreenGlitch({ enabled = true }: ScreenGlitchProps) {
   const overlayRef = useRef<HTMLDivElement | null>(null)

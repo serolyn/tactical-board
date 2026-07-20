@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Tests automatiques du projet.
+ *
+ * Ce fichier vérifie un comportement précis pour éviter les régressions.
+ * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
+ * rester vrai.
+ */
+
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -14,6 +23,13 @@ import {
   tacticalBoardRepository,
 } from '@/tactical-board/persistence/tacticalBoardRepository'
 import { useTacticalBoardStore } from '@/tactical-board/state/tacticalBoardStore'
+/**
+ * Cette fonction intervient sur le sujet “reset Store” dans tests.
+ *
+ * Fichier: src/tests/tacticalBoard.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord resetStore dans tacticalBoard.test.tsx.
+ */
+
 
 function resetStore() {
   useTacticalBoardStore.setState({
@@ -34,6 +50,13 @@ function resetStore() {
     notification: null,
   })
 }
+/**
+ * Cette fonction intervient sur le sujet “scenario With Two Units” dans tests.
+ *
+ * Fichier: src/tests/tacticalBoard.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord scenarioWithTwoUnits dans tacticalBoard.test.tsx.
+ */
+
 
 function scenarioWithTwoUnits(factionId = 'own') {
   const source = createDefaultScenario('Bataille restaurée', {

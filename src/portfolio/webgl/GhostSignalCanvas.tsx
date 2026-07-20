@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Effets WebGL du portfolio.
+ *
+ * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
+ * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
+ * faire à la place.
+ */
+
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { WebGLRenderer } from 'three'
@@ -168,6 +177,13 @@ function GhostSignalPerformanceGuard({
 
   return null
 }
+/**
+ * Cette fonction extrait le sujet “initial Ghost Signal Quality” dans portfolio.
+ *
+ * Fichier: src/portfolio/webgl/GhostSignalCanvas.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord selectInitialGhostSignalQuality dans GhostSignalCanvas.tsx.
+ */
+
 
 function selectInitialGhostSignalQuality(): GhostSignalQuality {
   const deviceMemory = (navigator as NavigatorWithDeviceMemory).deviceMemory

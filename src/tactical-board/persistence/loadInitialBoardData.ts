@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Persistance locale de Tactical Board.
+ *
+ * Ce dossier explique comment le board enregistre ses scénarios dans IndexedDB,
+ * recharge les données au démarrage et garde un journal de récupération.
+ */
+
 /** Prépare les scénarios, assets et réglages avant l'hydratation de Tactical Board. */
 import {
   applyObjectiveCampaign,

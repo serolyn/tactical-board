@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Effets WebGL du portfolio.
+ *
+ * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
+ * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
+ * faire à la place.
+ */
+
 /** Budgets graphiques utilisés avant et pendant la mesure de performance du canvas. */
 export type GhostSignalQuality = 'high' | 'low'
 
@@ -59,6 +68,13 @@ export function selectInitialQuality({
 
   return 'high'
 }
+/**
+ * Cette fonction intervient sur le sujet “degrade Quality” dans portfolio.
+ *
+ * Fichier: src/portfolio/webgl/ghostSignalQualityProfile.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord degradeQuality dans ghostSignalQualityProfile.ts.
+ */
+
 
 export function degradeQuality(quality: GhostSignalQuality): GhostSignalQuality {
   return quality === 'high' ? 'low' : 'low'

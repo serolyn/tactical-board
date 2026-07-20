@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Petits composants visuels réutilisables du board.
+ *
+ * Ces fichiers ne portent pas la logique métier: ils dessinent des boutons,
+ * modales, infobulles ou panneaux prêts à être réutilisés dans l'interface.
+ */
+
 import {
   Brain,
   BrainCircuit,
@@ -80,6 +88,13 @@ export interface UnitGlyphProps {
   iconKey?: string
   imageUrl?: string
 }
+/**
+ * Cette fonction intervient sur le sujet “unit Glyph” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/ui/UnitGlyph.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord UnitGlyph dans UnitGlyph.tsx.
+ */
+
 
 export function UnitGlyph({
   alt = '',

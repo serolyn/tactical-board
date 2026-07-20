@@ -34,6 +34,7 @@ npm run typecheck  # vérifier les types TypeScript
 npm run lint       # analyser le code avec Oxlint
 npm run build      # produire le site dans dist/
 npm run preview    # prévisualiser le build de production
+npm run docs:api   # générer la documentation technique TypeDoc
 ```
 
 Un envoi sur `main` déclenche le déploiement GitHub Pages. Le build utilise le
@@ -111,3 +112,19 @@ exemple, `@/portfolio/pages/HomePage` pointe vers
 Le document Tactical Board courant utilise `formatVersion: 2`. Les migrations,
 les clés de persistance, l’import atomique et la séparation des blobs sont des
 contrats à préserver lors de toute évolution.
+
+## Documentation technique (style Doxygen)
+
+Le projet fournit une documentation API générée automatiquement avec TypeDoc.
+
+```bash
+npm run docs:api
+```
+
+La sortie est créée dans `docs/api/` (point d’entrée : `docs/api/index.html`).
+
+Pour t’orienter plus vite dans l’architecture applicative, consulte aussi
+`docs/ARCHITECTURE.md`.
+
+Pour un repérage détaillé fichier par fichier (style Doxygen), consulte
+`docs/FILE_MAP.md`.

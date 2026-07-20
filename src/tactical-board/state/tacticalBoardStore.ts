@@ -1,4 +1,11 @@
 /** Relie le modèle métier au document actif et aux préférences éphémères de l'éditeur. */
+/**
+ * @packageDocumentation
+ * Store global Tactical Board (Zustand).
+ *
+ * Ce module centralise les documents, l'historique undo/redo, les outils
+ * actifs, la sélection et l'état d'interface consommé par la racine React.
+ */
 import { create } from 'zustand'
 import {
   applyCommandToHistory,
@@ -60,6 +67,13 @@ export interface TacticalBoardStoreState {
   notify: (message: string, tone?: TacticalBoardNotification['tone']) => void
   clearNotification: () => void
 }
+/**
+ * Cette fonction intervient sur le sujet “update Document List” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/state/tacticalBoardStore.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateDocumentList dans tacticalBoardStore.ts.
+ */
+
 
 function updateDocumentList(
   documents: readonly ScenarioDocumentV1[],
@@ -73,6 +87,13 @@ function updateDocumentList(
     ...documents.slice(index + 1),
   ]
 }
+/**
+ * Cette fonction extrait le sujet “ion Still Exists” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/state/tacticalBoardStore.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord selectionStillExists dans tacticalBoardStore.ts.
+ */
+
 
 function selectionStillExists(
   selection: BoardSelection,
@@ -284,6 +305,13 @@ export const useTacticalBoardStore = create<TacticalBoardStoreState>((set, get) 
     set({ notification: null })
   },
 }))
+/**
+ * Cette fonction extrait le sujet “active Scenario” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/state/tacticalBoardStore.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord selectActiveScenario dans tacticalBoardStore.ts.
+ */
+
 
 export const selectActiveScenario = (state: TacticalBoardStoreState) =>
   state.history?.present ?? null

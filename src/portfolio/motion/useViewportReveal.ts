@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Animation du portfolio.
+ *
+ * Ce fichier explique comment les éléments apparaissent, se déplacent ou se
+ * révèlent à l'écran. Lis-le pour comprendre pourquoi certaines transitions sont
+ * visibles et d'autres très discrètes.
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export interface ViewportRevealOptions {
@@ -14,6 +23,13 @@ export interface ViewportRevealState {
   revealNow: () => void
   setTarget: (node: HTMLElement | null) => void
 }
+/**
+ * Cette fonction intervient sur le sujet “supports Viewport Observation” dans portfolio.
+ *
+ * Fichier: src/portfolio/motion/useViewportReveal.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord supportsViewportObservation dans useViewportReveal.ts.
+ */
+
 
 export function supportsViewportObservation() {
   return (

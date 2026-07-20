@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Interface du plateau tactique.
+ *
+ * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
+ * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
+ * ici qu'il faut commencer.
+ */
+
 import { useRef, useState, type MutableRefObject, type PointerEvent } from 'react'
 import type { ArrowStyle, Position } from '@/tactical-board/model/tacticalBoardTypes'
 import { samePosition } from './battlefieldGeometry'
@@ -22,6 +31,13 @@ export interface UseArrowDrawingOptions {
   positionFromClientPoint: (clientX: number, clientY: number) => Position | null
   suppressClickRef: MutableRefObject<boolean>
 }
+/**
+ * Cette fonction intervient sur le sujet “use Arrow Drawing” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/useArrowDrawing.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord useArrowDrawing dans useArrowDrawing.ts.
+ */
+
 
 export function useArrowDrawing({
   arrowColor,

@@ -1,0 +1,71 @@
+/**
+ * @packageDocumentation
+ * Composant visuel réutilisable du portfolio.
+ *
+ * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
+ * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
+ * voit à l'écran, c'est souvent ici qu'il faut commencer.
+ */
+
+import { m } from 'motion/react'
+import { Link, NavLink } from 'react-router'
+import { motionTransitions } from '../motion/motionTokens'
+
+const navigation = [
+  { to: '/projects', label: 'Projets' },
+  { to: '/music', label: 'Musique' },
+  { to: '/lab', label: 'Lab' },
+  { to: '/about', label: 'À propos' },
+] as const
+/**
+ * Cette fonction intervient sur le sujet “editorial Header” dans portfolio.
+ *
+ * Fichier: src/portfolio/components/EditorialHeader.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord EditorialHeader dans EditorialHeader.tsx.
+ */
+
+
+export function EditorialHeader() {
+  return (
+    <header className="portfolio-header">
+      <div className="portfolio-header__inner">
+        <Link className="portfolio-wordmark" to="/" aria-label="SEROLYN — accueil">
+          SEROLYN
+        </Link>
+
+        <nav aria-label="Navigation principale">
+          <ul className="portfolio-navigation">
+            {navigation.map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  className={({ isActive }) =>
+                    isActive
+                      ? 'portfolio-navigation__link portfolio-navigation__link--active'
+                      : 'portfolio-navigation__link'
+                  }
+                  to={item.to}
+                >
+                  {({ isActive }) => (
+                    <>
+                      {item.label}
+                      {isActive ? (
+                        <m.span
+                          aria-hidden="true"
+                          className="portfolio-navigation__active-line"
+                          layoutId="portfolio-navigation-active"
+                          transition={motionTransitions.interface}
+                        />
+                      ) : null}
+                    </>
+                  )}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        <p className="portfolio-header__index">EVERYWHERE / 2026</p>
+      </div>
+    </header>
+  )
+}

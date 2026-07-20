@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Hooks de comportement Tactical Board.
+ *
+ * Ces fonctions réutilisables branchent la logique au cycle de vie React:
+ * autosave, raccourcis clavier, mode plein plateau ou URLs des assets.
+ */
+
 /** Branche le document actif sur le journal de reprise et l'autosauvegarde sérialisée. */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ScenarioDocumentV1 } from '@/tactical-board/model/tacticalBoardTypes'
@@ -21,6 +29,13 @@ export interface ScenarioAutosaveState {
   forceSave(): Promise<void>
   retry(): Promise<void>
 }
+/**
+ * Cette fonction intervient sur le sujet “use Scenario Autosave” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/hooks/useScenarioAutosave.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord useScenarioAutosave dans useScenarioAutosave.ts.
+ */
+
 
 export function useScenarioAutosave(
   activeScenario: ScenarioDocumentV1 | null,

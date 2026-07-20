@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Interface du plateau tactique.
+ *
+ * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
+ * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
+ * ici qu'il faut commencer.
+ */
+
 import { X } from 'lucide-react'
 import type { Faction, TacticalUnit } from '@/tactical-board/model/tacticalBoardTypes'
 import { BuiltinUnitIcon } from './BuiltinUnitIcon'
@@ -9,6 +18,13 @@ export interface UnitVisualProps {
   faction?: Faction
   unit: TacticalUnit
 }
+/**
+ * Cette fonction intervient sur le sujet “unit Visual” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/UnitVisual.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord UnitVisual dans UnitVisual.tsx.
+ */
+
 
 export function UnitVisual({ assetUrl, faction, unit }: UnitVisualProps) {
   const status = statusDetails(unit.status)

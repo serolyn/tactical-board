@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Modèle métier pur de Tactical Board.
+ *
+ * Ce dossier décrit les règles du jeu de données: documents, sélection,
+ * historique, unités, campagnes et migrations. Il ne dépend pas de React.
+ */
+
 /** Contrats métier persistés et commandes comprises par le reducer Tactical Board. */
 export const LEGACY_SCENARIO_FORMAT_VERSION = 1 as const
 export const SCENARIO_FORMAT_VERSION = 2 as const
@@ -65,7 +73,8 @@ export interface Faction {
   readonly id: EntityId
   readonly name: string
   readonly color: HexColor
-  /** Rôle sémantique stable, indépendant du libellé modifiable de la faction. */
+  
+/** Rôle sémantique stable, indépendant du libellé modifiable de la faction. */
   readonly role: FactionRole
 }
 
@@ -185,7 +194,8 @@ export type AnnotationChanges =
     >)
 
 export interface CommandBase {
-  /** Sans date, updatedAt reste inchangé afin que la commande demeure déterministe. */
+  
+/** Sans date, updatedAt reste inchangé afin que la commande demeure déterministe. */
   readonly at?: IsoDateString
 }
 
@@ -242,7 +252,8 @@ export type ScenarioCommand =
   | ({
       readonly type: 'moveUnits'
       readonly unitIds: readonly EntityId[]
-      /** Translation commune ; une valeur négative déplace vers le haut ou la gauche. */
+      
+/** Translation commune ; une valeur négative déplace vers le haut ou la gauche. */
       readonly delta: Position
     } & CommandBase)
   | ({

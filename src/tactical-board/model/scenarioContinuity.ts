@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Modèle métier pur de Tactical Board.
+ *
+ * Ce dossier décrit les règles du jeu de données: documents, sélection,
+ * historique, unités, campagnes et migrations. Il ne dépend pas de React.
+ */
+
 /** Produit le scénario suivant en copiant uniquement les forces choisies par l'utilisateur. */
 import { BUILT_IN_UNIT_TYPE_BY_ID } from './unitCatalog'
 import { createDefaultScenario, createEntityId } from './scenarioDocument'
@@ -8,6 +16,13 @@ export interface CreateNextScenarioOptions {
   name: string
   now?: string
 }
+/**
+ * Cette fonction construit le sujet “next Scenario” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/scenarioContinuity.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord createNextScenario dans scenarioContinuity.ts.
+ */
+
 
 export function createNextScenario(
   source: ScenarioDocumentV2,

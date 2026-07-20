@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Tests automatiques du projet.
+ *
+ * Ce fichier vérifie un comportement précis pour éviter les régressions.
+ * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
+ * rester vrai.
+ */
+
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -5,11 +14,25 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import SiteRouter from '@/app/SiteRouter'
 
 const BASE_PATH = '/tactical-board'
+/**
+ * Cette fonction intervient sur le sujet “visit” dans tests.
+ *
+ * Fichier: src/tests/portfolio.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord visit dans portfolio.test.tsx.
+ */
+
 
 function visit(pathname: string, basename = `${BASE_PATH}/`) {
   window.history.replaceState({}, '', pathname)
   return render(<SiteRouter basename={basename} />)
 }
+/**
+ * Cette fonction intervient sur le sujet “description Meta” dans tests.
+ *
+ * Fichier: src/tests/portfolio.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord descriptionMeta dans portfolio.test.tsx.
+ */
+
 
 function descriptionMeta() {
   return document.head.querySelector<HTMLMetaElement>('meta[name="description"]')

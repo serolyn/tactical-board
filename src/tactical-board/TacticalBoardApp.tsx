@@ -1,3 +1,10 @@
+/**
+ * @packageDocumentation
+ * Racine UI de Tactical Board.
+ *
+ * Ce module assemble les panneaux, le plateau, les raccourcis clavier,
+ * l'autosauvegarde et les flux d'import/export autour du scénario actif.
+ */
 import {
   CalendarDays,
   Crosshair,
@@ -70,18 +77,33 @@ import {
   ScenarioDetailsModal,
 } from './features/scenarios/ScenarioFlowModals'
 import styles from './styles/TacticalBoardApp.module.css'
-
+/**
+ * Convertit l'état interne d'autosauvegarde en libellé simple pour l'écran.
+ *
+ * Le store garde plusieurs états techniques, mais l'interface n'a besoin que
+ * de trois mots: sauvegardé, en cours, ou erreur.
+ */
 function saveStateFor(snapshot: ReturnType<typeof useScenarioAutosave>['saveSnapshot']): UiSaveState {
   if (snapshot.state === 'error') return 'error'
   if (snapshot.state === 'saving' || snapshot.state === 'pending') return 'saving'
   return 'saved'
 }
-
+/**
+ * Transforme une erreur JavaScript en message lisible pour l'utilisateur.
+ *
+ * Cette fonction évite d'exposer des objets d'erreur trop techniques dans
+ * l'interface du board.
+ */
 function errorMessage(error: unknown) {
   if (error instanceof Error) return error.message
   return 'Une erreur inattendue est survenue.'
 }
-
+/**
+ * Formate la date d'un scénario pour l'affichage humain.
+ *
+ * La fonction accepte un format ISO ou une date libre, puis la réduit en date
+ * française courte pour les panneaux et les alertes.
+ */
 function formatScenarioDate(value: string) {
   const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
     ? new Date(`${value}T12:00:00`)
@@ -93,7 +115,12 @@ function formatScenarioDate(value: string) {
     year: 'numeric',
   }).format(date)
 }
-
+/**
+ * Détecte si l'écran est assez large pour afficher la version bureau du board.
+ *
+ * Ce repère sert à choisir une présentation plus ou moins compacte selon la
+ * taille de la fenêtre.
+ */
 function useDesktopLayout() {
   const query = '(min-width: 1180px)'
   const [matches, setMatches] = useState(() =>
@@ -111,8 +138,12 @@ function useDesktopLayout() {
   }, [])
   return matches
 }
-
-// Cette racine orchestre l'interface du Board ; le modèle et la persistance restent séparés de React.
+/**
+ * Assemble toute l'interface du board: état, panneaux, plateau et autosauvegarde.
+ *
+ * Si tu veux comprendre l'application Tactical Board, ce composant est le bon
+ * point de départ parce qu'il relie la logique, la persistance et l'écran.
+ */
 export default function TacticalBoardApp() {
   const desktopLayout = useDesktopLayout()
   const activeScenario = useTacticalBoardStore(selectActiveScenario)

@@ -14,7 +14,9 @@
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:watch": "vitest",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docs:api": "typedoc",
+    "docs:api:open": "xdg-open docs/api/index.html"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -44,6 +46,7 @@
     "fake-indexeddb": "^6.2.5",
     "jsdom": "^29.1.1",
     "oxlint": "^1.71.0",
+    "typedoc": "^0.28.14",
     "typescript": "~6.0.2",
     "vite": "^8.1.1",
     "vitest": "^4.1.10"

@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Petits composants visuels réutilisables du board.
+ *
+ * Ces fichiers ne portent pas la logique métier: ils dessinent des boutons,
+ * modales, infobulles ou panneaux prêts à être réutilisés dans l'interface.
+ */
+
 import type { ReactNode } from 'react'
 import { X } from 'lucide-react'
 
@@ -14,6 +22,13 @@ export interface PanelShellProps {
   side?: 'left' | 'right'
   title: ReactNode
 }
+/**
+ * Cette fonction intervient sur le sujet “panel Shell” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/ui/PanelShell.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord PanelShell dans PanelShell.tsx.
+ */
+
 
 export function PanelShell({
   children,

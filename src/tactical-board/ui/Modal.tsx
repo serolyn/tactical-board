@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Petits composants visuels réutilisables du board.
+ *
+ * Ces fichiers ne portent pas la logique métier: ils dessinent des boutons,
+ * modales, infobulles ou panneaux prêts à être réutilisés dans l'interface.
+ */
+
 import {
   useEffect,
   useId,
@@ -30,6 +38,13 @@ export interface ModalProps {
   size?: 'small' | 'medium' | 'large'
   title: ReactNode
 }
+/**
+ * Cette fonction intervient sur le sujet “modal” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/ui/Modal.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord Modal dans Modal.tsx.
+ */
+
 
 export function Modal({
   children,

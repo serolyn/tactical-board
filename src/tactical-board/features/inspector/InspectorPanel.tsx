@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Panneau d'inspection Tactical Board.
+ *
+ * Ce fichier sert à afficher et éditer les détails de ce qui est sélectionné
+ * sur le plateau. Il aide l'utilisateur à changer un objet sans quitter le board.
+ */
+
 import { useEffect, useMemo, useState, type KeyboardEvent } from 'react'
 import {
   ArrowRight,
@@ -84,6 +92,13 @@ export interface InspectorPanelProps {
   units?: readonly TacticalUnit[]
   unitTypes: readonly UnitType[]
 }
+/**
+ * Cette fonction intervient sur le sujet “inspector Panel” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord InspectorPanel dans InspectorPanel.tsx.
+ */
+
 
 export function InspectorPanel({
   annotation,
@@ -181,6 +196,13 @@ interface MultiUnitInspectorProps {
   onUpdateStatus?: (status: UnitStatus) => void
   units: readonly TacticalUnit[]
 }
+/**
+ * Cette fonction intervient sur le sujet “multi Unit Inspector” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord MultiUnitInspector dans InspectorPanel.tsx.
+ */
+
 
 function MultiUnitInspector({
   factions,
@@ -344,6 +366,13 @@ interface UnitInspectorProps {
   unit: TacticalUnit
   unitTypes: readonly UnitType[]
 }
+/**
+ * Cette fonction intervient sur le sujet “unit Inspector” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord UnitInspector dans InspectorPanel.tsx.
+ */
+
 
 function UnitInspector({
   factions,
@@ -514,6 +543,13 @@ interface AnnotationInspectorProps {
   onDelete?: () => void
   onUpdate?: (changes: AnnotationChanges) => void
 }
+/**
+ * Cette fonction intervient sur le sujet “annotation Inspector” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord AnnotationInspector dans InspectorPanel.tsx.
+ */
+
 
 function AnnotationInspector({ annotation, onDelete, onUpdate }: AnnotationInspectorProps) {
   return (
@@ -602,6 +638,13 @@ interface CommitTextFieldProps {
   placeholder?: string
   value: string
 }
+/**
+ * Cette fonction intervient sur le sujet “commit Text Field” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord CommitTextField dans InspectorPanel.tsx.
+ */
+
 
 function CommitTextField({
   disabled,
@@ -658,6 +701,13 @@ interface ColorFieldProps {
   onCommit: (value: string) => void
   value: string
 }
+/**
+ * Cette fonction intervient sur le sujet “color Field” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord ColorField dans InspectorPanel.tsx.
+ */
+
 
 function ColorField({ label, onCommit, value }: ColorFieldProps) {
   const [draft, setDraft] = useState(value)
@@ -699,6 +749,13 @@ function ColorField({ label, onCommit, value }: ColorFieldProps) {
     </label>
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “empty Inspector” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord EmptyInspector dans InspectorPanel.tsx.
+ */
+
 
 function EmptyInspector() {
   return (
@@ -709,10 +766,24 @@ function EmptyInspector() {
     </div>
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “icon Value” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord iconValue dans InspectorPanel.tsx.
+ */
+
 
 function iconValue(icon: IconRef) {
   return icon.kind === 'catalog' ? `catalog:${icon.name}` : `asset:${icon.assetId}`
 }
+/**
+ * Cette fonction intervient sur le sujet “position Label” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/inspector/InspectorPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord positionLabel dans InspectorPanel.tsx.
+ */
+
 
 function positionLabel(position: { row: number; column: number }) {
   return `${String.fromCharCode(65 + position.column)}${position.row + 1}`

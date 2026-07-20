@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Modèle métier pur de Tactical Board.
+ *
+ * Ce dossier décrit les règles du jeu de données: documents, sélection,
+ * historique, unités, campagnes et migrations. Il ne dépend pas de React.
+ */
+
 import type { ArrowStyle } from './tacticalBoardTypes'
 
 /** Outil actif dans le plateau ; il s’agit d’un état UI, jamais persisté. */

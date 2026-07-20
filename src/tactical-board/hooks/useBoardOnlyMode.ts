@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Hooks de comportement Tactical Board.
+ *
+ * Ces fonctions réutilisables branchent la logique au cycle de vie React:
+ * autosave, raccourcis clavier, mode plein plateau ou URLs des assets.
+ */
+
 /** Synchronise le mode plateau seul avec l'API plein écran du navigateur. */
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 
@@ -13,6 +21,13 @@ export interface BoardOnlyModeState {
   enterBoardOnlyMode(): void
   leaveBoardOnlyMode(): void
 }
+/**
+ * Cette fonction intervient sur le sujet “use Board Only Mode” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/hooks/useBoardOnlyMode.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord useBoardOnlyMode dans useBoardOnlyMode.ts.
+ */
+
 
 export function useBoardOnlyMode({
   onEnter,

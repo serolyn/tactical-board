@@ -1,0 +1,271 @@
+<!DOCTYPE html><html class="default" lang="en" data-base="../"><head><meta charset="utf-8"/><meta http-equiv="x-ua-compatible" content="IE=edge"/><title>FILE_MAP | SEROLYN — Documentation technique</title><meta name="description" content="Documentation for SEROLYN — Documentation technique"/><meta name="viewport" content="width=device-width, initial-scale=1"/><link rel="stylesheet" href="../assets/style.css"/><link rel="stylesheet" href="../assets/highlight.css"/><script defer src="../assets/main.js"></script><script async src="../assets/icons.js" id="tsd-icons-script"></script><script async src="../assets/search.js" id="tsd-search-script"></script><script async src="../assets/navigation.js" id="tsd-nav-script"></script><script async src="../assets/hierarchy.js" id="tsd-hierarchy-script"></script></head><body><script>document.documentElement.dataset.theme = localStorage.getItem("tsd-theme") || "os";document.body.style.display="none";setTimeout(() => window.app?app.showPage():document.body.style.removeProperty("display"),500)</script><header class="tsd-page-toolbar">
+<div class="tsd-toolbar-contents container"><a href="../index.html" class="title">SEROLYN — Documentation technique</a>
+<div id="tsd-toolbar-links"></div><button id="tsd-search-trigger" class="tsd-widget" aria-label="Search"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-search"></use></svg></button><dialog id="tsd-search" aria-label="Search"><input role="combobox" id="tsd-search-input" aria-controls="tsd-search-results" aria-autocomplete="list" aria-expanded="true" autocapitalize="off" autocomplete="off" placeholder="Search the docs" maxLength="100"/>
+<ul role="listbox" id="tsd-search-results"></ul>
+<div id="tsd-search-status" aria-live="polite" aria-atomic="true">
+<div>Preparing search index...</div></div></dialog><a href="#" class="tsd-widget menu" id="tsd-toolbar-menu-trigger" data-toggle="menu" aria-label="Menu"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-menu"></use></svg></a></div></header>
+<div class="container container-main">
+<div class="col-content">
+<div class="tsd-page-title">
+<ul class="tsd-breadcrumb" aria-label="Breadcrumb">
+<li><a href="" aria-current="page">FILE_MAP</a></li></ul></div>
+<div class="tsd-panel tsd-typography"><h1 id="carte-des-fichiers-style-doxygen" class="tsd-anchor-link">Carte des fichiers (style Doxygen)<a href="#carte-des-fichiers-style-doxygen" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h1>
+<p>Ce document sert de repère opérationnel : chaque fichier source est listé avec
+sa responsabilité principale.</p>
+<h2 id="utilisation" class="tsd-anchor-link">Utilisation<a href="#utilisation" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li>Commencer par les points d’entrée.</li>
+<li>Suivre ensuite le dossier correspondant au besoin : <code>portfolio</code> ou
+<code>tactical-board</code>.</li>
+<li>Croiser avec la documentation API générée dans <code>docs/api/</code>.</li>
+</ul>
+<h2 id="points-dentrée" class="tsd-anchor-link">Points d’entrée<a href="#points-dentrée" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><code>src/main.tsx</code> : monte React et attache le routeur racine.</li>
+<li><code>src/app/SiteRouter.tsx</code> : déclare toutes les routes et choisit portfolio ou board.</li>
+<li><code>src/app/SiteRouteEffects.tsx</code> : applique titre/description HTML selon la route.</li>
+<li><code>src/app/siteRouteMetadata.ts</code> : table centrale des métadonnées de routes.</li>
+<li><code>src/app/normalizeSiteBasename.ts</code> : normalise le basename Vite/GitHub Pages.</li>
+<li><code>src/app/effects/ScreenGlitch.tsx</code> : couche visuelle glitch globale.</li>
+<li><code>src/app/effects/screen-glitch.css</code> : styles de l’effet glitch.</li>
+<li><code>src/assets.d.ts</code> : déclarations TypeScript pour imports d’assets.</li>
+</ul>
+<h2 id="portfolio" class="tsd-anchor-link">Portfolio<a href="#portfolio" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="shell-pages-composants" class="tsd-anchor-link">Shell, pages, composants<a href="#shell-pages-composants" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/portfolio/PortfolioShell.tsx</code> : shell global portfolio (header/main/footer).</li>
+<li><code>src/portfolio/pages/HomePage.tsx</code> : page d’accueil éditoriale.</li>
+<li><code>src/portfolio/pages/ProjectsPage.tsx</code> : index des projets publiés.</li>
+<li><code>src/portfolio/pages/ProjectDetailPage.tsx</code> : détail d’un projet par slug.</li>
+<li><code>src/portfolio/pages/MusicPage.tsx</code> : index des scènes sonores publiées.</li>
+<li><code>src/portfolio/pages/MusicDetailPage.tsx</code> : détail d’une scène sonore.</li>
+<li><code>src/portfolio/pages/LabPage.tsx</code> : index des entrées lab publiées.</li>
+<li><code>src/portfolio/pages/LabDetailPage.tsx</code> : détail d’une entrée lab.</li>
+<li><code>src/portfolio/pages/AboutPage.tsx</code> : page de présentation.</li>
+<li><code>src/portfolio/pages/NotFoundPage.tsx</code> : fallback des routes portfolio inconnues.</li>
+<li><code>src/portfolio/components/EditorialHeader.tsx</code> : en-tête et navigation principale portfolio.</li>
+<li><code>src/portfolio/components/EmptyState.tsx</code> : composant d’état vide (index sans contenu).</li>
+<li><code>src/portfolio/components/EntryCard.tsx</code> : carte de résumé d’entrée (index).</li>
+<li><code>src/portfolio/components/EntryHero.tsx</code> : bandeau hero des pages détail.</li>
+<li><code>src/portfolio/components/EntryIndex.tsx</code> : grille/liste d’entrées publiées.</li>
+<li><code>src/portfolio/components/EntryLinks.tsx</code> : rendu des liens d’une entrée.</li>
+<li><code>src/portfolio/components/EntryMetadata.tsx</code> : bloc de métadonnées d’entrée.</li>
+<li><code>src/portfolio/components/EntrySections.tsx</code> : rendu des sections éditoriales.</li>
+<li><code>src/portfolio/components/HeroVisualSlot.tsx</code> : support visuel du hero (image/WebGL).</li>
+<li><code>src/portfolio/components/SectionHeading.tsx</code> : titre normalisé des sections.</li>
+</ul>
+<h3 id="contenu-publié" class="tsd-anchor-link">Contenu publié<a href="#contenu-publié" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/portfolio/content/index.ts</code> : agrégation/exports du contenu portfolio.</li>
+<li><code>src/portfolio/content/site.ts</code> : textes globaux du site (home/about/navigation).</li>
+<li><code>src/portfolio/content/projects.ts</code> : base de données des projets.</li>
+<li><code>src/portfolio/content/music.ts</code> : base de données des scènes sonores.</li>
+<li><code>src/portfolio/content/lab.ts</code> : base de données des entrées lab.</li>
+<li><code>src/portfolio/content/types.ts</code> : types TypeScript du modèle de contenu.</li>
+<li><code>src/portfolio/content/validation.ts</code> : validation runtime du contenu publié.</li>
+</ul>
+<h3 id="motion" class="tsd-anchor-link">Motion<a href="#motion" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/portfolio/motion/PortfolioMotionProvider.tsx</code> : provider d’animations portfolio.</li>
+<li><code>src/portfolio/motion/domAnimationFeatures.ts</code> : features Motion chargées côté DOM.</li>
+<li><code>src/portfolio/motion/motionTokens.ts</code> : variantes/tokens d’animation partagés.</li>
+<li><code>src/portfolio/motion/AnimatedLink.tsx</code> : lien animé réutilisable.</li>
+<li><code>src/portfolio/motion/AnimatedRoutes.tsx</code> : transitions entre routes portfolio.</li>
+<li><code>src/portfolio/motion/PageTransition.tsx</code> : conteneur de transition de page.</li>
+<li><code>src/portfolio/motion/Reveal.tsx</code> : révélation progressive d’éléments.</li>
+<li><code>src/portfolio/motion/StaggerGroup.tsx</code> : orchestration d’animations en cascade.</li>
+<li><code>src/portfolio/motion/useViewportReveal.ts</code> : hook de reveal basé viewport.</li>
+</ul>
+<h3 id="webgl-portfolio-uniquement" class="tsd-anchor-link">WebGL (portfolio uniquement)<a href="#webgl-portfolio-uniquement" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/portfolio/webgl/GhostSignalCanvas.tsx</code> : canvas WebGL du signal fantôme.</li>
+<li><code>src/portfolio/webgl/GhostSignalScene.tsx</code> : scène 3D du hero portfolio.</li>
+<li><code>src/portfolio/webgl/GhostSignalMaterial.ts</code> : matériau/shader du signal.</li>
+<li><code>src/portfolio/webgl/GhostMembrane.tsx</code> : géométrie/couche visuelle complémentaire.</li>
+<li><code>src/portfolio/webgl/ghostSignalCapabilities.ts</code> : détection des capacités WebGL.</li>
+<li><code>src/portfolio/webgl/ghostSignalQualityProfile.ts</code> : profils qualité/performance.</li>
+<li><code>src/portfolio/webgl/ghostSignalCycle.ts</code> : cycle temporel du signal.</li>
+<li><code>src/portfolio/webgl/useHeroActivity.ts</code> : hook d’activité utilisateur sur le hero.</li>
+<li><code>src/portfolio/webgl/webglContextLifecycle.ts</code> : gestion de vie du contexte WebGL.</li>
+<li><code>src/portfolio/webgl/HeroWebGLErrorBoundary.tsx</code> : isolation des erreurs WebGL.</li>
+<li><code>src/portfolio/webgl/MusicModel.tsx</code> : modèle 3D lié aux scènes musicales.</li>
+<li><code>src/portfolio/webgl/musicScene.tsx</code> : scène 3D associée aux pages musique.</li>
+</ul>
+<h3 id="styles-et-assets-portfolio" class="tsd-anchor-link">Styles et assets portfolio<a href="#styles-et-assets-portfolio" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/portfolio/styles/tokens.css</code> : variables design (couleurs, spacing, etc.).</li>
+<li><code>src/portfolio/styles/typography.css</code> : fontes et règles typographiques.</li>
+<li><code>src/portfolio/styles/portfolio.css</code> : layout global et styles de pages portfolio.</li>
+<li><code>src/portfolio/assets/Project_WE310.wav</code> : ressource audio locale.</li>
+<li><code>src/portfolio/assets/fog-reflections.webp</code> : visuel éditorial local.</li>
+<li><code>src/portfolio/assets/moonlit-harbor.webp</code> : visuel éditorial local.</li>
+<li><code>src/portfolio/assets/signal-horizon.webp</code> : visuel hero principal.</li>
+<li><code>src/portfolio/assets/signal-preview-desktop.png</code> : aperçu desktop documenté.</li>
+<li><code>src/portfolio/assets/signal-preview-mobile.png</code> : aperçu mobile documenté.</li>
+</ul>
+<h2 id="tactical-board" class="tsd-anchor-link">Tactical Board<a href="#tactical-board" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<h3 id="racine-état-et-hooks" class="tsd-anchor-link">Racine, état et hooks<a href="#racine-état-et-hooks" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/tactical-board/TacticalBoardApp.tsx</code> : composition principale de l’application board.</li>
+<li><code>src/tactical-board/state/tacticalBoardStore.ts</code> : store Zustand et actions globales.</li>
+<li><code>src/tactical-board/hooks/useBoardAssetUrls.ts</code> : URLs d’assets (prévisualisation/export).</li>
+<li><code>src/tactical-board/hooks/useBoardOnlyMode.ts</code> : mode plein plateau sans panneaux.</li>
+<li><code>src/tactical-board/hooks/useGlobalBoardShortcuts.ts</code> : raccourcis clavier globaux.</li>
+<li><code>src/tactical-board/hooks/useScenarioAutosave.ts</code> : autosauvegarde du scénario actif.</li>
+</ul>
+<h3 id="modèle-métier" class="tsd-anchor-link">Modèle métier<a href="#modèle-métier" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/tactical-board/model/tacticalBoardTypes.ts</code> : types métier centraux du board.</li>
+<li><code>src/tactical-board/model/scenarioDocument.ts</code> : structure et création de scénario.</li>
+<li><code>src/tactical-board/model/scenarioDocumentSchema.ts</code> : schémas/validations de document.</li>
+<li><code>src/tactical-board/model/scenarioHistory.ts</code> : historique et navigation undo/redo.</li>
+<li><code>src/tactical-board/model/scenarioNaming.ts</code> : règles de nommage/tri des scénarios.</li>
+<li><code>src/tactical-board/model/scenarioContinuity.ts</code> : enchaînement des scénarios.</li>
+<li><code>src/tactical-board/model/applyScenarioCommand.ts</code> : application de commandes métier.</li>
+<li><code>src/tactical-board/model/boardInteraction.ts</code> : interactions de plateau.</li>
+<li><code>src/tactical-board/model/boardSelection.ts</code> : sélection simple/multi et dérivations.</li>
+<li><code>src/tactical-board/model/objectiveCampaign.ts</code> : logique de campagne/objectifs.</li>
+<li><code>src/tactical-board/model/objectiveCampaignDefinition.ts</code> : définition des campagnes.</li>
+<li><code>src/tactical-board/model/unitCatalog.ts</code> : catalogue des types d’unités intégrés.</li>
+</ul>
+<h3 id="persistence" class="tsd-anchor-link">Persistence<a href="#persistence" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/tactical-board/persistence/tacticalBoardRepository.ts</code> : accès IndexedDB principal.</li>
+<li><code>src/tactical-board/persistence/loadInitialBoardData.ts</code> : chargement initial hydraté.</li>
+<li><code>src/tactical-board/persistence/scenarioAutosave.ts</code> : écriture autosave de scénarios.</li>
+<li><code>src/tactical-board/persistence/recoveryJournal.ts</code> : journal de récupération.</li>
+<li><code>src/tactical-board/persistence/imageAssetRecord.ts</code> : modèle de stockage des images.</li>
+</ul>
+<h3 id="import-export" class="tsd-anchor-link">Import / export<a href="#import-export" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/tactical-board/import-export/scenarioExchange.ts</code> : import/export JSON de scénarios.</li>
+<li><code>src/tactical-board/import-export/imageAssets.ts</code> : normalisation des images embarquées.</li>
+<li><code>src/tactical-board/import-export/exportBoardImage.ts</code> : export PNG du plateau.</li>
+<li><code>src/tactical-board/import-export/fileDownloads.ts</code> : déclenchement des téléchargements.</li>
+</ul>
+<h3 id="features-métier-ui" class="tsd-anchor-link">Features métier UI<a href="#features-métier-ui" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/tactical-board/features/battlefield/Battlefield.tsx</code> : surface interactive du plateau.</li>
+<li><code>src/tactical-board/features/battlefield/Battlefield.module.css</code> : styles du plateau.</li>
+<li><code>src/tactical-board/features/battlefield/battlefieldGeometry.ts</code> : géométrie de grille.</li>
+<li><code>src/tactical-board/features/battlefield/BattlefieldToolbar.tsx</code> : barre d’outils du plateau.</li>
+<li><code>src/tactical-board/features/battlefield/BattlefieldToolbar.module.css</code> : styles toolbar.</li>
+<li><code>src/tactical-board/features/battlefield/BattlefieldSettingsModal.tsx</code> : réglages du plateau.</li>
+<li><code>src/tactical-board/features/battlefield/BattlefieldSettingsModal.module.css</code> : styles modal réglages.</li>
+<li><code>src/tactical-board/features/battlefield/ArrowLayer.tsx</code> : couche SVG des flèches.</li>
+<li><code>src/tactical-board/features/battlefield/useArrowDrawing.ts</code> : logique de dessin des flèches.</li>
+<li><code>src/tactical-board/features/battlefield/MarkerLayer.tsx</code> : couche de marqueurs.</li>
+<li><code>src/tactical-board/features/battlefield/DragGhostLayer.tsx</code> : prévisualisation pendant drag.</li>
+<li><code>src/tactical-board/features/battlefield/UnitVisual.tsx</code> : rendu visuel d’une unité.</li>
+<li><code>src/tactical-board/features/battlefield/unitVisualModel.ts</code> : modèle visuel dérivé d’unité.</li>
+<li><code>src/tactical-board/features/battlefield/unitDragPreview.ts</code> : aperçu de déplacement d’unité.</li>
+<li><code>src/tactical-board/features/battlefield/BuiltinUnitIcon.tsx</code> : icône d’unité intégrée.</li>
+<li><code>src/tactical-board/features/inspector/InspectorPanel.tsx</code> : panneau d’inspection/édition.</li>
+<li><code>src/tactical-board/features/inspector/InspectorPanel.module.css</code> : styles inspecteur.</li>
+<li><code>src/tactical-board/features/library/LibraryPanel.tsx</code> : gestion bibliothèque (types/factions).</li>
+<li><code>src/tactical-board/features/library/LibraryPanel.module.css</code> : styles bibliothèque.</li>
+<li><code>src/tactical-board/features/scenarios/ScenarioTopBar.tsx</code> : barre haute des scénarios.</li>
+<li><code>src/tactical-board/features/scenarios/ScenarioTopBar.module.css</code> : styles top bar scénarios.</li>
+<li><code>src/tactical-board/features/scenarios/NewScenarioModal.tsx</code> : création de scénario.</li>
+<li><code>src/tactical-board/features/scenarios/NewScenarioModal.module.css</code> : styles création.</li>
+<li><code>src/tactical-board/features/scenarios/ScenarioFlowModals.tsx</code> : modales de progression de flux.</li>
+<li><code>src/tactical-board/features/scenarios/ScenarioFlowModals.module.css</code> : styles modales de flux.</li>
+</ul>
+<h3 id="ui-réutilisable-board" class="tsd-anchor-link">UI réutilisable board<a href="#ui-réutilisable-board" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/tactical-board/ui/Button.tsx</code> : bouton réutilisable board.</li>
+<li><code>src/tactical-board/ui/Button.module.css</code> : styles bouton.</li>
+<li><code>src/tactical-board/ui/Modal.tsx</code> : modal générique.</li>
+<li><code>src/tactical-board/ui/Modal.module.css</code> : styles modal.</li>
+<li><code>src/tactical-board/ui/PanelShell.tsx</code> : conteneur standard de panneau.</li>
+<li><code>src/tactical-board/ui/PanelShell.module.css</code> : styles conteneur panneau.</li>
+<li><code>src/tactical-board/ui/SaveStatus.tsx</code> : indicateur de statut de sauvegarde.</li>
+<li><code>src/tactical-board/ui/SaveStatus.module.css</code> : styles statut sauvegarde.</li>
+<li><code>src/tactical-board/ui/Tooltip.tsx</code> : infobulle réutilisable.</li>
+<li><code>src/tactical-board/ui/Tooltip.module.css</code> : styles infobulle.</li>
+<li><code>src/tactical-board/ui/UnitGlyph.tsx</code> : glyphe d’unité.</li>
+<li><code>src/tactical-board/ui/UnitGlyph.module.css</code> : styles glyphe.</li>
+</ul>
+<h3 id="styles-et-assets-board" class="tsd-anchor-link">Styles et assets board<a href="#styles-et-assets-board" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h3>
+<ul>
+<li><code>src/tactical-board/styles/tactical-board.css</code> : styles globaux board.</li>
+<li><code>src/tactical-board/styles/TacticalBoardApp.module.css</code> : layout racine board.</li>
+<li><code>src/tactical-board/styles/FormControls.module.css</code> : styles des contrôles de formulaire.</li>
+<li><code>src/tactical-board/assets/resolveBuiltinUnitIcon.ts</code> : résolution des icônes intégrées.</li>
+<li><code>src/tactical-board/assets/base-icon-game.png</code> : icône unité de base.</li>
+<li><code>src/tactical-board/assets/obstacle-icon-game.png</code> : icône obstacle.</li>
+</ul>
+<h2 id="shared" class="tsd-anchor-link">Shared<a href="#shared" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><code>src/shared/assets/tactical-terrain.webp</code> : texture/visuel terrain partagé.</li>
+</ul>
+<h2 id="tests" class="tsd-anchor-link">Tests<a href="#tests" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><code>src/tests/setup.ts</code> : initialisation commune des tests.</li>
+<li><code>src/tests/portfolio.test.tsx</code> : tests de navigation/affichage portfolio.</li>
+<li><code>src/tests/publishedContent.test.ts</code> : validation du contenu publié.</li>
+<li><code>src/tests/routingIsolation.test.tsx</code> : isolation stricte portfolio vs board.</li>
+<li><code>src/tests/screenGlitch.test.tsx</code> : comportement de l’effet glitch.</li>
+<li><code>src/tests/webglFallback.test.tsx</code> : fallback quand WebGL indisponible.</li>
+<li><code>src/tests/tacticalBoardModel.test.ts</code> : tests du modèle métier board.</li>
+<li><code>src/tests/tacticalBoard.test.tsx</code> : tests UI et interactions Tactical Board.</li>
+<li><code>src/tests/persistence.test.ts</code> : tests IndexedDB/persistance.</li>
+</ul>
+<h2 id="assets-globaux-non-versionnés-logique-métier" class="tsd-anchor-link">Assets globaux non versionnés logique métier<a href="#assets-globaux-non-versionnés-logique-métier" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<ul>
+<li><code>src/assets/effects/signal-glitch.mp4</code> : média de support effet glitch.</li>
+<li><code>src/assets/effects/signal-glitch.webm</code> : variante webm du média glitch.</li>
+</ul>
+<h2 id="convention-de-mise-à-jour" class="tsd-anchor-link">Convention de mise à jour<a href="#convention-de-mise-à-jour" aria-label="Permalink" class="tsd-anchor-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="../assets/icons.svg#icon-anchor"></use></svg></a></h2>
+<p>Quand un fichier est ajouté, renommé ou déplacé :</p>
+<ol>
+<li>Mettre à jour cette carte.</li>
+<li>Mettre à jour la documentation API si nécessaire (<code>npm run docs:api</code>).</li>
+<li>Vérifier que le rôle du fichier reste compatible avec la séparation
+portfolio/board.</li>
+</ol>
+</div></div>
+<div class="col-sidebar">
+<div class="page-menu">
+<div class="tsd-navigation settings">
+<details class="tsd-accordion"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>Settings</h3></summary>
+<div class="tsd-accordion-details">
+<div class="tsd-filter-visibility"><span class="settings-label">Member Visibility</span>
+<ul id="tsd-filter-options">
+<li class="tsd-filter-item"><label class="tsd-filter-input"><input type="checkbox" id="tsd-filter-inherited" name="inherited" checked/><svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect class="tsd-checkbox-background" width="30" height="30" x="1" y="1" rx="6" fill="none"></rect><path class="tsd-checkbox-checkmark" d="M8.35422 16.8214L13.2143 21.75L24.6458 10.25" stroke="none" stroke-width="3.5" stroke-linejoin="round" fill="none"></path></svg><span>Inherited</span></label></li></ul></div>
+<div class="tsd-theme-toggle"><label class="settings-label" for="tsd-theme">Theme</label><select id="tsd-theme"><option value="os">OS</option><option value="light">Light</option><option value="dark">Dark</option></select></div></div></details></div>
+<details open class="tsd-accordion tsd-page-navigation"><summary class="tsd-accordion-summary"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><use href="../assets/icons.svg#icon-chevronDown"></use></svg>
+<h3>On This Page</h3></summary>
+<div class="tsd-accordion-details"><a href="#carte-des-fichiers-style-doxygen"><span>Carte des fichiers (style <wbr/>Doxygen)</span></a>
+<ul>
+<li><a href="#utilisation"><span>Utilisation</span></a></li>
+<li><a href="#points-dentrée"><span>Points d’entrée</span></a></li>
+<li><a href="#portfolio"><span>Portfolio</span></a></li>
+<li>
+<ul>
+<li><a href="#shell-pages-composants"><span>Shell, pages, composants</span></a></li>
+<li><a href="#contenu-publié"><span>Contenu publié</span></a></li>
+<li><a href="#motion"><span>Motion</span></a></li>
+<li><a href="#webgl-portfolio-uniquement"><span>Web<wbr/>GL (portfolio uniquement)</span></a></li>
+<li><a href="#styles-et-assets-portfolio"><span>Styles et assets portfolio</span></a></li></ul></li>
+<li><a href="#tactical-board"><span>Tactical <wbr/>Board</span></a></li>
+<li>
+<ul>
+<li><a href="#racine-état-et-hooks"><span>Racine, état et hooks</span></a></li>
+<li><a href="#modèle-métier"><span>Modèle métier</span></a></li>
+<li><a href="#persistence"><span>Persistence</span></a></li>
+<li><a href="#import-export"><span>Import / export</span></a></li>
+<li><a href="#features-métier-ui"><span>Features métier <wbr/>UI</span></a></li>
+<li><a href="#ui-réutilisable-board"><span>UI réutilisable board</span></a></li>
+<li><a href="#styles-et-assets-board"><span>Styles et assets board</span></a></li></ul></li>
+<li><a href="#shared"><span>Shared</span></a></li>
+<li><a href="#tests"><span>Tests</span></a></li>
+<li><a href="#assets-globaux-non-versionnés-logique-métier"><span>Assets globaux non versionnés logique métier</span></a></li>
+<li><a href="#convention-de-mise-à-jour"><span>Convention de mise à jour</span></a></li></ul></div></details></div>
+<div class="site-menu">
+<nav class="tsd-navigation"><a href="../index.html">SEROLYN — Documentation technique</a>
+<ul class="tsd-small-nested-navigation" id="tsd-nav-container">
+<li>Loading...</li></ul></nav></div></div></div><footer>
+<p class="tsd-generator">Generated using <a href="https://typedoc.org/" target="_blank">TypeDoc</a></p></footer>
+<div class="overlay"></div></body></html>

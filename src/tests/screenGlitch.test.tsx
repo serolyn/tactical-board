@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Tests automatiques du projet.
+ *
+ * Ce fichier vérifie un comportement précis pour éviter les régressions.
+ * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
+ * rester vrai.
+ */
+
 import { cleanup, fireEvent, render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,6 +17,13 @@ let reducedMotion = false
 let visibilityState: DocumentVisibilityState = 'visible'
 let initialMatchMediaDescriptor: PropertyDescriptor | undefined
 let initialRootStyle = ''
+/**
+ * Cette fonction intervient sur le sujet “restore Property” dans tests.
+ *
+ * Fichier: src/tests/screenGlitch.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord restoreProperty dans screenGlitch.test.tsx.
+ */
+
 
 function restoreProperty(
   target: object,
@@ -17,6 +33,13 @@ function restoreProperty(
   if (descriptor) Object.defineProperty(target, property, descriptor)
   else Reflect.deleteProperty(target, property)
 }
+/**
+ * Cette fonction intervient sur le sujet “install Environment Mocks” dans tests.
+ *
+ * Fichier: src/tests/screenGlitch.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord installEnvironmentMocks dans screenGlitch.test.tsx.
+ */
+
 
 function installEnvironmentMocks() {
   Object.defineProperty(window, 'matchMedia', {
@@ -35,6 +58,13 @@ function installEnvironmentMocks() {
 
   vi.spyOn(document, 'visibilityState', 'get').mockImplementation(() => visibilityState)
 }
+/**
+ * Cette fonction intervient sur le sujet “screen Glitch Tree” dans tests.
+ *
+ * Fichier: src/tests/screenGlitch.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord screenGlitchTree dans screenGlitch.test.tsx.
+ */
+
 
 function screenGlitchTree(enabled = true) {
   return (
@@ -43,6 +73,13 @@ function screenGlitchTree(enabled = true) {
     </MemoryRouter>
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “render Screen Glitch” dans tests.
+ *
+ * Fichier: src/tests/screenGlitch.test.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord renderScreenGlitch dans screenGlitch.test.tsx.
+ */
+
 
 function renderScreenGlitch(enabled = true) {
   return render(screenGlitchTree(enabled))

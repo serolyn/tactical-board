@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Interface du plateau tactique.
+ *
+ * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
+ * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
+ * ici qu'il faut commencer.
+ */
+
 import type { ComponentType, SVGProps } from 'react'
 import {
   Castle,
@@ -55,6 +64,13 @@ const ICONS: Record<string, SvgComponent> = {
   'chess-pawn': ChessPawn,
   castle: Castle,
 }
+/**
+ * Cette fonction intervient sur le sujet “tank Icon” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/BuiltinUnitIcon.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord TankIcon dans BuiltinUnitIcon.tsx.
+ */
+
 
 function TankIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -67,6 +83,13 @@ function TankIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “cavalry Icon” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/BuiltinUnitIcon.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord CavalryIcon dans BuiltinUnitIcon.tsx.
+ */
+
 
 function CavalryIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -76,6 +99,13 @@ function CavalryIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “artillery Icon” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/BuiltinUnitIcon.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord ArtilleryIcon dans BuiltinUnitIcon.tsx.
+ */
+
 
 function ArtilleryIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -91,6 +121,13 @@ export interface BuiltinUnitIconProps {
   className?: string
   iconKey: string
 }
+/**
+ * Cette fonction intervient sur le sujet “builtin Unit Icon” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/battlefield/BuiltinUnitIcon.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord BuiltinUnitIcon dans BuiltinUnitIcon.tsx.
+ */
+
 
 export function BuiltinUnitIcon({ iconKey, ...props }: BuiltinUnitIconProps) {
   const imageUrl = resolveBuiltinUnitIconImage(iconKey)

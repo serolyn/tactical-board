@@ -1,5 +1,20 @@
+/**
+ * @packageDocumentation
+ * Modèle métier pur de Tactical Board.
+ *
+ * Ce dossier décrit les règles du jeu de données: documents, sélection,
+ * historique, unités, campagnes et migrations. Il ne dépend pas de React.
+ */
+
 /** Règles pures de nommage et de classement de la bibliothèque de scénarios. */
 import type { ScenarioDocumentV1 } from './tacticalBoardTypes'
+/**
+ * Cette fonction intervient sur le sujet “unique Scenario Name” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/scenarioNaming.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord uniqueScenarioName dans scenarioNaming.ts.
+ */
+
 
 export function uniqueScenarioName(
   baseName: string,
@@ -17,6 +32,13 @@ export function uniqueScenarioName(
   }
   return candidate
 }
+/**
+ * Cette fonction intervient sur le sujet “sort Scenarios” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/scenarioNaming.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord sortScenarios dans scenarioNaming.ts.
+ */
+
 
 export function sortScenarios(
   documents: readonly ScenarioDocumentV1[],

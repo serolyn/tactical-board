@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Effets WebGL du portfolio.
+ *
+ * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
+ * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
+ * faire à la place.
+ */
+
 import { useFrame } from '@react-three/fiber'
 import {
   useEffect,
@@ -148,28 +157,36 @@ export function GhostSignalScene({
   profile,
   scroll,
 }: GhostSignalSceneProps) {
-  /** Groupe principal déplacé et tourné à chaque frame. */
+  
+/** Groupe principal déplacé et tourné à chaque frame. */
   const sculpture = useRef<Group>(null)
 
-  /** Références vers les échos secondaires. */
+  
+/** Références vers les échos secondaires. */
   const echoGroups = useRef<Array<Group | null>>([])
 
-  /** Mesh contenant tous les fragments. */
+  
+/** Mesh contenant tous les fragments. */
   const fragments = useRef<InstancedMesh>(null)
 
-  /** Groupe permettant de déplacer tous les fragments ensemble. */
+  
+/** Groupe permettant de déplacer tous les fragments ensemble. */
   const fragmentRig = useRef<Group>(null)
 
-  /** Intensité rouge transmise aux shaders des membranes. */
+  
+/** Intensité rouge transmise aux shaders des membranes. */
   const redSignal = useRef(0)
 
-  /** État logique utilisé pour synchroniser le repère rouge du DOM. */
+  
+/** État logique utilisé pour synchroniser le repère rouge du DOM. */
   const signalActive = useRef(false)
 
-  /** Version la plus récente du callback React. */
+  
+/** Version la plus récente du callback React. */
   const signalChangeRef = useRef(onSignalChange)
 
-  /**
+  
+/**
    * Cylindre déformé par le vertex shader.
    */
   const geometry = useMemo(
@@ -185,13 +202,15 @@ export function GhostSignalScene({
     [profile],
   )
 
-  /** Géométrie très simple partagée par tous les fragments. */
+  
+/** Géométrie très simple partagée par tous les fragments. */
   const fragmentGeometry = useMemo(
     () => new TetrahedronGeometry(0.13, 0),
     [],
   )
 
-  /**
+  
+/**
    * Matériau fantomatique des fragments.
    *
    * AdditiveBlending mélange leur couleur avec l'arrière-plan sombre :
@@ -211,19 +230,22 @@ export function GhostSignalScene({
     [],
   )
 
-  /** Couleur normale des fragments. */
+  
+/** Couleur normale des fragments. */
   const fragmentBaseColor = useMemo(
     () => new Color('#4f5fc4'),
     [],
   )
 
-  /** Couleur des fragments pendant l’anomalie rouge. */
+  
+/** Couleur des fragments pendant l’anomalie rouge. */
   const fragmentSignalColor = useMemo(
     () => new Color('#ff170d'),
     [],
   )
 
-  /**
+  
+/**
    * Position et transformation de chaque fragment.
    */
   const fragmentDescriptors = useMemo(
@@ -246,22 +268,26 @@ export function GhostSignalScene({
     [],
   )
 
-  /** Le profil de qualité choisit combien d’échos afficher. */
+  
+/** Le profil de qualité choisit combien d’échos afficher. */
   const echoLayers =
     ECHO_LAYERS.slice(0, profile.echoes)
 
-  /** Position adaptée à la taille de l’écran. */
+  
+/** Position adaptée à la taille de l’écran. */
   const baseX = compact ? 0.28 : 1.08
   const baseY = compact ? 0.28 : -0.02
 
-  /** Échelle adaptée à la taille de l’écran. */
+  
+/** Échelle adaptée à la taille de l’écran. */
   const sculptureScale = compact
     ? ([0.72, 0.76, 0.72] as const)
     : ([1.28, 0.84, 1.18] as const)
 
   signalChangeRef.current = onSignalChange
 
-  /**
+  
+/**
    * Enregistre la transformation de chaque fragment dans l’InstancedMesh.
    */
   useEffect(() => {
@@ -286,13 +312,15 @@ export function GhostSignalScene({
     mesh.instanceMatrix.needsUpdate = true
   }, [fragmentDescriptors])
 
-  /** Libère le cylindre lorsqu’il est remplacé ou démonté. */
+  
+/** Libère le cylindre lorsqu’il est remplacé ou démonté. */
   useEffect(
     () => () => geometry.dispose(),
     [geometry],
   )
 
-  /** Libère les autres ressources Three.js au démontage. */
+  
+/** Libère les autres ressources Three.js au démontage. */
   useEffect(
     () => () => {
       fragmentGeometry.dispose()
@@ -308,13 +336,15 @@ export function GhostSignalScene({
     ],
   )
 
-  /** Désactive le signal DOM lorsque la scène disparaît. */
+  
+/** Désactive le signal DOM lorsque la scène disparaît. */
   useEffect(
     () => () => signalChangeRef.current(false),
     [],
   )
 
-  /**
+  
+/**
    * Anime la scène avant chaque frame.
    */
   useFrame(({ clock }, delta) => {
@@ -324,7 +354,8 @@ export function GhostSignalScene({
 
     const elapsed = clock.elapsedTime
 
-    /**
+    
+/**
      * Intensité commune à la fissure et aux fragments.
      */
     const intensity =
@@ -332,7 +363,8 @@ export function GhostSignalScene({
 
     redSignal.current = intensity
 
-    /**
+    
+/**
      * L’intensité est multipliée pour rendre le changement de couleur
      * des petits fragments nettement visible.
      */
@@ -343,7 +375,8 @@ export function GhostSignalScene({
         1,
       )
 
-    /**
+    
+/**
      * Ajoute un léger scintillement pendant l’impulsion.
      */
     const fragmentPulse =
@@ -353,7 +386,8 @@ export function GhostSignalScene({
     const fragmentRedAmount =
       fragmentSignalStrength * fragmentPulse
 
-    /**
+    
+/**
      * MeshBasicMaterial ne dépend pas des lumières.
      * Sa couleur passe donc directement du bleu au rouge.
      */
@@ -364,7 +398,8 @@ export function GhostSignalScene({
         fragmentRedAmount,
       )
 
-      /**
+      
+/**
      * Les fragments respirent légèrement même lorsque le signal rouge
      * est inactif. Pendant l'impulsion, ils deviennent plus visibles.
      */
@@ -377,7 +412,8 @@ export function GhostSignalScene({
       + ghostBreathing * 0.08
       + fragmentSignalStrength * 0.42
 
-    /**
+    
+/**
      * Informe le DOM uniquement lorsque l’état actif change.
      */
     const nextSignalActive =
@@ -395,7 +431,8 @@ export function GhostSignalScene({
       )
     }
 
-    /**
+    
+/**
      * Cibles de rotation et de déplacement de la sculpture principale.
      */
     const targetRotationX =
@@ -420,7 +457,8 @@ export function GhostSignalScene({
       + pointer.current.y * 0.16
       + scroll.current * 0.08
 
-    /**
+    
+/**
      * MathUtils.damp crée des déplacements progressifs et amortis.
      */
     currentSculpture.rotation.x =
@@ -463,7 +501,8 @@ export function GhostSignalScene({
         delta,
       )
 
-    /**
+    
+/**
      * Anime les échos avec un retard différent.
      */
     echoGroups.current.forEach(
@@ -528,7 +567,8 @@ export function GhostSignalScene({
     )
 
  if (fragmentRig.current) {
-  /**
+  
+/**
    * Rotation orbitale clairement visible autour de la sculpture.
    */
   fragmentRig.current.rotation.y =
@@ -540,7 +580,8 @@ export function GhostSignalScene({
       delta,
     )
 
-  /**
+  
+/**
    * Les deux autres axes empêchent les fragments de tourner
    * comme un simple disque parfaitement horizontal.
    */
@@ -562,7 +603,8 @@ export function GhostSignalScene({
       delta,
     )
 
-  /**
+  
+/**
    * Le scroll repousse les fragments dans la profondeur.
    */
   fragmentRig.current.position.z =

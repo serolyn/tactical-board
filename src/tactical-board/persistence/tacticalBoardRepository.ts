@@ -1,4 +1,11 @@
 /** Isole toutes les transactions IndexedDB et les migrations de données Tactical Board. */
+/**
+ * @packageDocumentation
+ * Couche d'accès à IndexedDB pour Tactical Board.
+ *
+ * Ce module expose les opérations persistantes (documents, assets, settings),
+ * garantit les migrations à la lecture et encapsule les transactions IDB.
+ */
 import { deleteDB, openDB, type DBSchema, type IDBPDatabase } from 'idb'
 import {
   isLegacyScenarioDocumentV1,
@@ -38,6 +45,13 @@ interface TacticalBoardSchema extends DBSchema {
 }
 
 let databasePromise: Promise<IDBPDatabase<TacticalBoardSchema>> | null = null
+/**
+ * Cette classe structure le sujet “stored Scenario Migration Error” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/persistence/tacticalBoardRepository.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord StoredScenarioMigrationError dans tacticalBoardRepository.ts.
+ */
+
 
 export class StoredScenarioMigrationError extends Error {
   constructor(message: string) {
@@ -45,6 +59,13 @@ export class StoredScenarioMigrationError extends Error {
     this.name = 'StoredScenarioMigrationError'
   }
 }
+/**
+ * Cette fonction teste le sujet “record” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/persistence/tacticalBoardRepository.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord isRecord dans tacticalBoardRepository.ts.
+ */
+
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -267,6 +288,13 @@ export class TacticalBoardRepository {
 }
 
 export const tacticalBoardRepository = new TacticalBoardRepository()
+/**
+ * Cette fonction ferme le sujet “tactical Board Database” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/persistence/tacticalBoardRepository.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord closeTacticalBoardDatabase dans tacticalBoardRepository.ts.
+ */
+
 
 export async function closeTacticalBoardDatabase(): Promise<void> {
   if (!databasePromise) return
@@ -274,6 +302,13 @@ export async function closeTacticalBoardDatabase(): Promise<void> {
   database.close()
   databasePromise = null
 }
+/**
+ * Cette fonction intervient sur le sujet “delete Tactical Board Database” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/persistence/tacticalBoardRepository.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord deleteTacticalBoardDatabase dans tacticalBoardRepository.ts.
+ */
+
 
 export async function deleteTacticalBoardDatabase(): Promise<void> {
   await closeTacticalBoardDatabase()

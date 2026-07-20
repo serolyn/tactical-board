@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Effets WebGL du portfolio.
+ *
+ * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
+ * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
+ * faire à la place.
+ */
+
 interface DataSavingConnection extends EventTarget {
   readonly saveData?: boolean
 }
@@ -48,17 +57,38 @@ export function supportsWebGL2(
     return false
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “prefers Reduced Motion” dans portfolio.
+ *
+ * Fichier: src/portfolio/webgl/ghostSignalCapabilities.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord prefersReducedMotion dans ghostSignalCapabilities.ts.
+ */
+
 
 export function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined'
     && typeof window.matchMedia === 'function'
     && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
+/**
+ * Cette fonction intervient sur le sujet “prefers Data Saving” dans portfolio.
+ *
+ * Fichier: src/portfolio/webgl/ghostSignalCapabilities.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord prefersDataSaving dans ghostSignalCapabilities.ts.
+ */
+
 
 export function prefersDataSaving(): boolean {
   if (typeof navigator === 'undefined') return false
   return Boolean((navigator as NavigatorWithConnection).connection?.saveData)
 }
+/**
+ * Cette fonction intervient sur le sujet “read Ghost Signal Capabilities” dans portfolio.
+ *
+ * Fichier: src/portfolio/webgl/ghostSignalCapabilities.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord readGhostSignalCapabilities dans ghostSignalCapabilities.ts.
+ */
+
 
 export function readGhostSignalCapabilities(): GhostSignalCapabilities {
   const reducedMotion = prefersReducedMotion()
@@ -75,6 +105,13 @@ export function readGhostSignalCapabilities(): GhostSignalCapabilities {
 export function canRunGhostSignal(capabilities: GhostSignalCapabilities): boolean {
   return capabilities.webgl2 && !capabilities.reducedMotion
 }
+/**
+ * Cette fonction intervient sur le sujet “get Capability Fallback Cause” dans portfolio.
+ *
+ * Fichier: src/portfolio/webgl/ghostSignalCapabilities.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getCapabilityFallbackCause dans ghostSignalCapabilities.ts.
+ */
+
 
 export function getCapabilityFallbackCause(
   capabilities: GhostSignalCapabilities,
@@ -83,6 +120,13 @@ export function getCapabilityFallbackCause(
   if (!capabilities.webgl2) return 'webgl2-unavailable'
   return null
 }
+/**
+ * Cette fonction intervient sur le sujet “get Data Saving Connection” dans portfolio.
+ *
+ * Fichier: src/portfolio/webgl/ghostSignalCapabilities.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord getDataSavingConnection dans ghostSignalCapabilities.ts.
+ */
+
 
 export function getDataSavingConnection(): DataSavingConnection | undefined {
   if (typeof navigator === 'undefined') return undefined

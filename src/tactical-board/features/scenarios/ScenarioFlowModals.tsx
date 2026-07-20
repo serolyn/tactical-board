@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Barre et modales de scénario Tactical Board.
+ *
+ * Ce dossier gère les actions de haut niveau: créer un scénario, passer au
+ * suivant, consulter les détails ou suivre la progression. Il relie le métier
+ * du board aux actions visibles dans l'interface.
+ */
+
 import { useEffect, useState } from 'react'
 import { Archive, Copy, LayoutGrid } from 'lucide-react'
 import type { ScenarioPeriod } from '@/tactical-board/model/tacticalBoardTypes'
@@ -12,6 +21,13 @@ export interface NextScenarioModalProps {
   open: boolean
   sourceName: string
 }
+/**
+ * Cette fonction intervient sur le sujet “next Scenario Modal” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/scenarios/ScenarioFlowModals.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord NextScenarioModal dans ScenarioFlowModals.tsx.
+ */
+
 
 export function NextScenarioModal({
   onChoose,
@@ -52,6 +68,13 @@ export interface ObjectiveReachedModalProps {
   onContinue: () => void
   open: boolean
 }
+/**
+ * Cette fonction intervient sur le sujet “objective Reached Modal” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/scenarios/ScenarioFlowModals.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord ObjectiveReachedModal dans ScenarioFlowModals.tsx.
+ */
+
 
 export function ObjectiveReachedModal({
   onArchiveAndContinue,
@@ -92,6 +115,13 @@ export interface ProgressDateModalProps {
   onClose: () => void
   open: boolean
 }
+/**
+ * Cette fonction intervient sur le sujet “progress Date Modal” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/scenarios/ScenarioFlowModals.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord ProgressDateModal dans ScenarioFlowModals.tsx.
+ */
+
 
 export function ProgressDateModal({
   current,
@@ -135,6 +165,13 @@ export interface ScenarioDetailsModalProps {
   open: boolean
   period?: ScenarioPeriod
 }
+/**
+ * Cette fonction intervient sur le sujet “scenario Details Modal” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/scenarios/ScenarioFlowModals.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord ScenarioDetailsModal dans ScenarioFlowModals.tsx.
+ */
+
 
 export function ScenarioDetailsModal({
   objective,

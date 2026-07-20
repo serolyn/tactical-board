@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Bibliothèque d'éléments Tactical Board.
+ *
+ * Ce fichier regroupe les types, factions et entrées qui peuvent être ajoutés
+ * dans un scénario. C'est la partie à lire quand tu veux comprendre d'où viennent
+ * les éléments qu'on peut placer.
+ */
+
 import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Check, Pencil, Plus, Trash2, Upload } from 'lucide-react'
 
@@ -48,6 +57,13 @@ const DEFAULT_TYPE: CustomTypeDraft = {
   name: '',
 }
 const HEX_COLOR_PATTERN = /^#[0-9a-f]{6}$/i
+/**
+ * Cette fonction intervient sur le sujet “library Panel” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/library/LibraryPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord LibraryPanel dans LibraryPanel.tsx.
+ */
+
 
 export function LibraryPanel({
   activeFactionId,
@@ -359,6 +375,13 @@ interface TypeGridProps {
   resolveAssetUrl?: (assetId: string) => string | undefined
   types: readonly UnitType[]
 }
+/**
+ * Cette fonction intervient sur le sujet “type Grid” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/library/LibraryPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord TypeGrid dans LibraryPanel.tsx.
+ */
+
 
 function TypeGrid({
   activeId,
@@ -429,6 +452,13 @@ interface FactionEditorProps {
   onSave: () => void
   state: { draft: FactionDraft; id?: string } | null
 }
+/**
+ * Cette fonction intervient sur le sujet “faction Editor” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/library/LibraryPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord FactionEditor dans LibraryPanel.tsx.
+ */
+
 
 function FactionEditor({ busy, error, onChange, onClose, onDelete, onSave, state }: FactionEditorProps) {
   return (
@@ -494,6 +524,13 @@ interface CustomTypeEditorProps {
   onSave: () => void
   state: { draft: CustomTypeDraft; id?: string; imageUrl?: string } | null
 }
+/**
+ * Cette fonction intervient sur le sujet “custom Type Editor” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/features/library/LibraryPanel.tsx
+ * Si tu lis ce fichier pour apprendre, regarde d’abord CustomTypeEditor dans LibraryPanel.tsx.
+ */
+
 
 function CustomTypeEditor({ busy, error, onChange, onClose, onSave, state }: CustomTypeEditorProps) {
   const [localError, setLocalError] = useState<string | null>(null)

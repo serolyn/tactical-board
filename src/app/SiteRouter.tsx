@@ -1,21 +1,30 @@
+/**
+ * @packageDocumentation
+ * Point d'entrée du routage applicatif.
+ *
+ * Ce module est l'unique endroit autorisé à choisir entre les deux applications
+ * (`portfolio` et `tactical-board`). Il déclare les routes publiques, applique
+ * les effets de route communs, et monte `BrowserRouter` avec le basename
+ * compatible GitHub Pages.
+ */
 import { lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import { PortfolioShell } from '@/portfolio/PortfolioShell'
-import { AboutPage } from '@/portfolio/pages/AboutPage'
-import { HomePage } from '@/portfolio/pages/HomePage'
-import { LabPage } from '@/portfolio/pages/LabPage'
-import { MusicPage } from '@/portfolio/pages/MusicPage'
-import { NotFoundPage } from '@/portfolio/pages/NotFoundPage'
-import { ProjectsPage } from '@/portfolio/pages/ProjectsPage'
+import { AboutPage } from '@/portfolio/pages/PortfolioAboutPage'
+import { HomePage } from '@/portfolio/pages/PortfolioHomePage'
+import { LabPage } from '@/portfolio/pages/PortfolioLabIndexPage'
+import { MusicPage } from '@/portfolio/pages/PortfolioMusicIndexPage'
+import { NotFoundPage } from '@/portfolio/pages/PortfolioNotFoundPage'
+import { ProjectsPage } from '@/portfolio/pages/PortfolioProjectsIndexPage'
 import { ScreenGlitch } from './effects/ScreenGlitch'
 import { SiteRouteEffects } from './SiteRouteEffects'
 import { normalizeSiteBasename } from './normalizeSiteBasename'
 
 // Le routeur racine est l'unique point autorisé à choisir entre les deux applications.
 const TacticalBoardApp = lazy(() => import('@/tactical-board/TacticalBoardApp'))
-const ProjectDetailPage = lazy(() => import('@/portfolio/pages/ProjectDetailPage'))
-const MusicDetailPage = lazy(() => import('@/portfolio/pages/MusicDetailPage'))
-const LabDetailPage = lazy(() => import('@/portfolio/pages/LabDetailPage'))
+const ProjectDetailPage = lazy(() => import('@/portfolio/pages/PortfolioProjectDetailPage'))
+const MusicDetailPage = lazy(() => import('@/portfolio/pages/PortfolioMusicDetailPage'))
+const LabDetailPage = lazy(() => import('@/portfolio/pages/PortfolioLabDetailPage'))
 
 const tacticalBoardLoadingStyle = {
   display: 'grid',
@@ -26,6 +35,10 @@ const tacticalBoardLoadingStyle = {
   background: '#0d1211',
   fontFamily: 'system-ui, sans-serif',
 } as const
+/**
+ * Cette petite fabrique enveloppe une page portfolio dans un chargement différé, pour que l’interface reste fluide.
+ */
+
 
 function lazyPortfolioPage(page: ReactNode) {
   return (
@@ -40,7 +53,7 @@ export function SiteRouteTree() {
   return (
     <>
       <SiteRouteEffects />
-      <ScreenGlitch enabled={true} /> 
+      <ScreenGlitch enabled={false} /> 
       <Routes>
         <Route
           path="/board"

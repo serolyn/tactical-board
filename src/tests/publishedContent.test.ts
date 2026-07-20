@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Tests automatiques du projet.
+ *
+ * Ce fichier vérifie un comportement précis pour éviter les régressions.
+ * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
+ * rester vrai.
+ */
+
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -12,8 +21,8 @@ import {
   publishedMusic,
   publishedProjects,
   validatePortfolioContent,
-} from '@/portfolio/content'
-import type { PortfolioContent } from '@/portfolio/content/types'
+} from '@/portfolio/content/portfolioContent'
+import type { PortfolioContent } from '@/portfolio/content/portfolioContentTypes'
 
 describe('contenus publiés du portfolio', () => {
   it('valide le catalogue livré et exclut les brouillons des sélecteurs publics', () => {

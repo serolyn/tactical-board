@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Interface du plateau tactique.
+ *
+ * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
+ * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
+ * ici qu'il faut commencer.
+ */
+
 import { previewMoveUnits } from '@/tactical-board/model/applyScenarioCommand'
 import type {
   MoveUnitsPreview,

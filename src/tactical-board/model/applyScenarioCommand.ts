@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Modèle métier pur de Tactical Board.
+ *
+ * Ce dossier décrit les règles du jeu de données: documents, sélection,
+ * historique, unités, campagnes et migrations. Il ne dépend pas de React.
+ */
+
 /** Applique chaque mutation métier de façon pure et atomique sur un scénario. */
 import { produce } from 'immer'
 import { findUnitType } from './unitCatalog'
@@ -27,6 +35,13 @@ const NO_EFFECTS: CommandEffects = Object.freeze({
   removedUnitIds: Object.freeze([]),
   removedAnnotationIds: Object.freeze([]),
 })
+/**
+ * Cette classe structure le sujet “domain Error” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord DomainError dans applyScenarioCommand.ts.
+ */
+
 
 export class DomainError extends Error {
   readonly code: DomainErrorCode
@@ -43,6 +58,13 @@ export class DomainError extends Error {
     this.details = details
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “fail” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord fail dans applyScenarioCommand.ts.
+ */
+
 
 function fail(
   code: DomainErrorCode,
@@ -51,10 +73,24 @@ function fail(
 ): never {
   throw new DomainError(code, message, details)
 }
+/**
+ * Cette fonction intervient sur le sujet “same Position” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord samePosition dans applyScenarioCommand.ts.
+ */
+
 
 function samePosition(left: Position, right: Position): boolean {
   return left.row === right.row && left.column === right.column
 }
+/**
+ * Cette fonction intervient sur le sujet “same Icon” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord sameIcon dans applyScenarioCommand.ts.
+ */
+
 
 function sameIcon(left: IconRef, right: IconRef): boolean {
   return left.kind === right.kind &&
@@ -62,12 +98,26 @@ function sameIcon(left: IconRef, right: IconRef): boolean {
       ? left.name === (right as typeof left).name
       : left.assetId === (right as typeof left).assetId)
 }
+/**
+ * Cette fonction intervient sur le sujet “copy Icon” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord copyIcon dans applyScenarioCommand.ts.
+ */
+
 
 function copyIcon(icon: IconRef): IconRef {
   return icon.kind === 'catalog'
     ? { kind: 'catalog', name: icon.name }
     : { kind: 'asset', assetId: icon.assetId }
 }
+/**
+ * Cette fonction intervient sur le sujet “snapshot Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord snapshotType dans applyScenarioCommand.ts.
+ */
+
 
 function snapshotType(unitType: UnitType): UnitTypeSnapshot {
   return {
@@ -78,6 +128,13 @@ function snapshotType(unitType: UnitType): UnitTypeSnapshot {
     icon: copyIcon(unitType.icon),
   }
 }
+/**
+ * Cette fonction teste le sujet “inside” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord isInside dans applyScenarioCommand.ts.
+ */
+
 
 function isInside(position: Position, rows: number, columns: number): boolean {
   return (
@@ -89,6 +146,13 @@ function isInside(position: Position, rows: number, columns: number): boolean {
     position.column < columns
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “assert Grid Size” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord assertGridSize dans applyScenarioCommand.ts.
+ */
+
 
 function assertGridSize(rows: number, columns: number): void {
   if (
@@ -106,12 +170,26 @@ function assertGridSize(rows: number, columns: number): void {
     )
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “assert Inside” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord assertInside dans applyScenarioCommand.ts.
+ */
+
 
 function assertInside(document: ScenarioDocumentV1, position: Position): void {
   if (!isInside(position, document.grid.rows, document.grid.columns)) {
     fail('OUT_OF_BOUNDS', 'Cette position se trouve hors du plateau.', { position })
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “assert Position Inside” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord assertPositionInside dans applyScenarioCommand.ts.
+ */
+
 
 function assertPositionInside(
   document: ScenarioDocumentV1,
@@ -124,6 +202,13 @@ function assertPositionInside(
     assertInside(document, annotation.position)
   }
 }
+/**
+ * Cette fonction intervient sur le sujet “require Faction” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord requireFaction dans applyScenarioCommand.ts.
+ */
+
 
 function requireFaction(document: ScenarioDocumentV1, factionId: string): Faction {
   const faction = document.factions.find((candidate) => candidate.id === factionId)
@@ -132,6 +217,13 @@ function requireFaction(document: ScenarioDocumentV1, factionId: string): Factio
   }
   return faction
 }
+/**
+ * Cette fonction intervient sur le sujet “require Available Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord requireAvailableType dans applyScenarioCommand.ts.
+ */
+
 
 function requireAvailableType(document: ScenarioDocumentV1, typeId: string): UnitType {
   const unitType = findUnitType(typeId, document.customUnitTypes)
@@ -140,6 +232,13 @@ function requireAvailableType(document: ScenarioDocumentV1, typeId: string): Uni
   }
   return unitType
 }
+/**
+ * Cette fonction intervient sur le sujet “changed Document” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord changedDocument dans applyScenarioCommand.ts.
+ */
+
 
 function changedDocument(
   document: ScenarioDocumentV1,
@@ -151,6 +250,13 @@ function changedDocument(
     draft.updatedAt = command.at ?? document.updatedAt
   })
 }
+/**
+ * Cette fonction intervient sur le sujet “same Period” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord samePeriod dans applyScenarioCommand.ts.
+ */
+
 
 function samePeriod(left: ScenarioPeriod | undefined, right: ScenarioPeriod | undefined): boolean {
   return (
@@ -159,6 +265,13 @@ function samePeriod(left: ScenarioPeriod | undefined, right: ScenarioPeriod | un
     left?.current === right?.current
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “update Scenario Metadata” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateScenarioMetadata dans applyScenarioCommand.ts.
+ */
+
 
 function updateScenarioMetadata(
   document: ScenarioDocumentV1,
@@ -176,6 +289,13 @@ function updateScenarioMetadata(
       : { ...command.changes, period: { ...command.changes.period } }
   return result(document, changedDocument(document, command, changes))
 }
+/**
+ * Cette fonction intervient sur le sujet “update Scenario Progress” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateScenarioProgress dans applyScenarioCommand.ts.
+ */
+
 
 function updateScenarioProgress(
   document: ScenarioDocumentV1,
@@ -191,6 +311,13 @@ function updateScenarioProgress(
   const nextPeriod = Object.keys(period).length === 0 ? undefined : period
   return result(document, changedDocument(document, command, { period: nextPeriod }))
 }
+/**
+ * Cette fonction intervient sur le sujet “result” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord result dans applyScenarioCommand.ts.
+ */
+
 
 function result(
   original: ScenarioDocumentV1,
@@ -199,6 +326,13 @@ function result(
 ): CommandResult {
   return { document, changed: document !== original, effects }
 }
+/**
+ * Cette fonction intervient sur le sujet “update At” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateAt dans applyScenarioCommand.ts.
+ */
+
 
 function updateAt<T>(
   items: readonly T[],
@@ -211,6 +345,13 @@ function updateAt<T>(
   if (next === current) return items
   return [...items.slice(0, index), next, ...items.slice(index + 1)]
 }
+/**
+ * Cette fonction teste le sujet “annotation Outside” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord isAnnotationOutside dans applyScenarioCommand.ts.
+ */
+
 
 function isAnnotationOutside(
   annotation: BoardAnnotation,
@@ -221,6 +362,13 @@ function isAnnotationOutside(
     ? !isInside(annotation.start, rows, columns) || !isInside(annotation.end, rows, columns)
     : !isInside(annotation.position, rows, columns)
 }
+/**
+ * Cette fonction intervient sur le sujet “preview Resize” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord previewResize dans applyScenarioCommand.ts.
+ */
+
 
 export function previewResize(
   document: ScenarioDocumentV1,
@@ -242,6 +390,13 @@ export function previewResize(
     annotationCount: annotationIds.length,
   }
 }
+/**
+ * Cette fonction applique le sujet “resize” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord applyResize dans applyScenarioCommand.ts.
+ */
+
 
 function applyResize(
   document: ScenarioDocumentV1,
@@ -279,6 +434,13 @@ function applyResize(
     removedAnnotationIds: impact.annotationIds,
   })
 }
+/**
+ * Cette fonction intervient sur le sujet “place Unit” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord placeUnit dans applyScenarioCommand.ts.
+ */
+
 
 function placeUnit(
   document: ScenarioDocumentV1,
@@ -308,6 +470,13 @@ function placeUnit(
   const next = changedDocument(document, command, { units: [...document.units, unit] })
   return result(document, next)
 }
+/**
+ * Cette fonction intervient sur le sujet “move Unit” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord moveUnit dans applyScenarioCommand.ts.
+ */
+
 
 function moveUnit(
   document: ScenarioDocumentV1,
@@ -332,10 +501,24 @@ function moveUnit(
   }))
   return result(document, changedDocument(document, command, { units }))
 }
+/**
+ * Cette fonction intervient sur le sujet “position Key” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord positionKey dans applyScenarioCommand.ts.
+ */
+
 
 function positionKey(position: Position): string {
   return `${position.row}:${position.column}`
 }
+/**
+ * Cette fonction intervient sur le sujet “preview Move Units” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord previewMoveUnits dans applyScenarioCommand.ts.
+ */
+
 
 export function previewMoveUnits(
   document: ScenarioDocumentV1,
@@ -411,6 +594,13 @@ export function previewMoveUnits(
 
   return { moves, changed: true }
 }
+/**
+ * Cette fonction intervient sur le sujet “move Units” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord moveUnits dans applyScenarioCommand.ts.
+ */
+
 
 function moveUnits(
   document: ScenarioDocumentV1,
@@ -427,6 +617,13 @@ function moveUnits(
   })
   return result(document, changedDocument(document, command, { units }))
 }
+/**
+ * Cette fonction intervient sur le sujet “update Unit” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateUnit dans applyScenarioCommand.ts.
+ */
+
 
 function updateUnit(
   document: ScenarioDocumentV1,
@@ -454,6 +651,13 @@ function updateUnit(
   }))
   return result(document, changedDocument(document, command, { units }))
 }
+/**
+ * Cette fonction intervient sur le sujet “update Units” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateUnits dans applyScenarioCommand.ts.
+ */
+
 
 function updateUnits(
   document: ScenarioDocumentV1,
@@ -493,6 +697,13 @@ function updateUnits(
     ? result(document, changedDocument(document, command, { units }))
     : result(document, document)
 }
+/**
+ * Cette fonction intervient sur le sujet “change Unit Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord changeUnitType dans applyScenarioCommand.ts.
+ */
+
 
 function changeUnitType(
   document: ScenarioDocumentV1,
@@ -514,6 +725,13 @@ function changeUnitType(
   }))
   return result(document, changedDocument(document, command, { units }))
 }
+/**
+ * Cette fonction intervient sur le sujet “reach Objective” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord reachObjective dans applyScenarioCommand.ts.
+ */
+
 
 function reachObjective(
   document: ScenarioDocumentV1,
@@ -567,6 +785,13 @@ function reachObjective(
     removedAnnotationIds: [],
   })
 }
+/**
+ * Cette fonction intervient sur le sujet “add Annotation” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord addAnnotation dans applyScenarioCommand.ts.
+ */
+
 
 function addAnnotation(
   document: ScenarioDocumentV1,
@@ -591,6 +816,13 @@ function addAnnotation(
     changedDocument(document, command, { annotations: [...document.annotations, annotation] }),
   )
 }
+/**
+ * Cette fonction intervient sur le sujet “update Annotation” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateAnnotation dans applyScenarioCommand.ts.
+ */
+
 
 function updateAnnotation(
   document: ScenarioDocumentV1,
@@ -630,6 +862,13 @@ function updateAnnotation(
   const annotations = updateAt(document.annotations, index, () => candidate)
   return result(document, changedDocument(document, command, { annotations }))
 }
+/**
+ * Cette fonction intervient sur le sujet “update Faction” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateFaction dans applyScenarioCommand.ts.
+ */
+
 
 function updateFaction(
   document: ScenarioDocumentV1,
@@ -649,6 +888,13 @@ function updateFaction(
   }))
   return result(document, changedDocument(document, command, { factions }))
 }
+/**
+ * Cette fonction intervient sur le sujet “remove Faction” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord removeFaction dans applyScenarioCommand.ts.
+ */
+
 
 function removeFaction(
   document: ScenarioDocumentV1,
@@ -679,6 +925,13 @@ function removeFaction(
   const factions = document.factions.filter((candidate) => candidate.id !== command.factionId)
   return result(document, changedDocument(document, command, { factions, units }))
 }
+/**
+ * Cette fonction intervient sur le sujet “update Custom Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord updateCustomType dans applyScenarioCommand.ts.
+ */
+
 
 function updateCustomType(
   document: ScenarioDocumentV1,
@@ -706,6 +959,13 @@ function updateCustomType(
   }))
   return result(document, changedDocument(document, command, { customUnitTypes }))
 }
+/**
+ * Cette fonction intervient sur le sujet “archive Custom Type” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord archiveCustomType dans applyScenarioCommand.ts.
+ */
+
 
 function archiveCustomType(
   document: ScenarioDocumentV1,
@@ -880,10 +1140,24 @@ export function reduceScenario(
 ): ScenarioDocumentV1 {
   return applyCommand(document, command).document
 }
+/**
+ * Cette fonction teste le sujet “domain Error” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord isDomainError dans applyScenarioCommand.ts.
+ */
+
 
 export function isDomainError(error: unknown): error is DomainError {
   return error instanceof DomainError
 }
+/**
+ * Cette fonction intervient sur le sujet “make Annotation Changes” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/model/applyScenarioCommand.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord makeAnnotationChanges dans applyScenarioCommand.ts.
+ */
+
 
 export function makeAnnotationChanges<T extends AnnotationChanges>(changes: T): T {
   return changes

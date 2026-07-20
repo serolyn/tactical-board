@@ -1,3 +1,12 @@
+/**
+ * @packageDocumentation
+ * Import et export des données Tactical Board.
+ *
+ * Ce dossier transforme les scénarios en fichiers JSON ou en images, puis les
+ * relit en vérifiant qu'ils sont encore valides avant de les réinjecter dans
+ * l'application.
+ */
+
 /** Prépare une copie hors écran du plateau puis la convertit en PNG téléchargeable. */
 import { toBlob } from 'html-to-image'
 import { downloadBlob, sanitizeFilename } from './fileDownloads'
@@ -9,6 +18,13 @@ export interface BoardPngOptions {
   pixelRatio?: number
   backgroundColor?: string
 }
+/**
+ * Cette fonction intervient sur le sujet “positive Dimension” dans tactical-board.
+ *
+ * Fichier: src/tactical-board/import-export/exportBoardImage.ts
+ * Si tu lis ce fichier pour apprendre, regarde d’abord positiveDimension dans exportBoardImage.ts.
+ */
+
 
 function positiveDimension(value: number, fallback: number): number {
   return Number.isFinite(value) && value > 0 ? Math.ceil(value) : Math.max(1, Math.ceil(fallback))
