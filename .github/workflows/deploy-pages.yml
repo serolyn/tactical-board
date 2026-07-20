@@ -37,6 +37,14 @@ jobs:
       - name: Construire le site
         run: npm run build -- --base=/tactical-board/
 
+      - name: Vérifier la home portfolio publiée
+        run: |
+          grep -q '<title>SEROLYN' dist/index.html
+          grep -q '/tactical-board/assets/' dist/index.html
+
+      - name: Vérifier l'isolation portfolio et Tactical Board
+        run: npm run test -- src/tests/routingIsolation.test.tsx
+
       - name: Configurer GitHub Pages
         uses: actions/configure-pages@v5
 
