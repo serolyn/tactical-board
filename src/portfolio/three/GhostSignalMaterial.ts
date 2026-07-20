@@ -1,6 +1,7 @@
 import {
+  BackSide,
   Color,
-  DoubleSide,
+  FrontSide,
   ShaderMaterial,
   Vector2,
   type IUniform,
@@ -12,7 +13,9 @@ export interface GhostSignalUniforms {
   readonly uTime: IUniform<number>
   readonly uLayer: IUniform<number>
   readonly uQuality: IUniform<number>
+  readonly uMode: IUniform<number>
   readonly uPointer: IUniform<Vector2>
+  readonly uScroll: IUniform<number>
   readonly uOpacity: IUniform<number>
   readonly uSignal: IUniform<number>
   readonly uBlue: IUniform<Color>
@@ -25,34 +28,48 @@ export type GhostSignalShaderMaterial = ShaderMaterial & {
 }
 
 export interface GhostSignalMaterialOptions {
+  readonly mode: GhostSignalMaterialMode
   readonly layer: number
   readonly opacity: number
   readonly highQuality: boolean
 }
 
+export type GhostSignalMaterialMode = 'core' | 'back' | 'front' | 'echo'
+
+const MATERIAL_MODES: Record<GhostSignalMaterialMode, number> = {
+  core: 0,
+  back: 1,
+  front: 2,
+  echo: 3,
+}
+
 export function createGhostSignalMaterial({
+  mode,
   layer,
   opacity,
   highQuality,
 }: GhostSignalMaterialOptions): GhostSignalShaderMaterial {
+  const core = mode === 'core'
   return new ShaderMaterial({
-    name: `GhostSignalMaterial-${layer}`,
+    name: `GhostSignalMaterial-${mode}-${layer}`,
     vertexShader,
     fragmentShader,
-    transparent: true,
-    depthWrite: false,
+    transparent: !core,
+    depthWrite: core,
     depthTest: true,
-    side: DoubleSide,
+    side: mode === 'back' ? BackSide : FrontSide,
     uniforms: {
       uTime: { value: 0 },
       uLayer: { value: layer },
       uQuality: { value: highQuality ? 1 : 0 },
+      uMode: { value: MATERIAL_MODES[mode] },
       uPointer: { value: new Vector2() },
+      uScroll: { value: 0 },
       uOpacity: { value: opacity },
       uSignal: { value: 0 },
-      uBlue: { value: new Color('#536bad') },
-      uViolet: { value: new Color('#7766be') },
-      uEmber: { value: new Color('#cf4b46') },
+      uBlue: { value: new Color('#456fe8') },
+      uViolet: { value: new Color('#9a79ef') },
+      uEmber: { value: new Color('#f05a52') },
     },
   }) as GhostSignalShaderMaterial
 }

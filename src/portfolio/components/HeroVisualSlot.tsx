@@ -8,10 +8,14 @@ import {
 } from 'react'
 import { HeroWebGLErrorBoundary } from '../three/HeroWebGLErrorBoundary'
 import { useHeroActivity } from '../three/useHeroActivity'
+import type { GhostSignalCanvasDiagnostics } from '../three/GhostSignalCanvas'
 import {
   canRunGhostSignal,
   getDataSavingConnection,
+  getCapabilityFallbackCause,
   readGhostSignalCapabilities,
+  type GhostSignalCapabilities,
+  type GhostSignalFallbackCause,
 } from '../three/webglSupport'
 
 const GhostSignalCanvas = lazy(() => import('../three/GhostSignalCanvas'))
@@ -22,6 +26,14 @@ interface HeroVisualSlotProps {
   onSignalChange?: (active: boolean) => void
 }
 
+type GhostSignalCanvasState = 'detecting' | 'loading' | 'ready' | 'suspended' | 'fallback'
+
+const INITIAL_CAPABILITIES: GhostSignalCapabilities = {
+  reducedMotion: false,
+  saveData: false,
+  webgl2: false,
+}
+
 /**
  * Progressive boundary: the canonical image is always rendered first and the
  * isolated WebGL chunk is mounted only after all local capability gates pass.
@@ -29,10 +41,17 @@ interface HeroVisualSlotProps {
 export function HeroVisualSlot({ src, alt, onSignalChange }: HeroVisualSlotProps) {
   const heroRef = useRef<HTMLElement>(null)
   const signalChangeRef = useRef(onSignalChange)
+  const technicalFailureRef = useRef<GhostSignalFallbackCause | null>(null)
   const [eligible, setEligible] = useState(false)
-  const [failed, setFailed] = useState(false)
-  const [ready, setReady] = useState(false)
-  const active = useHeroActivity(heroRef, eligible && !failed)
+  const [capabilities, setCapabilities] = useState(INITIAL_CAPABILITIES)
+  const [capabilityFallback, setCapabilityFallback] = useState<GhostSignalFallbackCause | null>(null)
+  const [technicalFallback, setTechnicalFallback] = useState<GhostSignalFallbackCause | null>(null)
+  const [canvasState, setCanvasState] = useState<GhostSignalCanvasState>('detecting')
+  const [runtime, setRuntime] = useState<GhostSignalCanvasDiagnostics>({
+    fps: null,
+    profile: 'high',
+  })
+  const active = useHeroActivity(heroRef, eligible && !technicalFallback)
 
   signalChangeRef.current = onSignalChange
 
@@ -40,13 +59,19 @@ export function HeroVisualSlot({ src, alt, onSignalChange }: HeroVisualSlotProps
     signalChangeRef.current?.(nextActive)
   }, [])
   const clearSignal = useCallback(() => handleSignalChange(false), [handleSignalChange])
-  const handleReady = useCallback(() => setReady(true), [])
-  const handleSuspended = useCallback(() => setReady(false), [])
-  const handleFailure = useCallback(() => {
-    setFailed(true)
-    setReady(false)
+  const handleDiagnostics = useCallback((diagnostics: GhostSignalCanvasDiagnostics) => {
+    setRuntime(diagnostics)
+  }, [])
+  const handleLoading = useCallback(() => setCanvasState('loading'), [])
+  const handleReady = useCallback(() => setCanvasState('ready'), [])
+  const handleSuspended = useCallback(() => setCanvasState('suspended'), [])
+  const handleFailure = useCallback((cause: GhostSignalFallbackCause) => {
+    technicalFailureRef.current = cause
+    setTechnicalFallback(cause)
+    setCanvasState('fallback')
     clearSignal()
   }, [clearSignal])
+  const handleReactError = useCallback(() => handleFailure('react-error'), [handleFailure])
 
   useEffect(() => {
     const motionPreference = typeof window.matchMedia === 'function'
@@ -55,11 +80,17 @@ export function HeroVisualSlot({ src, alt, onSignalChange }: HeroVisualSlotProps
     const connection = getDataSavingConnection()
 
     const evaluate = () => {
-      const nextEligible = canRunGhostSignal(readGhostSignalCapabilities())
+      const nextCapabilities = readGhostSignalCapabilities()
+      const nextFallback = getCapabilityFallbackCause(nextCapabilities)
+      const nextEligible = canRunGhostSignal(nextCapabilities)
+      setCapabilities(nextCapabilities)
+      setCapabilityFallback(nextFallback)
       setEligible(nextEligible)
       if (!nextEligible) {
-        setReady(false)
+        setCanvasState('fallback')
         clearSignal()
+      } else if (!technicalFailureRef.current) {
+        setCanvasState('loading')
       }
     }
 
@@ -74,14 +105,22 @@ export function HeroVisualSlot({ src, alt, onSignalChange }: HeroVisualSlotProps
     }
   }, [clearSignal])
 
-  const webglEnabled = eligible && !failed
+  const fallbackCause = technicalFallback ?? capabilityFallback
+  const webglEnabled = eligible && !technicalFallback
+  const ready = canvasState === 'ready'
 
   return (
     <figure
       className="hero-visual-slot"
       data-hero-visual-slot
       data-webgl-active={active ? 'true' : 'false'}
-      data-webgl-state={ready ? 'ready' : webglEnabled ? 'loading' : 'fallback'}
+      data-webgl-fallback-cause={fallbackCause ?? 'none'}
+      data-webgl-fps={runtime.fps ?? 'measuring'}
+      data-webgl-profile={webglEnabled ? runtime.profile : 'none'}
+      data-webgl-reduced-motion={capabilities.reducedMotion ? 'true' : 'false'}
+      data-webgl-save-data={capabilities.saveData ? 'true' : 'false'}
+      data-webgl-state={canvasState}
+      data-webgl2={capabilities.webgl2 ? 'true' : 'false'}
       ref={heroRef}
     >
       <img
@@ -98,12 +137,14 @@ export function HeroVisualSlot({ src, alt, onSignalChange }: HeroVisualSlotProps
         data-ghost-signal-mount
       >
         {webglEnabled ? (
-          <HeroWebGLErrorBoundary onError={handleFailure}>
+          <HeroWebGLErrorBoundary onError={handleReactError}>
             <Suspense fallback={null}>
               <GhostSignalCanvas
                 active={active}
                 host={heroRef.current}
+                onDiagnostics={handleDiagnostics}
                 onFailure={handleFailure}
+                onLoading={handleLoading}
                 onReady={handleReady}
                 onSignalChange={handleSignalChange}
                 onSuspended={handleSuspended}
@@ -112,7 +153,25 @@ export function HeroVisualSlot({ src, alt, onSignalChange }: HeroVisualSlotProps
           </HeroWebGLErrorBoundary>
         ) : null}
       </div>
-      <figcaption>{ready ? 'GHOST SIGNAL / TEMPS RÉEL' : 'SIGNAL STATIQUE / FALLBACK VISUEL'}</figcaption>
+      {import.meta.env.DEV ? (
+        <output aria-hidden="true" className="ghost-signal-diagnostics" data-ghost-diagnostics>
+          <strong>GHOST / DEV</strong>
+          <span>WEBGL2 {capabilities.webgl2 ? 'OUI' : 'NON'}</span>
+          <span>MOUVEMENT RÉDUIT {capabilities.reducedMotion ? 'OUI' : 'NON'}</span>
+          <span>ÉCONOMIE DONNÉES {capabilities.saveData ? 'OUI' : 'NON'}</span>
+          <span>PROFIL {webglEnabled ? runtime.profile.toUpperCase() : 'AUCUN'}</span>
+          <span>CANVAS {canvasState.toUpperCase()}</span>
+          <span>FALLBACK {fallbackCause ?? 'AUCUN'}</span>
+          <span>FPS {runtime.fps ?? 'MESURE…'}</span>
+        </output>
+      ) : null}
+      <figcaption>
+        {ready
+          ? 'GHOST SIGNAL / TEMPS RÉEL'
+          : canvasState === 'fallback'
+            ? 'SIGNAL STATIQUE'
+            : 'GHOST SIGNAL'}
+      </figcaption>
     </figure>
   )
 }

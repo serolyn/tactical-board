@@ -16,6 +16,15 @@ export interface GhostSignalCapabilities {
   readonly webgl2: boolean
 }
 
+export type GhostSignalFallbackCause =
+  | 'reduced-motion'
+  | 'webgl2-unavailable'
+  | 'react-error'
+  | 'shader-error'
+  | 'gl-error'
+  | 'context-timeout'
+  | 'sustained-fps-below-24'
+
 type CanvasFactory = () => HTMLCanvasElement
 
 export function supportsWebGL2(
@@ -57,12 +66,20 @@ export function readGhostSignalCapabilities(): GhostSignalCapabilities {
   return {
     reducedMotion,
     saveData,
-    webgl2: reducedMotion || saveData ? false : supportsWebGL2(),
+    webgl2: supportsWebGL2(),
   }
 }
 
 export function canRunGhostSignal(capabilities: GhostSignalCapabilities): boolean {
-  return capabilities.webgl2 && !capabilities.reducedMotion && !capabilities.saveData
+  return capabilities.webgl2 && !capabilities.reducedMotion
+}
+
+export function getCapabilityFallbackCause(
+  capabilities: GhostSignalCapabilities,
+): GhostSignalFallbackCause | null {
+  if (capabilities.reducedMotion) return 'reduced-motion'
+  if (!capabilities.webgl2) return 'webgl2-unavailable'
+  return null
 }
 
 export function getDataSavingConnection(): DataSavingConnection | undefined {

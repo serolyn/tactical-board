@@ -9,24 +9,32 @@ const canvasControl = vi.hoisted(() => ({ mode: 'ready' as 'ready' | 'failure' }
 const canvasCallbacks = vi.hoisted(() => ({
   renders: [] as Array<Pick<
     GhostSignalCanvasProps,
-    'onFailure' | 'onReady' | 'onSignalChange' | 'onSuspended'
+    | 'onDiagnostics'
+    | 'onFailure'
+    | 'onLoading'
+    | 'onReady'
+    | 'onSignalChange'
+    | 'onSuspended'
   >>,
 }))
 
 vi.mock('../three/GhostSignalCanvas', () => {
   dynamicModuleEvaluated()
   function GhostSignalCanvasMock(props: GhostSignalCanvasProps) {
-    const { onFailure, onReady } = props
+    const { onDiagnostics, onFailure, onReady } = props
     canvasCallbacks.renders.push({
+      onDiagnostics,
       onFailure,
+      onLoading: props.onLoading,
       onReady,
       onSignalChange: props.onSignalChange,
       onSuspended: props.onSuspended,
     })
     useEffect(() => {
-      if (canvasControl.mode === 'failure') onFailure()
+      onDiagnostics({ fps: 58.4, profile: 'high' })
+      if (canvasControl.mode === 'failure') onFailure('shader-error')
       else onReady()
-    }, [onFailure, onReady])
+    }, [onDiagnostics, onFailure, onReady])
     return <span data-testid="ghost-signal-mock" />
   }
 
@@ -80,27 +88,11 @@ describe('HeroVisualSlot progressif', () => {
       'data-webgl-state',
       'fallback',
     ))
-    expect(dynamicModuleEvaluated).not.toHaveBeenCalled()
-  })
-
-  it('respecte aussi le mode économie de données avant tout import WebGL', async () => {
-    setReducedMotion(false)
-    setWebGLAvailable(true)
-    Object.defineProperty(navigator, 'connection', {
-      configurable: true,
-      value: {
-        saveData: true,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      },
-    })
-
-    const { container } = render(<HeroVisualSlot alt="Ciel nocturne" src="/sky.webp" />)
-
-    await waitFor(() => expect(container.querySelector('[data-webgl-state]')).toHaveAttribute(
-      'data-webgl-state',
-      'fallback',
-    ))
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute(
+      'data-webgl-fallback-cause',
+      'reduced-motion',
+    )
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute('data-webgl2', 'true')
     expect(dynamicModuleEvaluated).not.toHaveBeenCalled()
   })
 
@@ -115,6 +107,10 @@ describe('HeroVisualSlot progressif', () => {
       'fallback',
     ))
     expect(container.querySelector('canvas')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute(
+      'data-webgl-fallback-cause',
+      'webgl2-unavailable',
+    )
     expect(dynamicModuleEvaluated).not.toHaveBeenCalled()
   })
 
@@ -131,7 +127,39 @@ describe('HeroVisualSlot progressif', () => {
     ))
     expect(dynamicModuleEvaluated).toHaveBeenCalledOnce()
     expect(container.querySelector('.hero-visual-slot__future--ready')).toBeInTheDocument()
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute('data-webgl-profile', 'high')
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute('data-webgl-fps', '58.4')
+    expect(container.querySelector('[data-ghost-diagnostics]')).toHaveTextContent('CANVAS READY')
     expect(screen.getByRole('img', { name: 'Ciel nocturne' })).toBeInTheDocument()
+  })
+
+  it('expose save-data sans supprimer la scène 3D', async () => {
+    setReducedMotion(false)
+    setWebGLAvailable(true)
+    Object.defineProperty(navigator, 'connection', {
+      configurable: true,
+      value: {
+        saveData: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      },
+    })
+
+    const { container } = render(<HeroVisualSlot alt="Ciel nocturne" src="/sky.webp" />)
+
+    expect(await screen.findByTestId('ghost-signal-mock')).toBeInTheDocument()
+    await waitFor(() => expect(container.querySelector('[data-webgl-state]')).toHaveAttribute(
+      'data-webgl-state',
+      'ready',
+    ))
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute(
+      'data-webgl-save-data',
+      'true',
+    )
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute(
+      'data-webgl-fallback-cause',
+      'none',
+    )
   })
 
   it('garde les callbacks du Canvas stables pendant les rendus du signal', async () => {
@@ -174,5 +202,9 @@ describe('HeroVisualSlot progressif', () => {
     ))
     expect(screen.getByRole('img', { name: 'Ciel nocturne' })).toBeInTheDocument()
     expect(container.querySelector('.hero-visual-slot__future--ready')).not.toBeInTheDocument()
+    expect(container.querySelector('[data-webgl-state]')).toHaveAttribute(
+      'data-webgl-fallback-cause',
+      'shader-error',
+    )
   })
 })

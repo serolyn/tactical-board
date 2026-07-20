@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   canRunGhostSignal,
+  getCapabilityFallbackCause,
   prefersDataSaving,
   prefersReducedMotion,
   supportsWebGL2,
@@ -27,7 +28,7 @@ describe('détection des capacités Ghost Signal', () => {
     expect(supportsWebGL2(() => { throw new Error('GPU indisponible') })).toBe(false)
   })
 
-  it('combine WebGL, mouvement réduit et économie de données', () => {
+  it('réserve le fallback aux capacités réelles et conserve save-data comme diagnostic', () => {
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
       value: vi.fn((query: string) => ({ matches: query.includes('reduced-motion') })),
@@ -40,7 +41,15 @@ describe('détection des capacités Ghost Signal', () => {
     expect(prefersReducedMotion()).toBe(true)
     expect(prefersDataSaving()).toBe(true)
     expect(canRunGhostSignal({ webgl2: true, reducedMotion: true, saveData: false })).toBe(false)
-    expect(canRunGhostSignal({ webgl2: true, reducedMotion: false, saveData: true })).toBe(false)
+    expect(canRunGhostSignal({ webgl2: true, reducedMotion: false, saveData: true })).toBe(true)
     expect(canRunGhostSignal({ webgl2: true, reducedMotion: false, saveData: false })).toBe(true)
+    expect(getCapabilityFallbackCause({ webgl2: true, reducedMotion: true, saveData: false }))
+      .toBe('reduced-motion')
+    expect(getCapabilityFallbackCause({ webgl2: true, reducedMotion: false, saveData: true }))
+      .toBeNull()
+    expect(getCapabilityFallbackCause({ webgl2: false, reducedMotion: false, saveData: false }))
+      .toBe('webgl2-unavailable')
+    expect(getCapabilityFallbackCause({ webgl2: true, reducedMotion: false, saveData: false }))
+      .toBeNull()
   })
 })

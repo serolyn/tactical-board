@@ -1,20 +1,30 @@
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
-import { PerformanceMonitor } from '@react-three/drei'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { WebGLRenderer } from 'three'
 import { bindWebGLContextLifecycle } from './contextLifecycle'
 import { GhostSignalScene } from './GhostSignalScene'
 import {
+  GHOST_SIGNAL_PERFORMANCE_POLICY,
   GHOST_SIGNAL_PROFILES,
   degradeQuality,
+  evaluatePerformanceWindow,
   selectInitialQuality,
+  type GhostSignalPerformanceDecision,
   type GhostSignalQuality,
 } from './qualityProfile'
+import type { GhostSignalFallbackCause } from './webglSupport'
+
+export interface GhostSignalCanvasDiagnostics {
+  readonly fps: number | null
+  readonly profile: GhostSignalQuality
+}
 
 export interface GhostSignalCanvasProps {
   readonly active: boolean
   readonly host: HTMLElement | null
-  readonly onFailure: () => void
+  readonly onDiagnostics: (diagnostics: GhostSignalCanvasDiagnostics) => void
+  readonly onFailure: (cause: GhostSignalFallbackCause) => void
+  readonly onLoading: () => void
   readonly onReady: () => void
   readonly onSignalChange: (active: boolean) => void
   readonly onSuspended: () => void
@@ -25,12 +35,27 @@ interface NavigatorWithDeviceMemory extends Navigator {
 }
 
 interface FrameLifecycleProps {
-  readonly onFailure: () => void
+  readonly onFailure: (cause: GhostSignalFallbackCause) => void
   readonly onReady: () => void
+  readonly onRestoring: () => void
   readonly onSuspended: () => void
 }
 
-function FrameLifecycle({ onFailure, onReady, onSuspended }: FrameLifecycleProps) {
+interface RuntimePerformanceGuardProps {
+  readonly active: boolean
+  readonly enabled: boolean
+  readonly onDecline: () => void
+  readonly onFailure: (cause: GhostSignalFallbackCause) => void
+  readonly onFps: (fps: number | null) => void
+  readonly profile: GhostSignalQuality
+}
+
+function FrameLifecycle({
+  onFailure,
+  onReady,
+  onRestoring,
+  onSuspended,
+}: FrameLifecycleProps) {
   const { gl } = useThree()
   const ready = useRef(false)
   const readyFrame = useRef<number | null>(null)
@@ -38,7 +63,7 @@ function FrameLifecycle({ onFailure, onReady, onSuspended }: FrameLifecycleProps
   useEffect(() => {
     const renderer = gl as WebGLRenderer
     const previousShaderError = renderer.debug.onShaderError
-    renderer.debug.onShaderError = () => onFailure()
+    renderer.debug.onShaderError = () => onFailure('shader-error')
 
     const cleanupContext = bindWebGLContextLifecycle(renderer.domElement, {
       onLost: () => {
@@ -47,8 +72,9 @@ function FrameLifecycle({ onFailure, onReady, onSuspended }: FrameLifecycleProps
       },
       onRestored: () => {
         ready.current = false
+        onRestoring()
       },
-      onPermanentFailure: onFailure,
+      onPermanentFailure: () => onFailure('context-timeout'),
     })
 
     return () => {
@@ -56,7 +82,7 @@ function FrameLifecycle({ onFailure, onReady, onSuspended }: FrameLifecycleProps
       renderer.debug.onShaderError = previousShaderError
       cleanupContext()
     }
-  }, [gl, onFailure, onSuspended])
+  }, [gl, onFailure, onRestoring, onSuspended])
 
   useFrame(() => {
     if (ready.current || readyFrame.current !== null) return
@@ -65,7 +91,7 @@ function FrameLifecycle({ onFailure, onReady, onSuspended }: FrameLifecycleProps
       const context = gl.getContext()
       if (context.isContextLost()) return
       if (context.getError() !== context.NO_ERROR) {
-        onFailure()
+        onFailure('gl-error')
         return
       }
       ready.current = true
@@ -76,7 +102,72 @@ function FrameLifecycle({ onFailure, onReady, onSuspended }: FrameLifecycleProps
   return null
 }
 
-function initialQuality(): Exclude<GhostSignalQuality, 'fallback'> {
+function RuntimePerformanceGuard({
+  active,
+  enabled,
+  onDecline,
+  onFailure,
+  onFps,
+  profile,
+}: RuntimePerformanceGuardProps) {
+  const warmupElapsed = useRef(0)
+  const sampleElapsed = useRef(0)
+  const sampleFrames = useRef(0)
+  const failed = useRef(false)
+  const policyState = useRef<GhostSignalPerformanceDecision>({
+    action: 'none',
+    declineWindows: 0,
+    fallbackWindows: 0,
+  })
+
+  useEffect(() => {
+    warmupElapsed.current = 0
+    sampleElapsed.current = 0
+    sampleFrames.current = 0
+    failed.current = false
+    policyState.current = { action: 'none', declineWindows: 0, fallbackWindows: 0 }
+    onFps(null)
+  }, [active, enabled, onFps, profile])
+
+  useFrame((_, delta) => {
+    if (!active || !enabled || failed.current) return
+
+    if (!Number.isFinite(delta) || delta <= 0) {
+      sampleElapsed.current = 0
+      sampleFrames.current = 0
+      return
+    }
+
+    if (warmupElapsed.current < GHOST_SIGNAL_PERFORMANCE_POLICY.warmupSeconds) {
+      warmupElapsed.current += delta
+      return
+    }
+
+    sampleElapsed.current += delta
+    sampleFrames.current += 1
+    if (sampleElapsed.current < GHOST_SIGNAL_PERFORMANCE_POLICY.sampleSeconds) return
+
+    const fps = sampleFrames.current / sampleElapsed.current
+    sampleElapsed.current = 0
+    sampleFrames.current = 0
+    onFps(Math.round(fps * 10) / 10)
+
+    const decision = evaluatePerformanceWindow(profile, fps, policyState.current)
+    policyState.current = decision
+    if (decision.action === 'degrade') {
+      onDecline()
+      return
+    }
+    if (decision.action === 'fallback') {
+      failed.current = true
+      onFailure('sustained-fps-below-24')
+    }
+  })
+
+  return null
+}
+
+function initialQuality(): GhostSignalQuality {
   const deviceMemory = (navigator as NavigatorWithDeviceMemory).deviceMemory
   return selectInitialQuality({
     viewportWidth: window.innerWidth,
@@ -88,35 +179,62 @@ function initialQuality(): Exclude<GhostSignalQuality, 'fallback'> {
 export default function GhostSignalCanvas({
   active,
   host,
+  onDiagnostics,
   onFailure,
+  onLoading,
   onReady,
   onSignalChange,
   onSuspended,
 }: GhostSignalCanvasProps) {
   const [quality, setQuality] = useState<GhostSignalQuality>(initialQuality)
+  const [monitoring, setMonitoring] = useState(false)
   const pointer = useRef({ x: 0, y: 0 })
-  const profile = quality === 'fallback' ? null : GHOST_SIGNAL_PROFILES[quality]
+  const scroll = useRef(0)
+  const profile = GHOST_SIGNAL_PROFILES[quality]
   const compact = typeof window !== 'undefined' && window.innerWidth < 768
-
-  const fail = useCallback(() => {
-    setQuality('fallback')
-  }, [])
 
   const decline = useCallback(() => {
     setQuality((current) => degradeQuality(current))
   }, [])
 
-  useEffect(() => {
-    if (quality !== 'fallback') return
-    onSignalChange(false)
-    onFailure()
-  }, [onFailure, onSignalChange, quality])
+  const handleReady = useCallback(() => {
+    setMonitoring(true)
+    onReady()
+  }, [onReady])
+
+  const handleLoading = useCallback(() => {
+    setMonitoring(false)
+    onLoading()
+  }, [onLoading])
+
+  const handleSuspended = useCallback(() => {
+    setMonitoring(false)
+    onSuspended()
+  }, [onSuspended])
+
+  const publishFps = useCallback((fps: number | null) => {
+    onDiagnostics({ fps, profile: quality })
+  }, [onDiagnostics, quality])
 
   useEffect(() => {
-    if (!active || !host) {
+    onDiagnostics({ fps: null, profile: quality })
+  }, [onDiagnostics, quality])
+
+  useEffect(() => {
+    if (!host) return undefined
+    const scrollContainer = host.closest<HTMLElement>('[data-portfolio-scroll]')
+
+    const updateScroll = () => {
+      const bounds = host.getBoundingClientRect()
+      scroll.current = Math.max(0, Math.min(1, -bounds.top / Math.max(1, bounds.height)))
+    }
+    updateScroll()
+    scrollContainer?.addEventListener('scroll', updateScroll, { passive: true })
+
+    if (!active) {
       pointer.current.x = 0
       pointer.current.y = 0
-      return undefined
+      return () => scrollContainer?.removeEventListener('scroll', updateScroll)
     }
 
     const handlePointerMove = (event: PointerEvent) => {
@@ -127,12 +245,18 @@ export default function GhostSignalCanvas({
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
-    return () => window.removeEventListener('pointermove', handlePointerMove)
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove)
+      scrollContainer?.removeEventListener('scroll', updateScroll)
+    }
   }, [active, host])
 
-  const camera = useMemo(() => ({ fov: 36, near: 0.1, far: 14, position: [0, 0, 5.6] as const }), [])
-
-  if (!profile) return null
+  const camera = useMemo(() => ({
+    fov: 38,
+    near: 0.1,
+    far: 16,
+    position: [0, 0, 6.4] as const,
+  }), [])
 
   return (
     <Canvas
@@ -148,24 +272,27 @@ export default function GhostSignalCanvas({
       onCreated={({ gl }) => gl.setClearColor('#07080d', 0)}
       style={{ pointerEvents: 'none' }}
     >
-      <PerformanceMonitor
-        bounds={(refreshRate) => refreshRate > 90 ? [50, 85] : [44, 58]}
-        flipflops={2}
+      <GhostSignalScene
+        compact={compact}
+        onSignalChange={onSignalChange}
+        pointer={pointer}
+        profile={profile}
+        scroll={scroll}
+      />
+      <FrameLifecycle
+        onFailure={onFailure}
+        onReady={handleReady}
+        onRestoring={handleLoading}
+        onSuspended={handleSuspended}
+      />
+      <RuntimePerformanceGuard
+        active={active}
+        enabled={monitoring}
         onDecline={decline}
-        onFallback={fail}
-      >
-        <GhostSignalScene
-          compact={compact}
-          onSignalChange={onSignalChange}
-          pointer={pointer}
-          profile={profile}
-        />
-        <FrameLifecycle
-          onFailure={fail}
-          onReady={onReady}
-          onSuspended={onSuspended}
-        />
-      </PerformanceMonitor>
+        onFailure={onFailure}
+        onFps={publishFps}
+        profile={quality}
+      />
     </Canvas>
   )
 }
