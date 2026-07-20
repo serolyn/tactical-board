@@ -230,7 +230,7 @@ function validateLab(entry: LabEntry, collection: 'lab', issues: ContentValidati
   )
 }
 
-/** Validate a complete catalogue without mutating it or touching browser APIs. */
+/** Valide un catalogue complet sans mutation ni accès aux API du navigateur. */
 export function validatePortfolioContent(content: PortfolioContent): readonly ContentValidationIssue[] {
   const issues: ContentValidationIssue[] = []
   const knownSlugs = new Map<string, ContentCollectionName>()
@@ -276,7 +276,7 @@ export class PortfolioContentError extends Error {
   }
 }
 
-/** Fail early during development/build instead of silently publishing broken content. */
+/** Échoue tôt en développement ou au build pour éviter de publier un contenu invalide. */
 export function assertValidPortfolioContent(content: PortfolioContent): void {
   const issues = validatePortfolioContent(content)
   if (issues.length > 0) throw new PortfolioContentError(issues)

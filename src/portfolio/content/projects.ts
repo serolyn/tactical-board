@@ -1,10 +1,10 @@
-import signalHorizon from '../../assets/portfolio/signal-horizon.webp'
+import signalHorizon from '@/portfolio/assets/signal-horizon.webp'
 
 import type { ProjectEntry } from './types'
 
 /**
- * Copy this unpublished template when a documented project is ready.
- * It is intentionally descriptive rather than a fictional public project.
+ * Modèle non publié à copier lorsqu'un projet documenté est prêt. Son contenu
+ * reste descriptif afin de ne pas inventer un projet public.
  */
 export const projects = [
   {

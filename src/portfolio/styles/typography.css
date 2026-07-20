@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400 700;
   font-display: swap;
-  src: url("../../assets/portfolio/fonts/Manrope-Variable-400-700-latin.woff2") format("woff2");
+  src: url("../assets/fonts/Manrope-Variable-400-700-latin.woff2") format("woff2");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: italic;
   font-weight: 400;
   font-display: swap;
-  src: url("../../assets/portfolio/fonts/Newsreader-Italic-400-latin.woff2") format("woff2");
+  src: url("../assets/fonts/Newsreader-Italic-400-latin.woff2") format("woff2");
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../../assets/portfolio/fonts/IBMPlexMono-Regular-400-latin.woff2") format("woff2");
+  src: url("../assets/fonts/IBMPlexMono-Regular-400-latin.woff2") format("woff2");
 }
 
 .portfolio-shell {

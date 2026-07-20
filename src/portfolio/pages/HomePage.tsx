@@ -4,12 +4,12 @@ import { EmptyState } from '../components/EmptyState'
 import { EntryIndex } from '../components/EntryIndex'
 import { HeroVisualSlot } from '../components/HeroVisualSlot'
 import { SectionHeading } from '../components/SectionHeading'
+import { AnimatedLink } from '../motion/AnimatedLink'
+import { Reveal } from '../motion/Reveal'
 import {
-  AnimatedLink,
   getHeroArrivalVariants,
   getHeroSignalVariants,
-  Reveal,
-} from '../motion'
+} from '../motion/motionTokens'
 import {
   publishedLab,
   publishedMusic,

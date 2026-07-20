@@ -1,8 +1,8 @@
 /**
- * Local portfolio content model.
+ * Modèle local du contenu du portfolio.
  *
- * Entries are deliberately plain TypeScript objects: they stay searchable,
- * reviewable and editable without introducing a CMS or a parsing layer.
+ * Les entrées restent de simples objets TypeScript, faciles à rechercher,
+ * relire et modifier sans CMS ni couche d'analyse supplémentaire.
  */
 
 export type EntryStatus =
@@ -103,7 +103,7 @@ export type ProjectEntry = BaseEntry & {
 }
 
 export type MusicEntry = BaseEntry & {
-  /** A draft can intentionally omit artwork instead of presenting a fake cover. */
+  /** Un brouillon peut omettre son visuel plutôt que présenter une fausse pochette. */
   readonly artwork: ContentImage | null
   readonly audioSrc?: string
   readonly duration?: string
@@ -167,7 +167,7 @@ export type SiteContent = {
     readonly current: string
     readonly technologies: readonly string[]
   }
-  /** Empty slots are intentional: unset social and contact links stay hidden. */
+  /** Les emplacements vides sont volontaires : les liens absents restent masqués. */
   readonly socialLinks: readonly ContentLink[]
   readonly contactLinks: readonly ContentLink[]
 }

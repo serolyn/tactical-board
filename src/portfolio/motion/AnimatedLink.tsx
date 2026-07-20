@@ -18,7 +18,7 @@ export interface AnimatedLinkProps extends MotionSafeLinkProps {
   indicator?: AnimatedLinkIndicator
 }
 
-/** Internal navigation stays immediate; only its presentation uses Motion. */
+/** La navigation interne reste immédiate ; seule sa présentation utilise Motion. */
 export function AnimatedLink({
   children,
   indicator = false,

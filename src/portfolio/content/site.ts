@@ -1,5 +1,5 @@
-import fogReflections from '../../assets/portfolio/fog-reflections.webp'
-import signalHorizon from '../../assets/portfolio/signal-horizon.webp'
+import fogReflections from '@/portfolio/assets/fog-reflections.webp'
+import signalHorizon from '@/portfolio/assets/signal-horizon.webp'
 
 import type { SiteContent } from './types'
 

@@ -50,9 +50,8 @@ export const motionTransitions = {
 } as const satisfies Record<string, Transition>
 
 /**
- * Page variants stay deliberately restrained. The reduced-motion branch is
- * opacity-only rather than relying on Motion to remove transforms after the
- * variants have already been authored.
+ * Les transitions de pages restent sobres. Le mode mouvement réduit ne joue
+ * que sur l'opacité, sans demander à Motion de neutraliser des transformations.
  */
 export function getPageTransitionVariants(reducedMotion: boolean): Variants {
   if (reducedMotion) {

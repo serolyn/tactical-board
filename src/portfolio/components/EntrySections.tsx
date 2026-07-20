@@ -1,5 +1,5 @@
 import type { ContentLink, ContentSection, MetadataSection } from '../content'
-import { Reveal } from '../motion'
+import { Reveal } from '../motion/Reveal'
 import { ContentLinkAction, EntryLinks } from './EntryLinks'
 
 function SignalPalette({ section }: { section: MetadataSection }) {

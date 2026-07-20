@@ -26,7 +26,7 @@ export interface RevealProps extends RevealMotionProps, ViewportRevealOptions {
   children: ReactNode
 }
 
-/** A one-shot editorial reveal with a visible-by-default capability fallback. */
+/** Révélation éditoriale unique, visible par défaut si l'observation est indisponible. */
 export function Reveal({
   as = 'div',
   children,

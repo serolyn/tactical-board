@@ -1,4 +1,4 @@
-import { Reveal } from '../motion'
+import { Reveal } from '../motion/Reveal'
 
 interface SectionHeadingProps {
   index: string

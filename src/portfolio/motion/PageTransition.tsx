@@ -14,7 +14,7 @@ export interface PageTransitionProps extends PageTransitionMotionProps {
   routeKey?: string
 }
 
-/** The sole page entrance/exit vocabulary used by portfolio routes. */
+/** Vocabulaire unique des entrées et sorties de pages du portfolio. */
 export function PageTransition({
   children,
   onEntered,

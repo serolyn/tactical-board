@@ -23,9 +23,8 @@ export function supportsViewportObservation() {
 }
 
 /**
- * Small observer primitive shared by Reveal and StaggerGroup. Its safe state is
- * visible: unsupported APIs, construction failures and missing targets never
- * strand editorial content at opacity zero.
+ * Primitive d'observation partagée par `Reveal` et `StaggerGroup`. Son état de
+ * repli reste visible afin de ne jamais masquer le contenu éditorial.
  */
 export function useViewportReveal({
   disabled = false,

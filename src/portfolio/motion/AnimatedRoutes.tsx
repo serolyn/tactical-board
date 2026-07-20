@@ -122,8 +122,8 @@ function AnimatedRouteFrame({
 }
 
 /**
- * Outlet wrapper that keeps the outgoing page mounted just long enough to
- * leave, then scopes scroll/focus work to the incoming page only.
+ * Conserve brièvement la page sortante pour son animation, puis limite le
+ * défilement et le focus à la seule page entrante.
  */
 export function AnimatedRoutes({
   announcementClassName = 'visually-hidden',

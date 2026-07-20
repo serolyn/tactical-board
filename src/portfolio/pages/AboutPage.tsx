@@ -1,5 +1,5 @@
 import { siteContent } from '../content'
-import { Reveal } from '../motion'
+import { Reveal } from '../motion/Reveal'
 
 export function AboutPage() {
   const optionalLinks = [...siteContent.socialLinks, ...siteContent.contactLinks]

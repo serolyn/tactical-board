@@ -9,11 +9,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "capture:portfolio": "node scripts/capture-portfolio-phase3c.mjs",
-    "postbuild": "node scripts/copy-spa-fallback.mjs && node scripts/copy-art-direction.mjs",
+    "postbuild": "node scripts/copy-spa-fallback.mjs",
     "lint": "oxlint",
     "typecheck": "tsc -b --pretty false",
-    "test": "node --test scripts/copy-art-direction.node-check.mjs && vitest run",
+    "test": "vitest run",
     "test:watch": "vitest",
     "preview": "vite preview"
   },

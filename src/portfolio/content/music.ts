@@ -1,8 +1,8 @@
 import type { MusicEntry } from './types'
 
 /**
- * Editorial template only. It has no fictional song title, artwork or audio,
- * and `published: false` keeps it out of every public selector.
+ * Modèle éditorial sans titre, visuel ni audio fictifs. `published: false`
+ * l'écarte de toutes les sélections publiques.
  */
 export const music = [
   {

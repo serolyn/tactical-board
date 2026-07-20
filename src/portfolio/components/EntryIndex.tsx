@@ -1,5 +1,5 @@
 import { EntryCard, type EntryCardData } from './EntryCard'
-import { StaggerGroup, StaggerItem } from '../motion'
+import { StaggerGroup, StaggerItem } from '../motion/StaggerGroup'
 
 interface EntryIndexProps {
   entries: readonly EntryCardData[]

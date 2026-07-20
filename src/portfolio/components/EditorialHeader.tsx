@@ -1,6 +1,6 @@
 import { m } from 'motion/react'
 import { Link, NavLink } from 'react-router'
-import { motionTransitions } from '../motion'
+import { motionTransitions } from '../motion/motionTokens'
 
 const navigation = [
   { to: '/projects', label: 'Projets' },

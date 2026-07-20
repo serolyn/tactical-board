@@ -1,9 +1,9 @@
-import tacticalTerrain from '../../assets/tactical-terrain.webp'
-import fogReflections from '../../assets/portfolio/fog-reflections.webp'
-import moonlitHarbor from '../../assets/portfolio/moonlit-harbor.webp'
-import signalHorizon from '../../assets/portfolio/signal-horizon.webp'
-import signalPreviewDesktop from '../../assets/portfolio/signal-preview-desktop.png'
-import signalPreviewMobile from '../../assets/portfolio/signal-preview-mobile.png'
+import fogReflections from '@/portfolio/assets/fog-reflections.webp'
+import moonlitHarbor from '@/portfolio/assets/moonlit-harbor.webp'
+import signalHorizon from '@/portfolio/assets/signal-horizon.webp'
+import signalPreviewDesktop from '@/portfolio/assets/signal-preview-desktop.png'
+import signalPreviewMobile from '@/portfolio/assets/signal-preview-mobile.png'
+import tacticalTerrain from '@/shared/assets/tactical-terrain.webp'
 
 import type { LabEntry } from './types'
 

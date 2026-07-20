@@ -1,3 +1,4 @@
+/** API publique du contenu : valide les sources puis expose uniquement les entrées publiées. */
 import { lab } from './lab'
 import { music } from './music'
 import { projects } from './projects'
@@ -44,7 +45,7 @@ export type {
 
 export const portfolioContent = { projects, music, lab }
 
-/** The only selector used to turn authoring arrays into public collections. */
+/** Sélecteur unique qui transforme les tableaux éditoriaux en collections publiques. */
 export function selectPublishedEntries<TEntry extends PortfolioEntry>(
   entries: readonly TEntry[],
 ): readonly TEntry[] {
@@ -67,5 +68,5 @@ export function getPublishedLabBySlug(slug: string) {
   return publishedLab.find((entry) => entry.slug === slug)
 }
 
-// Importing the content index validates the authoring files during app startup and build.
+// L'import de cet index valide les contenus au démarrage et pendant le build.
 assertValidPortfolioContent(portfolioContent)

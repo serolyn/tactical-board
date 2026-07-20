@@ -40,7 +40,7 @@ export interface StaggerItemProps extends StaggerMotionProps {
   children: ReactNode
 }
 
-/** Container variants coordinate direct StaggerItem descendants. */
+/** Les variantes du conteneur coordonnent ses descendants directs `StaggerItem`. */
 export function StaggerGroup({
   as = 'div',
   children,

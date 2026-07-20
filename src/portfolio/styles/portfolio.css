@@ -67,7 +67,7 @@
   outline-offset: 5px;
 }
 
-/* RouteEffects targets headings for screen-reader context; they are not tabbable controls. */
+/* Le routeur cible les titres pour le contexte des lecteurs d'écran, sans les rendre tabulables. */
 .portfolio-shell h1[tabindex="-1"]:focus {
   outline: none;
 }

@@ -1,11 +1,12 @@
 import { Link } from 'react-router'
 import { EditorialHeader } from './components/EditorialHeader'
-import { AnimatedRoutes, PortfolioMotionProvider } from './motion'
+import { AnimatedRoutes } from './motion/AnimatedRoutes'
+import { PortfolioMotionProvider } from './motion/PortfolioMotionProvider'
 import './styles/tokens.css'
 import './styles/typography.css'
 import './styles/portfolio.css'
 
-/** Semantic, keyboard-accessible frame shared by every portfolio route. */
+/** Cadre sémantique et navigable au clavier partagé par toutes les routes du portfolio. */
 export function PortfolioShell() {
   return (
     <PortfolioMotionProvider>

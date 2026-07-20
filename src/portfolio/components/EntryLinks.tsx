@@ -1,5 +1,6 @@
 import type { ContentLink } from '../content'
-import { AnimatedLink, Reveal } from '../motion'
+import { AnimatedLink } from '../motion/AnimatedLink'
+import { Reveal } from '../motion/Reveal'
 
 function staticHref(href: string) {
   const base = import.meta.env.BASE_URL.endsWith('/')

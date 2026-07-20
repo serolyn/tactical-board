@@ -6,9 +6,9 @@ import {
   useRef,
   useState,
 } from 'react'
-import { HeroWebGLErrorBoundary } from '../three/HeroWebGLErrorBoundary'
-import { useHeroActivity } from '../three/useHeroActivity'
-import type { GhostSignalCanvasDiagnostics } from '../three/GhostSignalCanvas'
+import { HeroWebGLErrorBoundary } from '../webgl/HeroWebGLErrorBoundary'
+import { useHeroActivity } from '../webgl/useHeroActivity'
+import type { GhostSignalCanvasDiagnostics } from '../webgl/GhostSignalCanvas'
 import {
   canRunGhostSignal,
   getDataSavingConnection,
@@ -16,9 +16,9 @@ import {
   readGhostSignalCapabilities,
   type GhostSignalCapabilities,
   type GhostSignalFallbackCause,
-} from '../three/webglSupport'
+} from '../webgl/ghostSignalCapabilities'
 
-const GhostSignalCanvas = lazy(() => import('../three/GhostSignalCanvas'))
+const GhostSignalCanvas = lazy(() => import('../webgl/GhostSignalCanvas'))
 
 interface HeroVisualSlotProps {
   src: string
@@ -35,8 +35,8 @@ const INITIAL_CAPABILITIES: GhostSignalCapabilities = {
 }
 
 /**
- * Progressive boundary: the canonical image is always rendered first and the
- * isolated WebGL chunk is mounted only after all local capability gates pass.
+ * L'image canonique reste le premier rendu. Le fragment WebGL isolé ne se charge
+ * qu'après validation des capacités locales du navigateur.
  */
 export function HeroVisualSlot({ src, alt, onSignalChange }: HeroVisualSlotProps) {
   const heroRef = useRef<HTMLElement>(null)
