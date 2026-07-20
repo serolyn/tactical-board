@@ -1,0 +1,115 @@
+.pdf-book {
+  position: relative;
+  padding: clamp(40px, 8vw, 120px) clamp(16px, 4vw, 64px);
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 50% 48%,
+      rgb(105 100 199 / 18%),
+      transparent 42%
+    ),
+    #07080d;
+}
+
+.pdf-book__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto 36px;
+}
+
+.pdf-book__eyebrow,
+.pdf-book__counter {
+  color: #c99b70;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.pdf-book__title {
+  margin: 8px 0 0;
+  color: #000003;
+  font-size: clamp(2.2rem, 6vw, 6rem);
+  line-height: 0.9;
+}
+
+.pdf-book__stage {
+  position: relative;
+  display: grid;
+  width: 100%;
+  max-width: 100%;
+  place-items: center;
+  min-height: min(82vh, 850px);
+  perspective: 1800px;
+}
+
+/*
+ * Le moteur insère son propre Canvas dans ce conteneur.
+ */
+.pdf-book__pages {
+  filter:
+    drop-shadow(0 35px 50px rgb(0 0 0 / 55%))
+    drop-shadow(0 0 35px rgb(105 100 199 / 15%));
+}
+
+
+
+.pdf-book__stage::before {
+  content: "";
+  position: absolute;
+  bottom: 7%;
+  left: 50%;
+  width: min(80%, 900px);
+  height: 12%;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 55%);
+  filter: blur(35px);
+  transform: translateX(-50%);
+}
+
+.pdf-book__controls {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  max-width: 900px;
+  margin: 30px auto 0;
+}
+
+.pdf-book__controls button,
+.pdf-book__controls a {
+  min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid rgb(221 221 229 / 25%);
+  color: #dddde5;
+  background: transparent;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pdf-book__controls button:hover,
+.pdf-book__controls a:hover {
+  border-color: #6964c7;
+  color: #ffffff;
+}
+
+@media (max-width: 720px) {
+  .pdf-book__stage {
+    min-height: 70vh;
+  }
+
+  .pdf-book__controls {
+    flex-wrap: wrap;
+    gap: 12px 20px;
+  }
+
+  .pdf-book__controls a {
+    order: 3;
+    width: 100%;
+    text-align: center;
+  }
+}

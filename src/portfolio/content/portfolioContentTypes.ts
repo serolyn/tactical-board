@@ -1,17 +1,6 @@
-/**
- * @packageDocumentation
- * Données éditoriales du portfolio.
- *
- * Ce fichier contient le texte publié, pas la mise en page. C'est ici que tu
- * modifies les titres, résumés, listes et règles de validation du contenu.
- */
 
-/**
- * Modèle local du contenu du portfolio.
- *
- * Les entrées restent de simples objets TypeScript, faciles à rechercher,
- * relire et modifier sans CMS ni couche d'analyse supplémentaire.
- */
+
+// ici les types utilise sont cree et initialise avec leurs regles comme dans un DTD
 
 import type { ComponentType } from 'react'
 
@@ -80,12 +69,19 @@ export type LinkSection = {
   readonly link: ContentLink
 }
 
+export type ComponentSection = {
+  readonly id: string
+  readonly type: 'component'
+  readonly component: ComponentType
+}
+
 export type ContentSection =
   | TextSection
   | ImageSection
   | QuoteSection
   | MetadataSection
   | LinkSection
+  | ComponentSection
 
 export type ContentCredit = {
   readonly role: string

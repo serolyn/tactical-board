@@ -6,7 +6,9 @@
  * modifies les titres, résumés, listes et règles de validation du contenu.
  */
 
-import signalHorizon from '@/portfolio/assets/signal-horizon.webp'
+import bookCover from '@/assets/effects/book/cover.webp'
+
+import { PdfBook } from './books/PdfBook'
 
 import type { ProjectEntry } from './portfolioContentTypes'
 
@@ -17,15 +19,15 @@ import type { ProjectEntry } from './portfolioContentTypes'
 export const projects = [
   {
     slug: 'project-template',
-    title: 'PROJET À DOCUMENTER — BROUILLON NON PUBLIÉ',
+    title: 'Nemyl, la ville des reflets',
     year: 2026,
     status: 'Brouillon',
     summary: 'Exemple de structure à remplacer par un projet réel documenté.',
     introduction:
       'Ce contenu sert uniquement de modèle éditorial et reste absent du portfolio public.',
     cover: {
-      src: signalHorizon,
-      alt: 'Image provisoire du modèle de projet non publié.',
+      src: bookCover,
+      alt: 'Couverture du livre intégré au projet modèle.',
       width: 1600,
       height: 900,
       position: 'center',
@@ -42,6 +44,11 @@ export const projects = [
         paragraphs: ['Remplacer ce paragraphe par le contexte et les intentions du projet.'],
       },
       {
+        id: 'flipbook',
+        type: 'component',
+        component: PdfBook,
+      },
+      {
         id: 'informations',
         type: 'metadata',
         title: 'Informations',
@@ -51,6 +58,6 @@ export const projects = [
         ],
       },
     ],
-    published: false,
+    published: true,
   },
 ] satisfies readonly ProjectEntry[]

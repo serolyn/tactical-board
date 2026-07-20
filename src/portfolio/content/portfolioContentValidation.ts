@@ -188,6 +188,8 @@ function validateSections(
       case 'link':
         validateLink(section.link, `${field}.link`, collection, slug, issues)
         break
+      case 'component':
+        break
     }
   }
 }

@@ -1070,6 +1070,14 @@
   grid-column: 2;
 }
 
+.entry-section--component .entry-section__content--component {
+  grid-column: 1 / -1;
+}
+
+.entry-section--component .pdf-book {
+  width: 100%;
+}
+
 .entry-section__content h2 {
   margin-bottom: 2rem;
   font-size: clamp(2.2rem, 4.6vw, 4.8rem);

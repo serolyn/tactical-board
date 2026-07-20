@@ -12,12 +12,6 @@ import { EntryHero } from '../components/PortfolioEntryHero'
 import { EntrySections } from '../components/PortfolioEntrySections'
 import { getPublishedProjectBySlug, type ProjectEntry } from '../content/portfolioContent'
 import { NotFoundPage } from './PortfolioNotFoundPage'
-/**
- * Cette fonction intervient sur le sujet “project Detail View” dans portfolio.
- *
- * Fichier: src/portfolio/pages/ProjectDetailPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord ProjectDetailView dans ProjectDetailPage.tsx.
- */
 
 
 export function ProjectDetailView({ entry }: { entry: ProjectEntry }) {
@@ -39,12 +33,6 @@ export function ProjectDetailView({ entry }: { entry: ProjectEntry }) {
     </article>
   )
 }
-/**
- * Cette fonction intervient sur le sujet “project Detail Page” dans portfolio.
- *
- * Fichier: src/portfolio/pages/ProjectDetailPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord ProjectDetailPage dans ProjectDetailPage.tsx.
- */
 
 
 export function ProjectDetailPage() {

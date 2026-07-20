@@ -55,7 +55,7 @@ export function MusicStoryOverlay() {
       await animate(
         ".rose",
         {
-          opacity: [0, 1],
+          opacity: [1, 1],
           y: [100, 0],
           scale: [0.88, 1],
           filter: [

@@ -27,14 +27,17 @@ import type { PortfolioContent } from '@/portfolio/content/portfolioContentTypes
 describe('contenus publiés du portfolio', () => {
   it('valide le catalogue livré et exclut les brouillons des sélecteurs publics', () => {
     expect(validatePortfolioContent(portfolioContent)).toEqual([])
-    expect(projects[0]?.published).toBe(false)
+    expect(projects[0]?.published).toBe(true)
+    expect(projects[0]?.sections.some((section) => section.type === 'component')).toBe(true)
+    expect(publishedProjects.map((entry) => entry.slug)).toEqual(['project-template'])
     expect(music[0]?.published).toBe(true)
     expect(music[1]?.published).toBe(false)
-    expect(publishedProjects).toEqual([])
-    expect(publishedMusic.map((entry) => entry.slug)).toEqual(['music-template'])
-    expect(getPublishedProjectBySlug('project-template')).toBeUndefined()
-    expect(getPublishedMusicBySlug('music-template')).toMatchObject({
-      title: 'À TITRER — BROUILLON NON PUBLIÉ',
+    expect(publishedMusic.map((entry) => entry.slug)).toEqual(['ep-1'])
+    expect(getPublishedProjectBySlug('project-template')).toMatchObject({
+      title: 'PROJET À DOCUMENTER — BROUILLON NON PUBLIÉ',
+    })
+    expect(getPublishedMusicBySlug('ep-1')).toMatchObject({
+      title: 'Nemyl',
     })
     expect(getPublishedMusicBySlug('music-template-2')).toBeUndefined()
   })
@@ -48,7 +51,7 @@ describe('contenus publiés du portfolio', () => {
     const tacticalBoard = getPublishedLabBySlug('tactical-board')
     expect(tacticalBoard).toMatchObject({
       title: 'TACTICAL BOARD',
-      statement: 'Cartographier une guerre intérieure.',
+      statement: 'Cartographier une guerre.',
     })
     expect(tacticalBoard?.links).toContainEqual({
       label: 'Ouvrir le tableau',

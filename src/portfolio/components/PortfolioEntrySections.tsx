@@ -142,6 +142,12 @@ export function EntrySections({ sections, links = [] }: EntrySectionsProps) {
                 </div>
               </div>
             ) : null}
+
+            {section.type === 'component' ? (
+              <div className="entry-section__content entry-section__content--component">
+                <section.component />
+              </div>
+            ) : null}
           </Reveal>
         )
       })}
