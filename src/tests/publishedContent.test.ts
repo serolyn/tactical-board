@@ -16,17 +16,21 @@ import {
 import type { PortfolioContent } from '@/portfolio/content/types'
 
 describe('contenus publiés du portfolio', () => {
-  it('valide le catalogue livré et exclut tous les brouillons des sélecteurs publics', () => {
+  it('valide le catalogue livré et exclut les brouillons des sélecteurs publics', () => {
     expect(validatePortfolioContent(portfolioContent)).toEqual([])
     expect(projects[0]?.published).toBe(false)
-    expect(music[0]?.published).toBe(false)
+    expect(music[0]?.published).toBe(true)
+    expect(music[1]?.published).toBe(false)
     expect(publishedProjects).toEqual([])
-    expect(publishedMusic).toEqual([])
+    expect(publishedMusic.map((entry) => entry.slug)).toEqual(['music-template'])
     expect(getPublishedProjectBySlug('project-template')).toBeUndefined()
-    expect(getPublishedMusicBySlug('music-template')).toBeUndefined()
+    expect(getPublishedMusicBySlug('music-template')).toMatchObject({
+      title: 'À TITRER — BROUILLON NON PUBLIÉ',
+    })
+    expect(getPublishedMusicBySlug('music-template-2')).toBeUndefined()
   })
 
-  it('publie uniquement les deux entrées Lab et conserve leurs contrats essentiels', () => {
+  it('conserve les contrats essentiels des deux entrées Lab publiées', () => {
     expect(publishedLab.map((entry) => entry.slug)).toEqual([
       'tactical-board',
       'signal-fantome',

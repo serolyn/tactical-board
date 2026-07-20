@@ -1,3 +1,13 @@
+// Three injecte ces symboles au rendu ; ce repli sert aux validateurs du fichier isolé.
+#ifndef SHADER_TYPE
+precision highp float;
+attribute vec3 position;
+attribute vec3 normal;
+attribute vec2 uv;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+#endif
+
 uniform float uTime;
 uniform float uLayer;
 uniform float uQuality;
@@ -28,7 +38,7 @@ void main() {
   // La déformation conserve de vraies faces avant, arrière et latérales.
   float taper = 0.34 + pow(max(0.0, sin(vertical * PI)), 0.62) * 0.78;
   float angularLobes = 1.0
-    + sin(angle * 3.0 + centeredY * 1.8 + uLayer * 0.7) * 0.16
+    + sin(angle * 8.0 + centeredY * 1.2 + uLayer * 0.2) * 0.16
     + sin(angle * 5.0 - centeredY * 2.7) * 0.075;
   float breathing = 1.0 + sin(slowTime * 1.4 + centeredY * 2.1 + uLayer) * 0.025;
 
@@ -36,7 +46,7 @@ void main() {
   transformed.xz *= taper * angularLobes * breathing;
   transformed.z *= 0.72;
 
-  float twist = centeredY * 0.58
+  float twist = centeredY * 0.01
     + sin(slowTime + centeredY * 2.4 + uLayer * 0.45) * 0.075;
   transformed.xz = rotate2d(twist) * transformed.xz;
 

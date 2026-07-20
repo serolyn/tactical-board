@@ -5,6 +5,7 @@ import { fileURLToPath, URL } from 'node:url'
 // https://vite.dev/config/
 export default defineConfig({
   base: '/tactical-board/',
+  assetsInclude: ['**/*.glb'],
   plugins: [react()],
   resolve: {
     alias: {

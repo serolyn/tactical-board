@@ -69,6 +69,13 @@ Les métadonnées ont été supprimées lors de l’optimisation. Ces trois sour
 autorisent la modification et la publication, y compris commerciale ; leur
 attribution visible n’est pas obligatoire mais leurs crédits sont conservés ici.
 
+### Vidéo d’effet
+
+| Fichier | Source et statut | Transformation | Usage |
+| --- | --- | --- | --- |
+| `signal-glitch.webm` | Asset local fourni dans le dépôt ; provenance détaillée à confirmer | Source VP9 conservée | Source de l’effet de rupture d’écran |
+| `signal-glitch.mp4` | Dérivé local du fichier WebM ci-dessus | Conversion H.264 `yuv420p`, sans audio, avec lecture rapide | Overlay vidéo de l’effet de rupture d’écran |
+
 ### Fontes
 
 | Fichier | Auteur | Source | Licence |

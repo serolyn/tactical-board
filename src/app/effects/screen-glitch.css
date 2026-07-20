@@ -1,0 +1,95 @@
+.screen-glitch__filters {
+  position: absolute;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* La vidéo est entièrement absente entre deux ruptures et reste en pause. */
+.screen-glitch {
+  position: fixed;
+  z-index: 2147483647;
+  inset: 0;
+  visibility: hidden;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 65ms linear,
+    visibility 0s linear 65ms;
+}
+
+.screen-glitch--active {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0s;
+}
+
+.screen-glitch__video,
+.screen-glitch__scanlines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.screen-glitch__video {
+  display: block;
+  object-fit: cover;
+  object-position: var(--glitch-video-position, 50%) center;
+  opacity: var(--glitch-video-opacity, 0);
+  mix-blend-mode: normal;
+  filter: brightness(2.8) contrast(1.45) saturate(1.5);
+  transform:
+    scaleX(var(--glitch-video-mirror, 1))
+    scale(1.035);
+  transform-origin: center;
+  transition: opacity 25ms linear;
+}
+
+.screen-glitch__scanlines {
+  opacity: var(--glitch-scanline-opacity, 0);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 12%) 0,
+    rgb(255 255 255 / 12%) 1px,
+    rgb(0 0 0 / 8%) 1px,
+    rgb(0 0 0 / 8%) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  mix-blend-mode: overlay;
+  transition: opacity 35ms linear;
+}
+
+/*
+ * Le filtre traite le rendu complet comme une image : texte, médias et WebGL
+ * sont réellement déplacés par bandes et séparés en rouge/cyan.
+ */
+#root.screen-glitch-filtering,
+[data-portfolio-scroll].screen-glitch-filtering {
+  filter: url("#screen-glitch-filter");
+  transform:
+    translate3d(
+      var(--glitch-site-x, 0px),
+      var(--glitch-site-y, 0px),
+      0
+    )
+    skewX(var(--glitch-site-skew, 0deg));
+  transform-origin: center;
+  transition: none;
+  will-change: filter, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-glitch {
+    display: none !important;
+  }
+
+  #root.screen-glitch-filtering,
+  [data-portfolio-scroll].screen-glitch-filtering {
+    filter: none !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}

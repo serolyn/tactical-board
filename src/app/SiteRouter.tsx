@@ -7,6 +7,7 @@ import { LabPage } from '@/portfolio/pages/LabPage'
 import { MusicPage } from '@/portfolio/pages/MusicPage'
 import { NotFoundPage } from '@/portfolio/pages/NotFoundPage'
 import { ProjectsPage } from '@/portfolio/pages/ProjectsPage'
+import { ScreenGlitch } from './effects/ScreenGlitch'
 import { SiteRouteEffects } from './SiteRouteEffects'
 import { normalizeSiteBasename } from './normalizeSiteBasename'
 
@@ -39,6 +40,7 @@ export function SiteRouteTree() {
   return (
     <>
       <SiteRouteEffects />
+      <ScreenGlitch enabled={true} /> 
       <Routes>
         <Route
           path="/board"

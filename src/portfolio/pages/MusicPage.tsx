@@ -2,6 +2,7 @@ import { EmptyState } from '../components/EmptyState'
 import { EntryIndex } from '../components/EntryIndex'
 import { SectionHeading } from '../components/SectionHeading'
 import { publishedMusic, siteContent } from '../content'
+import MusicScene from '../webgl/musicScene'
 
 export function MusicPage() {
   return (
@@ -9,6 +10,9 @@ export function MusicPage() {
       <header className="page-boundary page-intro">
         <div className="page-intro__copy">
           <p className="portfolio-meta">MUSIQUE / INDEX / 00</p>
+          <section aria-hidden="true" className="music-page__visual">
+            <MusicScene />
+          </section>
           <h1 tabIndex={-1}>{siteContent.music.title}</h1>
           <p className="page-intro__lead">{siteContent.music.introduction}</p>
         </div>
