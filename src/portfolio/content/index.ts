@@ -1,0 +1,72 @@
+/** API publique du contenu : valide les sources puis expose uniquement les entrées publiées. */
+import { lab } from './lab'
+import { music } from './music'
+import { projects } from './projects'
+import type { PortfolioEntry } from './types'
+import { assertValidPortfolioContent } from './validation'
+
+export { lab } from './lab'
+export { music } from './music'
+export { projects } from './projects'
+export { siteContent } from './site'
+export type {
+  ContentCredit,
+  ContentImage,
+  ContentLink,
+  ContentLinkKind,
+  ContentSection,
+  EntryStatus,
+  ImageSection,
+  LabEntry,
+  LabKind,
+  LinkSection,
+  MetadataItem,
+  MetadataSection,
+  MusicEntry,
+  PortfolioContent,
+  PortfolioEntry,
+  ProjectEntry,
+  QuoteSection,
+  SiteContent,
+  SiteIdentity,
+  TextSection,
+} from './types'
+export {
+  assertValidPortfolioContent,
+  PortfolioContentError,
+  reservedContentSlugs,
+  validatePortfolioContent,
+} from './validation'
+export type {
+  ContentCollectionName,
+  ContentValidationCode,
+  ContentValidationIssue,
+} from './validation'
+
+export const portfolioContent = { projects, music, lab }
+
+/** Sélecteur unique qui transforme les tableaux éditoriaux en collections publiques. */
+export function selectPublishedEntries<TEntry extends PortfolioEntry>(
+  entries: readonly TEntry[],
+): readonly TEntry[] {
+  return entries.filter((entry) => entry.published)
+}
+
+export const publishedProjects = selectPublishedEntries(projects)
+export const publishedMusic = selectPublishedEntries(music)
+export const publishedLab = selectPublishedEntries(lab)
+
+export function getPublishedProjectBySlug(slug: string) {
+  return publishedProjects.find((entry) => entry.slug === slug)
+}
+
+export function getPublishedMusicBySlug(slug: string) {
+  return publishedMusic.find((entry) => entry.slug === slug)
+}
+
+export function getPublishedLabBySlug(slug: string) {
+  return publishedLab.find((entry) => entry.slug === slug)
+}
+
+// L'import de cet index valide les contenus au démarrage et pendant le build.
+assertValidPortfolioContent(portfolioContent)

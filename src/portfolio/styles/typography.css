@@ -1,0 +1,56 @@
+@font-face {
+  font-family: "Manrope";
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url("../assets/fonts/Manrope-Variable-400-700-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Newsreader";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/Newsreader-Italic-400-latin.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("../assets/fonts/IBMPlexMono-Regular-400-latin.woff2") format("woff2");
+}
+
+.portfolio-shell {
+  font-family: var(--portfolio-font-main);
+  font-size: 1rem;
+  font-weight: 450;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.portfolio-shell h1,
+.portfolio-shell h2,
+.portfolio-shell h3,
+.portfolio-shell p {
+  margin: 0;
+}
+
+.portfolio-meta {
+  color: var(--portfolio-warmth);
+  font-family: var(--portfolio-font-meta);
+  font-size: 0.64rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.portfolio-ghost {
+  color: rgba(221, 221, 229, 0.5);
+  font-family: var(--portfolio-font-ghost);
+  font-style: italic;
+  font-weight: 400;
+}

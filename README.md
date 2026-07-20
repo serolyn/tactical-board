@@ -1,88 +1,113 @@
-# Tactical Board
+# SEROLYN — Portfolio et Tactical Board
 
-Tactical Board est un éditeur de scénarios tactiques sur grille. Il reprend la lisibilité d’un plateau d’échecs sans appliquer aucune règle d’échecs : les unités sont placées et déplacées librement pour construire une carte opérationnelle.
+Ce dépôt contient deux applications React sœurs, publiées ensemble sans
+backend :
 
-**Version en ligne :** [https://serolyn.github.io/tactical-board/](https://serolyn.github.io/tactical-board/)
+- le portfolio éditorial SEROLYN sur `/` ;
+- Tactical Board, un éditeur de scénarios tactiques, sur `/board`.
 
-L’application fonctionne entièrement dans le navigateur. Elle n’utilise ni compte, ni serveur, ni backend ; scénarios et images sont enregistrés dans IndexedDB.
+Le portfolio présente des projets, des scènes sonores et des expérimentations.
+Tactical Board conserve ses scénarios et ses images dans IndexedDB, uniquement
+sur la route `/board`.
+
+**Site :** [https://serolyn.github.io/tactical-board/](https://serolyn.github.io/tactical-board/)
 
 ## Installation
 
-Prérequis : Node.js 22 ou une version récente compatible avec Vite 8.
+Le projet demande Node.js 22.22.0 ou une version compatible plus récente.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Vite affiche ensuite l’adresse locale, généralement `http://localhost:5173`.
+Vite indique ensuite l’adresse locale, généralement
+`http://localhost:5173/tactical-board/`.
 
-## Commandes
+## Commandes principales
 
 ```bash
-npm run dev        # serveur de développement
-npm run test       # tests Vitest
-npm run test:watch # tests en mode interactif
-npm run typecheck  # vérification TypeScript
-npm run lint       # analyse Oxlint
-npm run build      # build de production dans dist/
-npm run preview    # aperçu du build
+npm run dev        # lancer le serveur de développement
+npm run test       # exécuter les tests Vitest
+npm run test:watch # relancer les tests pendant le développement
+npm run typecheck  # vérifier les types TypeScript
+npm run lint       # analyser le code avec Oxlint
+npm run build      # produire le site dans dist/
+npm run preview    # prévisualiser le build de production
 ```
 
-Chaque envoi sur la branche `main` publie automatiquement la version de production sur GitHub Pages.
+Un envoi sur `main` déclenche le déploiement GitHub Pages. Le build utilise le
+base path `/tactical-board/` et crée aussi le fallback `404.html` nécessaire aux
+liens directs.
 
-## Utilisation
+## Routes
 
-1. Choisissez une faction et un type dans la bibliothèque.
-2. Touchez ou cliquez une case pour placer autant d’unités que nécessaire.
-3. Revenez à l’outil **Sélection** pour déplacer une unité par glisser-déposer, ou sélectionnez-la puis choisissez sa destination. Un aperçu semi-transparent suit le pointeur pendant le glissement ; les collisions et sorties du plateau sont refusées.
-4. Utilisez l’inspecteur compact pour modifier son nom, sa faction, son type, son icône et son statut. Une unité détruite reste visible sous une grande croix rouge.
-5. Une opportunité **À rallier** peut rejoindre immédiatement **Mes forces** ; un **Obstacle** peut être neutralisé depuis ce même inspecteur.
-6. Les outils **Flèche** et **Marqueur** ajoutent les annotations tactiques. La palette de flèches propose attaque/menace, soutien et route/déplacement. La gomme ne supprime que les annotations ; l’outil suppression vise les unités.
-
-Pour agir sur plusieurs unités, maintenez `Shift` et cliquez chacune d’elles. L’**Inspecteur** affiche les actions groupées lorsque vous relâchez la touche. Il ne propose que les actions applicables à toute la sélection, notamment le ralliement, la neutralisation et les changements communs de faction ou de statut. Faites glisser l’une des unités sélectionnées pour déplacer toute la formation : les aperçus semi-transparents conservent ses écarts et le mouvement est refusé si une destination est occupée ou hors limites. Une modification groupée ne crée qu’une seule étape d’historique.
-
-Le bouton **Plein écran** masque toute l’interface pour ne conserver que le plateau interactif. `Échap` ou le bouton discret en haut à droite restaure l’interface. Le mode se ferme aussi automatiquement lorsqu’un panneau d’actions ou un dialogue est nécessaire, par exemple après une multi-sélection.
-
-Le plateau utilise une texture de terrain centrée et recadrée sans déformation. La grille interactive reste dessinée séparément au-dessus du terrain avec des lignes discrètes, afin de conserver son alignement pour toutes les dimensions.
-
-Le menu **Plateau** règle les dimensions de 5 × 5 à 20 × 20, les coordonnées et le vidage complet. Une réduction qui retire du contenu demande confirmation et reste annulable.
-
-Les factions et types personnalisés sont propres à chaque scénario. Les images PNG, JPEG, WebP et SVG sont validées, nettoyées puis optimisées avant leur stockage. Archiver un type personnalisé ne modifie pas les unités déjà placées.
-
-## Scénarios et sauvegardes
-
-- L’autosauvegarde locale intervient après chaque modification ; `Ctrl/Cmd+S` force l’écriture immédiate.
-- Un journal de reprise synchrone protège aussi la courte fenêtre précédant l’écriture IndexedDB, notamment lors d’un rechargement immédiat.
-- Chaque scénario peut porter un objectif court, une période facultative, un statut actif/archivé et un lien vers le scénario précédent.
-- Le menu du scénario permet de créer, renommer, modifier l’objectif et la période, dupliquer, archiver, supprimer, importer et exporter. **Créer le suivant** propose soit un plateau vide, soit la reprise des seules unités de **Mes forces**.
-- Le scénario fourni **L’objectif** organise la campagne de l’été 2026 sur 20 × 20. Ces données restent un contenu initial : tous les mécanismes de l’application sont génériques.
-- L’export JSON est autonome et inclut les images référencées. Un import valide crée toujours un nouveau scénario et ne remplace aucune donnée existante.
-- **Exporter tous les scénarios** produit une sauvegarde versionnée de la bibliothèque et déduplique les images partagées.
-- L’export PNG capture le plateau entier avec unités, noms, statuts et annotations, indépendamment du zoom affiché.
-
-Les données restent attachées au profil du navigateur et à l’origine du site. Pour transférer ou sauvegarder durablement un scénario, utilisez régulièrement l’export JSON.
-
-## Raccourcis
-
-| Raccourci | Action |
+| Route | Contenu |
 | --- | --- |
-| `Suppr` | Supprimer la sélection |
-| `Échap` | Fermer le panneau actif, annuler l’outil puis désélectionner |
-| `Ctrl/Cmd+Z` | Annuler |
-| `Ctrl/Cmd+Maj+Z` | Rétablir |
-| `Ctrl/Cmd+S` | Sauvegarder immédiatement |
-| `Shift` + clics | Constituer une sélection multiple, puis ouvrir ses actions au relâchement |
+| `/` | Accueil du portfolio |
+| `/projects` et `/projects/:slug` | Projets et détails publiés |
+| `/music` et `/music/:slug` | Scènes sonores et détails publiés |
+| `/lab` et `/lab/:slug` | Expérimentations et détails publiés |
+| `/about` | Présentation |
+| `/board` | Application Tactical Board indépendante |
+| `/art-direction/` | Planche visuelle statique |
 
-Les raccourcis de suppression et d’historique global sont neutralisés pendant la saisie dans un champ.
+`/projects/tactical-board` reste une redirection historique vers
+`/lab/tactical-board`. Une route inconnue affiche la page introuvable du
+portfolio.
 
-## Architecture
+## Arborescence simplifiée
 
-- `src/domain` : contrats TypeScript, catalogue, invariants, reducer pur et historique.
-- `src/store` : état applicatif Zustand et état d’interaction.
-- `src/features` : plateau, bibliothèque, scénarios et inspecteur.
-- `src/components` : composants d’interface réutilisables et accessibles.
-- `src/data` : contenu initial de la campagne et continuité entre scénarios, séparés du fonctionnement générique.
-- `src/services` : IndexedDB, autosauvegarde, images, import/export JSON et PNG.
+```text
+src/
+├── main.tsx
+├── app/
+│   └── SiteRouter.tsx
+├── portfolio/
+│   ├── assets, components, content, motion, pages, styles
+│   ├── webgl/
+│   └── PortfolioShell.tsx
+├── tactical-board/
+│   ├── assets, features, hooks, import-export
+│   ├── model, persistence, state, styles, ui
+│   └── TacticalBoardApp.tsx
+├── shared/
+│   └── assets/
+└── tests/
+docs/
+├── CONTENT.md
+└── DESIGN.md
+public/
+└── art-direction/
+```
 
-Le document et le format d’échange courants utilisent `formatVersion: 2`. Un scénario exporté est identifié par `kind: "tactical-board-scenario"` ; une sauvegarde globale par `kind: "tactical-board-scenario-collection"`. Les documents V1 sont migrés sans perte à leur lecture et les imports sont validés intégralement avant toute écriture.
+Le portfolio et Tactical Board ne s’importent jamais mutuellement. Le routeur
+racine est le seul module qui choisit entre les deux applications. `shared`
+reste réservé aux ressources réellement utilisées par les deux côtés.
+
+## Ordre de lecture conseillé
+
+1. `src/main.tsx` monte React.
+2. `src/app/SiteRouter.tsx` choisit le portfolio ou `/board`.
+3. `src/portfolio/PortfolioShell.tsx` structure les pages éditoriales.
+4. `src/tactical-board/TacticalBoardApp.tsx` orchestre le plateau.
+5. `src/tactical-board/model/` contient les règles métier pures et l’historique.
+6. `src/tactical-board/features/` regroupe plateau, bibliothèque, inspecteur et scénarios.
+7. `src/tactical-board/persistence/` gère IndexedDB, l’autosauvegarde et la récupération.
+
+Les imports internes utilisent l’alias unique `@/`, qui désigne `src/`. Par
+exemple, `@/portfolio/pages/HomePage` pointe vers
+`src/portfolio/pages/HomePage.tsx` ; aucun autre système d’alias n’est prévu.
+
+## Modifier le projet
+
+- Le contenu du portfolio se trouve dans `src/portfolio/content/`. Le guide
+  [docs/CONTENT.md](./docs/CONTENT.md) explique comment ajouter et publier une entrée.
+- Les styles, principes visuels, assets et licences sont centralisés dans
+  [docs/DESIGN.md](./docs/DESIGN.md).
+- Le plateau est rendu en DOM/CSS, avec ses annotations en SVG. Three.js et
+  Motion restent strictement réservés au portfolio.
+
+Le document Tactical Board courant utilise `formatVersion: 2`. Les migrations,
+les clés de persistance, l’import atomique et la séparation des blobs sont des
+contrats à préserver lors de toute évolution.
