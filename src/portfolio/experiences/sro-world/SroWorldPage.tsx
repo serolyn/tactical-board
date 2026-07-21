@@ -49,7 +49,6 @@ export function SroWorldPage() {
       <header className="sro-world-page__header">
         <div>
           <p>SEROLYN / SRO WORLD</p>
-          <h1>La chambre du signal</h1>
         </div>
 
         <Link

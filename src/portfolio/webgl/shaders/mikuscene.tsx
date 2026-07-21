@@ -31,7 +31,7 @@ import '@/portfolio/styles/miku.css'
  */
 const MODEL_POSITION: [number, number, number] = [
   0,
-  -0.15,
+  -0.90,
   0,
 ]
 
@@ -528,7 +528,7 @@ export function MikuThreeScene() {
         shadows
         camera={{
           position: [0, 0.1, 6.4],
-          fov: 32,
+          fov: 39,
           near: 0.1,
           far: 100,
         }}
