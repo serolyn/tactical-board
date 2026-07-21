@@ -9,7 +9,7 @@
 import SROCOVER from '@/assets/effects/music/SRO.webp'
 import fogReflections from '@/portfolio/assets/fog-reflections.webp'
 import nemylAudio from '@/portfolio/assets/Project_WE310.wav'
-import MikuThreeScene from '@/portfolio/webgl/shaders/mikuscene'
+import LazyMikuThreeScene from '@/portfolio/webgl/shaders/LazyMikuThreeScene'
 
 import { MusicStoryOverlay } from './MusicStory/MusicStoryOverlay'
 
@@ -76,7 +76,7 @@ export const music = [
       position: 'left',
     },
 
-    storyOverlay: MikuThreeScene,
+    storyOverlay: LazyMikuThreeScene,
 
     credits: [],
     links: [],
