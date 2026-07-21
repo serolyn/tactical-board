@@ -25,6 +25,7 @@ const TacticalBoardApp = lazy(() => import('@/tactical-board/TacticalBoardApp'))
 const ProjectDetailPage = lazy(() => import('@/portfolio/pages/PortfolioProjectDetailPage'))
 const MusicDetailPage = lazy(() => import('@/portfolio/pages/PortfolioMusicDetailPage'))
 const LabDetailPage = lazy(() => import('@/portfolio/pages/PortfolioLabDetailPage'))
+const SroWorldPage = lazy(() => import('@/portfolio/experiences/sro-world/SroWorldPage'))
 
 const tacticalBoardLoadingStyle = {
   display: 'grid',
@@ -35,11 +36,24 @@ const tacticalBoardLoadingStyle = {
   background: '#0d1211',
   fontFamily: 'system-ui, sans-serif',
 } as const
+
+const immersiveWorldLoadingStyle = {
+  display: 'grid',
+  minHeight: '100dvh',
+  margin: 0,
+  placeItems: 'center',
+  color: '#dddde5',
+  background: '#05060a',
+  fontFamily: 'IBM Plex Mono, monospace',
+  fontSize: '0.72rem',
+  letterSpacing: '0.1em',
+  textTransform: 'uppercase',
+} as const
+
 /**
- * Cette petite fabrique enveloppe une page portfolio dans un chargement différé, pour que l’interface reste fluide.
+ * Cette petite fabrique enveloppe une page portfolio dans un chargement différé,
+ * pour que l’interface reste fluide.
  */
-
-
 function lazyPortfolioPage(page: ReactNode) {
   return (
     <Suspense fallback={<p className="route-loading" role="status">Chargement de l’entrée…</p>}>
@@ -53,7 +67,7 @@ export function SiteRouteTree() {
   return (
     <>
       <SiteRouteEffects />
-      <ScreenGlitch enabled={false} /> 
+      <ScreenGlitch enabled={false} />
       <Routes>
         <Route
           path="/board"
@@ -69,6 +83,22 @@ export function SiteRouteTree() {
             </Suspense>
           }
         />
+
+        <Route
+          path="/music/sro-world"
+          element={
+            <Suspense
+              fallback={
+                <p role="status" style={immersiveWorldLoadingStyle}>
+                  Initialisation du monde SRO…
+                </p>
+              }
+            >
+              <SroWorldPage />
+            </Suspense>
+          }
+        />
+
         <Route element={<PortfolioShell />}>
           <Route index element={<HomePage />} />
           <Route path="/projects" element={<ProjectsPage />} />
