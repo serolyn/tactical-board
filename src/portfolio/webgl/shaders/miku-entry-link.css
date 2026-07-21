@@ -1,0 +1,39 @@
+.miku-entry-link {
+  position: relative;
+}
+
+/*
+ * Bouton transparent placé uniquement au-dessus du personnage.
+ * Il permet d'ouvrir le monde SRO sans modifier la scène Three.js.
+ */
+.miku-entry-link__button {
+  position: absolute;
+  z-index: 5;
+  top: 50%;
+  left: 50%;
+
+  width: clamp(150px, 26vw, 320px);
+  height: 78%;
+
+  transform: translate(-50%, -50%);
+
+  padding: 0;
+  border: 0;
+  border-radius: 48%;
+
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.miku-entry-link__button:focus-visible {
+  outline: 2px solid rgb(145 139 234 / 78%);
+  outline-offset: 6px;
+}
+
+@media (max-width: 760px) {
+  .miku-entry-link__button {
+    width: min(54vw, 270px);
+    height: 72%;
+  }
+}
