@@ -1,0 +1,72 @@
+/*
+ * Profil de performance du plateau.
+ *
+ * Le relief reste visible, mais les effets coûteux ne sont plus recalculés
+ * en continu sur chaque pion, marqueur et flèche.
+ */
+
+/* La lueur ambiante reste statique au lieu de traverser constamment le viewport. */
+[aria-label='Zone du plateau'][data-tool]::before {
+  animation: none;
+  box-shadow: 0 0 72px 38px rgb(105 100 199 / 6%);
+  opacity: 0.8;
+  transform: none;
+}
+
+/* Un filtre sur tout le plateau force le navigateur à recomposer une très grande surface. */
+[data-board-export][data-board-surface='terrain'] {
+  filter: none;
+}
+
+/* Évite un calque de fusion coûteux sur toute la texture du terrain. */
+[data-board-export][data-board-surface='terrain']::before {
+  mix-blend-mode: normal;
+}
+
+/* La lumière du terrain devient fixe. Le volume reste donné par les ombres du cadre. */
+[data-board-export][data-board-surface='terrain']::after {
+  animation: none;
+  opacity: 0.82;
+}
+
+/* Les pions gardent leur élévation sans drop-shadow recalculé sur chaque élément. */
+[data-board-export] button[aria-pressed] {
+  filter: none;
+}
+
+/* Remplace le flou de l'ombre au sol par une ombre simple, beaucoup moins coûteuse. */
+[data-board-export] button[aria-pressed]::before {
+  filter: none;
+  box-shadow: 0 4px 7px rgb(0 0 0 / 55%);
+}
+
+/* Les dizaines de labels n'ont pas besoin d'un backdrop-filter individuel. */
+[data-board-export] button[aria-pressed] span {
+  backdrop-filter: none;
+}
+
+/* Les flèches restent lisibles, mais ne pulsent plus toutes en permanence. */
+[data-board-export] svg line {
+  animation: none;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 72%));
+}
+
+/* Les marqueurs sont statiques tant qu'ils ne sont pas manipulés. */
+[data-board-export] [role='img'][style*='--marker-color'] {
+  animation: none;
+}
+
+[data-board-export] [role='img'][style*='--marker-color'] span {
+  backdrop-filter: none;
+}
+
+@media (max-width: 900px) {
+  /* Sur les écrans modestes, on réduit encore les halos hors interaction. */
+  [aria-label='Zone du plateau'][data-tool]::before {
+    box-shadow: 0 0 48px 24px rgb(105 100 199 / 5%);
+  }
+
+  [data-board-export] svg line {
+    filter: none;
+  }
+}
