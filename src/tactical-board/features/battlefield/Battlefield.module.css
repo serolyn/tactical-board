@@ -6,12 +6,754 @@
   overflow: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
+  background: #0e1413;
+  touch-action: pan-x pan-y;
+}
+
+.viewport[data-tool='arrow'],
+.viewport[data-tool='marker'],
+.viewport[data-tool='erase'] {
+  cursor: crosshair;
+}
+
+.viewport[data-tool='place'] .unit,
+.viewport[data-tool='arrow'] .unit,
+.viewport[data-tool='marker'] .unit,
+.viewport[data-tool='erase'] .unit {
+  pointer-events: none;
+}
+
+.stage {
+  display: grid;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  place-items: center;
+  padding: 64px;
+}
+
+.boardFrame {
+  position: relative;
+  isolation: isolate;
+  border: 2px solid #56655d;
+  border-radius: 2px;
+  background-color: #23271f;
+  background-image: url('../../../shared/assets/tactical-terrain.webp');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 30%);
+  user-select: none;
+}
+
+.boardFrame::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: rgb(5 8 6 / 18%);
+  content: '';
+  pointer-events: none;
+}
+
+.grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+}
+
+.cell {
+  position: relative;
+  display: grid;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  min-width: 28px;
+  min-height: 28px;
+  appearance: none;
+  place-items: center;
+  overflow: visible;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid rgb(232 237 227 / 15%);
+  border-bottom: 1px solid rgb(232 237 227 / 15%);
+  border-radius: 0;
+  color: var(--text);
+  background: transparent;
+  transition: filter 100ms ease, outline-color 100ms ease;
+}
+
+.cell:hover,
+.cell:focus-visible {
+  z-index: 4;
+  background: rgb(238 241 232 / 6%);
+  filter: brightness(1.12);
+  outline: 2px solid #c3ceb5;
+  outline-offset: -2px;
+}
+
+.cellTarget {
+  z-index: 4;
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+}
+
+.cellBlocked {
+  outline: 3px solid var(--danger);
+  outline-offset: -3px;
+}
+
+.coordinate {
+  position: absolute;
+  z-index: 2;
+  top: 3px;
+  left: 4px;
+  color: rgb(227 233 222 / 48%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: max(7px, calc(var(--cell-size) * 0.13));
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  pointer-events: none;
+}
+
+.unitLayer {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.unit {
+  position: absolute;
+  display: flex;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: calc(var(--cell-size) * 0.08) calc(var(--cell-size) * 0.08) 3px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  pointer-events: auto;
+  touch-action: none;
+  transition: transform 110ms ease, opacity 110ms ease, background 110ms ease;
+}
+
+.unit:hover {
+  background: rgb(238 241 232 / 6%);
+  transform: translateY(-1px);
+}
+
+.viewport[data-tool='select'] .unit {
+  cursor: grab;
+}
+
+.viewport[data-tool='select'] .unit:active {
+  cursor: grabbing;
+}
+
+.unitSelected {
+  z-index: 6;
+  background: rgb(164 181 139 / 13%);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.unitDestroyed .iconFrame,
+.unitDestroyed .unitLabel {
+  opacity: 0.48;
+  filter: grayscale(0.8);
+}
+
+.destroyedOverlay {
+  position: absolute;
+  z-index: 10;
+  inset: 4%;
+  display: grid;
+  place-items: center;
+  color: #ff3f3f;
+  filter: drop-shadow(0 1px 1px rgb(27 4 4 / 90%));
+  pointer-events: none;
+}
+
+.destroyedOverlay svg {
+  width: 146%;
+  height: 146%;
+  stroke: currentcolor;
+  stroke-width: 3.5;
+}
+
+.unitNeutralized {
+  filter: grayscale(0.65);
+  opacity: 0.5;
+}
+
+.unitHidden {
+  opacity: 0.42;
+}
+
+.unit.unitDragSource {
+  opacity: 0.2;
+  background: transparent;
+  filter: saturate(0.55);
+  transform: none;
+}
+
+.dragGhostLayer {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.dragGhost {
+  position: absolute;
+  display: flex;
+  width: var(--cell-size);
+  height: var(--cell-size);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: calc(var(--cell-size) * 0.08) calc(var(--cell-size) * 0.08) 3px;
+  border-radius: 3px;
+  background: rgb(164 181 139 / 12%);
+  box-shadow: inset 0 0 0 2px rgb(195 206 181 / 88%), 0 5px 12px rgb(0 0 0 / 22%);
+  opacity: 0.7;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.dragGhostInvalid {
+  background: rgb(217 74 74 / 12%);
+  box-shadow: inset 0 0 0 2px rgb(242 91 91 / 92%), 0 5px 12px rgb(0 0 0 / 22%);
+  opacity: 0.56;
+}
+
+.iconFrame {
+  position: relative;
+  display: grid;
+  width: calc(var(--cell-size) * 0.58);
+  height: calc(var(--cell-size) * 0.58);
+  max-width: 48px;
+  max-height: 48px;
+  min-width: 17px;
+  min-height: 17px;
+  place-items: center;
+  border: max(2px, calc(var(--cell-size) * 0.04)) solid var(--faction-color);
+  border-radius: 50%;
+  color: var(--unit-color);
+  background: #17201d;
+}
+
+.iconFrame svg,
+.iconFrame img,
+.iconImage {
+  width: 68%;
+  height: 68%;
+}
+
+.iconImage {
+  display: block;
+  object-fit: contain;
+}
+
+.unitLabel {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 1px 3px;
+  border-radius: 2px;
+  color: #eef1e9;
+  background: rgb(12 17 15 / 72%);
+  font-size: max(7px, calc(var(--cell-size) * 0.12));
+  font-weight: 600;
+  line-height: 1.05;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 1px #000;
+  white-space: nowrap;
+}
+
+.factionBadge,
+.statusBadge {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  width: max(12px, calc(var(--cell-size) * 0.2));
+  height: max(12px, calc(var(--cell-size) * 0.2));
+  place-items: center;
+  border: 1px solid rgb(238 241 232 / 28%);
+  border-radius: 999px;
+  color: #fff;
+  font-size: max(7px, calc(var(--cell-size) * 0.1));
+  font-weight: 800;
+  line-height: 1;
+}
+
+.factionBadge {
+  right: -4px;
+  bottom: -2px;
+  background: var(--faction-color);
+}
+
+.statusBadge {
+  top: -4px;
+  left: -4px;
+  background: #273743;
+}
+
+.statusWounded {
+  color: #1b1000;
+  background: var(--warning);
+}
+
+.statusDestroyed {
+  background: var(--danger);
+}
+
+.statusNeutralized {
+  background: #53616c;
+  border-style: dashed;
+}
+
+.statusHidden {
+  background: #657783;
+}
+
+.annotationLayer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.arrow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.marker {
+  position: absolute;
+  z-index: 4;
+  display: grid;
+  width: calc(var(--cell-size) * 0.32);
+  height: calc(var(--cell-size) * 0.32);
+  min-width: 15px;
+  min-height: 15px;
+  place-items: center;
+  transform: translate(calc(var(--cell-size) * 0.64), calc(var(--cell-size) * 0.05));
+  border: 1px solid rgb(245 246 239 / 58%);
+  border-radius: 50% 50% 50% 15%;
+  color: #071016;
+  background: var(--marker-color);
+  pointer-events: none;
+}
+
+.marker svg {
+  width: 65%;
+  height: 65%;
+}
+
+.markerLabel {
+  position: absolute;
+  top: calc(100% + 3px);
+  left: 50%;
+  max-width: calc(var(--cell-size) * 0.92);
+  transform: translateX(-50%);
+  overflow: hidden;
+  padding: 1px 4px;
+  border-radius: 2px;
+  color: #f5fafc;
+  background: rgb(15 20 18 / 88%);
+  font-size: max(7px, calc(var(--cell-size) * 0.11));
+  font-weight: 700;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markerSelected {
+  outline: 2px solid #e7eadf;
+  outline-offset: 1px;
+}
+
+.emptyHint {
+  position: absolute;
+  z-index: 10;
+  top: 50%;
+  left: 50%;
+  max-width: min(300px, 78vw);
+  transform: translate(-50%, -50%);
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-soft);
+  background: #19211f;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.previewLine {
+  opacity: 0.72;
+}
+
+/* Tactical Signal depth layer */
+.viewport {
   background:
-    radial-gradient(
-      circle at 50% 35%,
-      rgb(105 100 199 / 16%),
-      transparent 34rem
-    ),
-    radial-gradient(
-      circle at 82% 76%,
-      rgb(207 75 70 / 7%),
+    radial-gradient(circle at 50% 34%, rgb(105 100 199 / 16%), transparent 36rem),
+    radial-gradient(circle at 82% 76%, rgb(207 75 70 / 7%), transparent 24rem),
+    linear-gradient(145deg, #07080d, #0d0e17 52%, #080910);
+}
+
+.viewport::before {
+  position: sticky;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 0;
+  content: '';
+  pointer-events: none;
+  box-shadow: 0 0 120px 70px rgb(105 100 199 / 7%);
+  animation: viewportSignal 9s ease-in-out infinite alternate;
+}
+
+.stage {
+  perspective: 1400px;
+}
+
+.boardFrame {
+  border: 1px solid rgb(145 139 234 / 34%);
+  border-radius: 7px;
+  background-color: #11121c;
+  filter: saturate(0.68) contrast(1.08) brightness(0.78);
+  box-shadow:
+    0 2px 0 rgb(221 221 229 / 8%) inset,
+    0 -1px 0 rgb(0 0 0 / 65%) inset,
+    0 12px 0 #080911,
+    0 16px 28px rgb(0 0 0 / 48%),
+    0 32px 80px rgb(0 0 0 / 42%),
+    0 0 48px rgb(105 100 199 / 14%);
+  transform: translateZ(0);
+  animation: boardArrival 650ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.boardFrame::before {
+  background:
+    radial-gradient(circle at 46% 38%, rgb(145 139 234 / 11%), transparent 32%),
+    radial-gradient(circle at 78% 70%, rgb(207 75 70 / 6%), transparent 24%),
+    linear-gradient(135deg, rgb(7 8 13 / 12%), rgb(7 8 13 / 42%));
+  mix-blend-mode: screen;
+}
+
+.boardFrame::after {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(115deg, transparent 28%, rgb(221 221 229 / 4%) 43%, transparent 57%),
+    radial-gradient(circle at 50% 50%, transparent 52%, rgb(4 5 9 / 42%) 100%);
+  content: '';
+  pointer-events: none;
+  animation: terrainSweep 12s ease-in-out infinite;
+}
+
+.grid {
+  z-index: 1;
+}
+
+.cell {
+  border-color: rgb(145 139 234 / 11%);
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease,
+    transform 180ms ease;
+}
+
+.cell:hover,
+.cell:focus-visible {
+  background: rgb(105 100 199 / 12%);
+  box-shadow:
+    0 0 0 1px rgb(145 139 234 / 48%) inset,
+    0 0 20px rgb(105 100 199 / 24%) inset;
+  filter: brightness(1.18);
+  outline: 0;
+  transform: translateZ(3px);
+}
+
+.cellTarget {
+  background: rgb(105 100 199 / 16%);
+  box-shadow:
+    0 0 0 2px var(--accent) inset,
+    0 0 22px rgb(105 100 199 / 38%) inset;
+  outline: 0;
+  animation: targetPulse 1.15s ease-in-out infinite;
+}
+
+.cellBlocked {
+  background: rgb(207 75 70 / 14%);
+  box-shadow:
+    0 0 0 2px var(--danger) inset,
+    0 0 20px rgb(207 75 70 / 35%) inset;
+  outline: 0;
+  animation: blockedPulse 750ms ease-in-out infinite alternate;
+}
+
+.coordinate {
+  color: rgb(221 221 229 / 38%);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 400;
+}
+
+.unit {
+  z-index: 1;
+  border-radius: 8px;
+  filter: drop-shadow(0 8px 8px rgb(0 0 0 / 48%));
+  transform: translateY(-3px);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 220ms ease,
+    opacity 160ms ease,
+    background-color 180ms ease;
+  animation: unitArrival 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.unit::before {
+  position: absolute;
+  z-index: -1;
+  right: 18%;
+  bottom: 9%;
+  left: 18%;
+  height: 13%;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 58%);
+  filter: blur(4px);
+  content: '';
+  opacity: 0.72;
+  pointer-events: none;
+  transform: translateY(4px) scaleX(1.1);
+}
+
+.unit:hover {
+  z-index: 8;
+  background: rgb(105 100 199 / 8%);
+  filter:
+    drop-shadow(0 12px 10px rgb(0 0 0 / 58%))
+    drop-shadow(0 0 9px rgb(145 139 234 / 24%));
+  transform: translateY(-8px) scale(1.055);
+}
+
+.viewport[data-tool='select'] .unit:active {
+  transform: translateY(-2px) scale(0.98);
+}
+
+.unitSelected {
+  z-index: 9;
+  background: rgb(105 100 199 / 13%);
+  box-shadow:
+    0 0 0 1px rgb(145 139 234 / 70%) inset,
+    0 0 24px rgb(105 100 199 / 30%);
+  outline: 0;
+  animation:
+    unitArrival 420ms cubic-bezier(0.22, 1, 0.36, 1) both,
+    selectedSignal 1.8s ease-in-out infinite;
+}
+
+.iconFrame {
+  border-color: color-mix(in srgb, var(--faction-color) 84%, white 16%);
+  background:
+    radial-gradient(circle at 35% 26%, rgb(255 255 255 / 13%), transparent 32%),
+    linear-gradient(145deg, #1a1b28, #0b0c13 72%);
+  box-shadow:
+    0 2px 0 rgb(255 255 255 / 10%) inset,
+    0 -3px 5px rgb(0 0 0 / 52%) inset,
+    0 4px 8px rgb(0 0 0 / 48%),
+    0 0 12px color-mix(in srgb, var(--faction-color) 28%, transparent);
+  transform: translateZ(0);
+}
+
+.unit:hover .iconFrame,
+.unitSelected .iconFrame {
+  box-shadow:
+    0 2px 0 rgb(255 255 255 / 16%) inset,
+    0 -3px 5px rgb(0 0 0 / 52%) inset,
+    0 7px 12px rgb(0 0 0 / 58%),
+    0 0 18px color-mix(in srgb, var(--faction-color) 44%, transparent);
+}
+
+.unitLabel {
+  border: 1px solid rgb(221 221 229 / 10%);
+  border-radius: 3px;
+  color: #dddde5;
+  background: rgb(7 8 13 / 82%);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 34%);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-weight: 400;
+  text-shadow: 0 1px 2px #000;
+  backdrop-filter: blur(4px);
+}
+
+.factionBadge,
+.statusBadge {
+  border-color: rgb(221 221 229 / 42%);
+  box-shadow:
+    0 2px 4px rgb(0 0 0 / 48%),
+    0 0 8px currentcolor;
+}
+
+.dragGhost {
+  border: 1px solid rgb(145 139 234 / 70%);
+  border-radius: 8px;
+  background: rgb(105 100 199 / 18%);
+  box-shadow:
+    0 0 0 1px rgb(145 139 234 / 46%) inset,
+    0 12px 22px rgb(0 0 0 / 42%),
+    0 0 26px rgb(105 100 199 / 34%);
+  opacity: 0.86;
+  animation: ghostFloat 850ms ease-in-out infinite alternate;
+}
+
+.dragGhostInvalid {
+  border-color: rgb(207 75 70 / 74%);
+  background: rgb(207 75 70 / 16%);
+  box-shadow:
+    0 0 0 1px rgb(207 75 70 / 52%) inset,
+    0 12px 22px rgb(0 0 0 / 42%),
+    0 0 24px rgb(207 75 70 / 34%);
+}
+
+.arrow {
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / 70%)) drop-shadow(0 0 4px currentcolor);
+  animation: arrowSignal 2.4s ease-in-out infinite;
+}
+
+.previewLine {
+  opacity: 0.95;
+  animation: previewFlow 700ms linear infinite;
+}
+
+.marker {
+  border-color: rgb(221 221 229 / 72%);
+  box-shadow:
+    0 4px 8px rgb(0 0 0 / 48%),
+    0 0 12px color-mix(in srgb, var(--marker-color) 46%, transparent);
+  animation: markerFloat 2.4s ease-in-out infinite;
+}
+
+.markerLabel {
+  border: 1px solid rgb(221 221 229 / 11%);
+  color: #dddde5;
+  background: rgb(7 8 13 / 88%);
+  box-shadow: 0 4px 10px rgb(0 0 0 / 36%);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  backdrop-filter: blur(5px);
+}
+
+.markerSelected {
+  outline-color: #918bea;
+  box-shadow:
+    0 0 0 2px rgb(145 139 234 / 70%),
+    0 0 18px rgb(105 100 199 / 58%);
+}
+
+.emptyHint {
+  border-color: rgb(145 139 234 / 26%);
+  color: var(--text-soft);
+  background: rgb(11 12 19 / 84%);
+  box-shadow: 0 16px 44px rgb(0 0 0 / 38%);
+  backdrop-filter: blur(12px);
+}
+
+@keyframes viewportSignal {
+  from { opacity: 0.55; transform: translateX(-14%); }
+  to { opacity: 1; transform: translateX(14%); }
+}
+
+@keyframes boardArrival {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes terrainSweep {
+  0%, 100% { background-position: -55% 0, center; opacity: 0.72; }
+  50% { background-position: 155% 0, center; opacity: 1; }
+}
+
+@keyframes unitArrival {
+  from { opacity: 0; transform: translateY(4px) scale(0.82); }
+  to { opacity: 1; transform: translateY(-3px) scale(1); }
+}
+
+@keyframes selectedSignal {
+  0%, 100% { box-shadow: 0 0 0 1px rgb(145 139 234 / 58%) inset, 0 0 16px rgb(105 100 199 / 22%); }
+  50% { box-shadow: 0 0 0 2px rgb(145 139 234 / 88%) inset, 0 0 30px rgb(105 100 199 / 46%); }
+}
+
+@keyframes targetPulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.32); }
+}
+
+@keyframes blockedPulse {
+  from { filter: brightness(0.92); }
+  to { filter: brightness(1.22); }
+}
+
+@keyframes ghostFloat {
+  from { filter: brightness(0.96); }
+  to { filter: brightness(1.18); }
+}
+
+@keyframes arrowSignal {
+  0%, 100% { opacity: 0.78; }
+  50% { opacity: 1; }
+}
+
+@keyframes previewFlow {
+  to { stroke-dashoffset: -15; }
+}
+
+@keyframes markerFloat {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -3px; }
+}
+
+@media (max-width: 767px) {
+  .stage {
+    padding: 36px;
+  }
+
+  .boardFrame {
+    box-shadow:
+      0 8px 0 #080911,
+      0 15px 28px rgb(0 0 0 / 44%),
+      0 0 34px rgb(105 100 199 / 12%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewport::before,
+  .boardFrame,
+  .boardFrame::after,
+  .unit,
+  .unitSelected,
+  .cellTarget,
+  .cellBlocked,
+  .dragGhost,
+  .arrow,
+  .previewLine,
+  .marker {
+    animation: none;
+  }
+}
