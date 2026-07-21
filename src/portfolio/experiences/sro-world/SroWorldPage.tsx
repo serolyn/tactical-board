@@ -29,7 +29,7 @@ export function SroWorldPage() {
     >
       <div
         className="sro-world-page__canvas"
-        aria-hidden="true"
+        aria-label="Scène 3D interactive contenant une télévision"
       >
         <Suspense
           fallback={
