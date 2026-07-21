@@ -8,7 +8,7 @@
 
 import bookCover from '@/assets/effects/book/cover.webp'
 
-import { PdfBook } from './books/PdfBook'
+import { LazyPdfBook } from './books/LazyPdfBook'
 
 import type { ProjectEntry } from './portfolioContentTypes'
 
@@ -46,7 +46,7 @@ export const projects = [
       {
         id: 'flipbook',
         type: 'component',
-        component: PdfBook,
+        component: LazyPdfBook,
       },
       {
         id: 'informations',
