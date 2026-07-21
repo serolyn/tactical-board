@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -60,25 +61,26 @@ interface CameraRigProps {
 }
 
 /*
- * La caméra observe doucement la souris dans la vue générale.
+ * La caméra suit clairement la souris dans la vue générale.
  *
  * Quand la télévision est sélectionnée, elle avance vers l'écran et cesse
- * de suivre le pointeur. Ce déplacement prépare le futur mode diaporama.
+ * de suivre le pointeur. Les amplitudes sont volontairement visibles afin que
+ * l'utilisateur comprenne immédiatement que la scène est interactive.
  */
 function CameraRig({ focused }: CameraRigProps) {
   useFrame(({ camera, pointer }, delta) => {
-    const smoothing = 1 - Math.exp(-3.8 * delta)
+    const smoothing = 1 - Math.exp(-4.2 * delta)
 
     const targetX = focused
       ? 0
-      : pointer.x * 0.22
+      : pointer.x * 0.68
 
     const targetY = focused
       ? 1.42
-      : 1.55 + pointer.y * 0.08
+      : 1.55 + pointer.y * 0.24
 
     const targetZ = focused
-      ? 3.05
+      ? 2.72
       : 6.2
 
     camera.position.x = MathUtils.lerp(
@@ -99,7 +101,15 @@ function CameraRig({ focused }: CameraRigProps) {
       smoothing,
     )
 
-    camera.lookAt(0, 1.32, -0.1)
+    const lookX = focused
+      ? 0
+      : pointer.x * 0.18
+
+    const lookY = focused
+      ? 1.32
+      : 1.32 + pointer.y * 0.09
+
+    camera.lookAt(lookX, lookY, -0.1)
   })
 
   return null
@@ -205,6 +215,12 @@ function InteractiveTelevision({
 
   const slide = TV_SLIDES[slideIndex]
 
+  useEffect(() => {
+    return () => {
+      document.body.style.cursor = 'default'
+    }
+  }, [])
+
   useFrame(({ clock }, delta) => {
     const group = groupRef.current
 
@@ -213,7 +229,7 @@ function InteractiveTelevision({
     }
 
     const targetScale = hovered
-      ? 1.025
+      ? 1.055
       : 1
 
     const smoothing = 1 - Math.exp(-7 * delta)
@@ -241,6 +257,16 @@ function InteractiveTelevision({
     ) % TV_SLIDES.length)
   }
 
+  const handlePointerEnter = () => {
+    setHovered(true)
+    document.body.style.cursor = 'pointer'
+  }
+
+  const handlePointerLeave = () => {
+    setHovered(false)
+    document.body.style.cursor = 'default'
+  }
+
   return (
     <group
       ref={groupRef}
@@ -258,29 +284,40 @@ function InteractiveTelevision({
         />
       </mesh>
 
+      <mesh position={[0, 0.08, 0.372]}>
+        <planeGeometry args={[2.62, 1.47]} />
+        <meshStandardMaterial
+          color={slide.screen}
+          emissive={slide.accent}
+          emissiveIntensity={focused ? 0.52 : hovered ? 0.4 : 0.25}
+          metalness={0.04}
+          roughness={0.28}
+          toneMapped={false}
+        />
+      </mesh>
+
+      {/*
+       * Zone invisible placée devant toute la télévision.
+       * Elle garantit un clic fiable même si le texte HTML recouvre visuellement
+       * l'écran ou si l'utilisateur clique près des bords.
+       */}
       <mesh
-        position={[0, 0.08, 0.372]}
+        position={[0, 0.02, 0.46]}
         onClick={(event) => {
           event.stopPropagation()
           handleClick()
         }}
         onPointerEnter={(event) => {
           event.stopPropagation()
-          setHovered(true)
-          document.body.style.cursor = 'pointer'
+          handlePointerEnter()
         }}
-        onPointerLeave={() => {
-          setHovered(false)
-          document.body.style.cursor = 'default'
-        }}
+        onPointerLeave={handlePointerLeave}
       >
-        <planeGeometry args={[2.62, 1.47]} />
-        <meshStandardMaterial
-          color={slide.screen}
-          emissive={slide.accent}
-          emissiveIntensity={focused ? 0.52 : 0.25}
-          metalness={0.04}
-          roughness={0.28}
+        <planeGeometry args={[3.05, 1.95]} />
+        <meshBasicMaterial
+          transparent
+          opacity={0}
+          depthWrite={false}
           toneMapped={false}
         />
       </mesh>
@@ -290,8 +327,10 @@ function InteractiveTelevision({
         transform
         distanceFactor={2.25}
         position={[0, 0.08, 0.39]}
+        pointerEvents="none"
         style={{
           '--sro-slide-accent': slide.accent,
+          pointerEvents: 'none',
         } as CSSProperties}
       >
         <div
