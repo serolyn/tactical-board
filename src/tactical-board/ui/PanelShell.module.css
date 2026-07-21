@@ -1,12 +1,14 @@
 .panel {
-  background: var(--tb-surface, #101923);
-  border-color: var(--tb-border, #2a3b4f);
-  color: var(--tb-text, #e6edf5);
   display: flex;
-  flex-direction: column;
+  width: var(--tb-panel-width, 18rem);
   height: 100%;
   min-height: 0;
-  width: var(--tb-panel-width, 18rem);
+  flex-direction: column;
+  border-color: var(--tb-border, rgb(221 221 229 / 10%));
+  color: var(--tb-text, #dddde5);
+  background:
+    linear-gradient(180deg, rgb(105 100 199 / 4%), transparent 18rem),
+    rgb(14 15 24 / 96%);
 }
 
 .left {
@@ -20,30 +22,43 @@
 }
 
 .header {
-  align-items: flex-start;
-  border-bottom: 1px solid var(--tb-border, #2a3b4f);
+  position: relative;
   display: flex;
-  gap: 0.75rem;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 0.75rem;
   padding: 1.2rem 1.15rem 1.05rem;
+  border-bottom: 1px solid var(--tb-border, rgb(221 221 229 / 10%));
+}
+
+.header::after {
+  position: absolute;
+  right: 1.15rem;
+  bottom: -1px;
+  left: 1.15rem;
+  height: 1px;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(90deg, rgb(105 100 199 / 36%), transparent);
+  opacity: 0.5;
 }
 
 .header h2 {
-  color: inherit;
-  font: 700 0.95rem/1.3 var(--tb-font, Inter, system-ui, sans-serif);
-  letter-spacing: 0.01em;
   margin: 0;
+  color: inherit;
+  font: 600 0.9rem/1.3 var(--tb-font, sans-serif);
+  letter-spacing: 0.01em;
 }
 
 .header p {
-  color: var(--tb-text-muted, #91a1b3);
-  font: 400 0.75rem/1.4 var(--tb-font, Inter, system-ui, sans-serif);
-  margin: 0.3rem 0 0;
+  margin: 0.32rem 0 0;
+  color: var(--tb-text-muted, #8d8e9c);
+  font: 400 0.72rem/1.45 var(--tb-font, sans-serif);
 }
 
 .content {
-  flex: 1;
   min-height: 0;
+  flex: 1;
   overflow: auto;
 }
 
@@ -51,17 +66,26 @@
   display: none;
 }
 
+@media (min-width: 1180px) {
+  .panel {
+    animation: panelContentEnter 520ms 120ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
 @media (max-width: 1179px) {
   .panel {
-    bottom: 0;
-    height: auto;
-    box-shadow: 0.75rem 0 2rem rgb(0 0 0 / 28%);
-    max-width: min(88vw, 22rem);
     position: fixed;
-    top: var(--tb-topbar-height, 4rem);
-    transition: transform 180ms ease;
-    width: 22rem;
     z-index: 55;
+    top: var(--tb-topbar-height, 4rem);
+    bottom: 0;
+    width: 22rem;
+    max-width: min(88vw, 22rem);
+    height: auto;
+    border-color: var(--tb-border-strong);
+    box-shadow: 0.75rem 0 2.5rem rgb(0 0 0 / 38%);
+    transition:
+      transform 280ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 280ms ease;
   }
 
   .left {
@@ -71,7 +95,7 @@
 
   .right {
     right: 0;
-    box-shadow: -0.75rem 0 2rem rgb(0 0 0 / 28%);
+    box-shadow: -0.75rem 0 2.5rem rgb(0 0 0 / 38%);
     transform: translateX(105%);
   }
 
@@ -80,35 +104,66 @@
   }
 
   .backdrop {
-    background: rgb(2 8 14 / 58%);
-    border: 0;
-    bottom: 0;
-    display: block;
-    inset-inline: 0;
     position: fixed;
-    top: var(--tb-topbar-height, 4rem);
     z-index: 50;
+    top: var(--tb-topbar-height, 4rem);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: block;
+    border: 0;
+    background: rgb(3 4 9 / 68%);
+    backdrop-filter: blur(4px);
+    animation: backdropEnter 180ms ease both;
   }
 }
 
 @media (max-width: 767px) {
   .panel {
-    border: 0;
-    border-top: 1px solid var(--tb-border, #2a3b4f);
-    border-bottom: 0;
-    bottom: 3.625rem;
-    border-radius: 1rem 1rem 0 0;
-    box-shadow: 0 -0.75rem 2rem rgb(0 0 0 / 28%);
-    left: 0;
-    max-height: calc(78svh - 3.625rem);
-    max-width: none;
-    right: 0;
     top: auto;
-    transform: translateY(105%);
+    right: 0;
+    bottom: 3.625rem;
+    left: 0;
     width: 100%;
+    max-width: none;
+    max-height: calc(78svh - 3.625rem);
+    border: 0;
+    border-top: 1px solid var(--tb-border-strong, rgb(221 221 229 / 20%));
+    border-bottom: 0;
+    border-radius: 14px 14px 0 0;
+    box-shadow: 0 -1rem 3rem rgb(0 0 0 / 42%);
+    transform: translateY(105%);
   }
 
   .open {
     transform: translateY(0);
+  }
+}
+
+@keyframes panelContentEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes backdropEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel,
+  .backdrop {
+    animation: none;
+    transition: none;
   }
 }
