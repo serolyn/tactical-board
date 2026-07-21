@@ -6,15 +6,17 @@
  * modifies les titres, résumés, listes et règles de validation du contenu.
  */
 
+import SROCOVER from '@/assets/effects/music/SRO.webp'
 import fogReflections from '@/portfolio/assets/fog-reflections.webp'
 import nemylAudio from '@/portfolio/assets/Project_WE310.wav'
+import MikuThreeScene from '@/portfolio/webgl/shaders/mikuscene'
+
 import { MusicStoryOverlay } from './MusicStory/MusicStoryOverlay'
 
 import type { MusicEntry } from './portfolioContentTypes'
 
 /**
- * Modèle éditorial sans titre, visuel ni audio fictifs. `published: false`
- * l'écarte de toutes les sélections publiques.
+ * Liste des morceaux et expériences musicales du portfolio.
  */
 export const music = [
   {
@@ -23,49 +25,73 @@ export const music = [
     year: 2026,
     status: 'En développement',
     summary: 'Introduction',
+
     artwork: {
       src: fogReflections,
-      alt: 'Image provisoire du modèle de scène sonore montrant des reflets dans la brume.',
+      alt: 'Image provisoire montrant des reflets dans la brume.',
       width: 720,
       height: 1440,
       position: 'right',
     },
+
     storyOverlay: MusicStoryOverlay,
     audioSrc: nemylAudio,
+
     credits: [],
     links: [],
+
     sections: [
       {
         id: 'description',
         type: 'text',
         title: 'Description',
-        paragraphs: ['Remplacer ce paragraphe par la description de la scène sonore.'],
+        paragraphs: [
+          'Remplacer ce paragraphe par la description de la scène sonore.',
+        ],
       },
       {
         id: 'notes',
         type: 'quote',
-        quote: 'Ajouter ici un fragment ou une note seulement lorsqu’un morceau existe.',
+        quote:
+          'Ajouter ici un fragment ou une note seulement lorsqu’un morceau existe.',
       },
     ],
+
     published: true,
   },
+
   {
     slug: 'music-template-2',
-    title: 'À TITRER — BROUILLON NON PUBLIÉ',
+    title: 'SRO',
     year: 2026,
     status: 'Brouillon',
-    summary: 'Exemple de seconde scène sonore à compléter avec un morceau réel.',
-    artwork: null,
+    summary:
+      'Exemple de seconde scène sonore à compléter avec un morceau réel.',
+
+    artwork: {
+      src: SROCOVER,
+      alt: 'Cover de la musique SRO.',
+      width: 720,
+      height: 1440,
+      position: 'left',
+    },
+
+    storyOverlay: MikuThreeScene,
+
     credits: [],
     links: [],
+
     sections: [
       {
         id: 'description',
         type: 'text',
         title: 'Description',
-        paragraphs: ['Remplacer ce paragraphe par la description du morceau.'],
+        paragraphs: [
+          'Remplacer ce paragraphe par la description du morceau.',
+        ],
       },
     ],
-    published: false,
+
+    published: true,
   },
 ] satisfies readonly MusicEntry[]

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { useParams } from 'react-router'
 
 import { EntryHero } from '../components/PortfolioEntryHero'
@@ -129,7 +129,9 @@ export function MusicDetailView({ entry }: MusicDetailViewProps) {
         title={entry.title}
       />
 
-      {storyOverlay}
+      <Suspense fallback={null}>
+        {storyOverlay}
+      </Suspense>
 
       {audioPlayer}
 

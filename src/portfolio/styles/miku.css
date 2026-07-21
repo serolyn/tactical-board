@@ -1,0 +1,234 @@
+.music-glb-scene {
+  position: relative;
+  isolation: isolate;
+
+  width: 100%;
+  height: clamp(560px, 74vh, 820px);
+  min-height: 560px;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(
+      circle at 50% 44%,
+      rgba(105, 100, 199, 0.19) 0%,
+      rgba(49, 43, 82, 0.1) 27%,
+      transparent 58%
+    ),
+    radial-gradient(
+      circle at 76% 70%,
+      rgba(207, 75, 70, 0.07),
+      transparent 25%
+    ),
+    linear-gradient(
+      180deg,
+      #12101a 0%,
+      #0b0a11 58%,
+      #07070b 100%
+    );
+}
+
+.music-glb-scene::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+
+  pointer-events: none;
+  content: '';
+
+  background-image:
+    linear-gradient(
+      rgba(145, 139, 234, 0.025) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(145, 139, 234, 0.018) 1px,
+      transparent 1px
+    );
+
+  background-size:
+    56px 56px,
+    56px 56px;
+
+  mask-image:
+    radial-gradient(
+      circle at center,
+      black,
+      transparent 72%
+    );
+}
+
+.music-glb-scene canvas {
+  position: relative;
+  z-index: 2;
+
+  display: block;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  cursor: crosshair;
+}
+
+.music-glb-scene__vignette {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(7, 7, 11, 0.52),
+      transparent 18%,
+      transparent 82%,
+      rgba(7, 7, 11, 0.52)
+    ),
+    linear-gradient(
+      180deg,
+      rgba(7, 7, 11, 0.23),
+      transparent 18%,
+      transparent 70%,
+      rgba(7, 7, 11, 0.72)
+    ),
+    radial-gradient(
+      circle at center,
+      transparent 48%,
+      rgba(4, 4, 8, 0.62) 100%
+    );
+}
+
+.music-glb-scene__grain {
+  position: absolute;
+  z-index: 4;
+  inset: -40%;
+
+  pointer-events: none;
+
+  opacity: 0.035;
+
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='.75'/%3E%3C/svg%3E");
+
+  animation:
+    music-grain-shift 0.25s steps(2) infinite;
+}
+
+.music-glb-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 10px 14px;
+
+  color: rgba(221, 221, 229, 0.8);
+  background: rgba(10, 9, 16, 0.78);
+
+  border:
+    1px solid rgba(145, 139, 234, 0.2);
+
+  border-radius: 2px;
+
+  backdrop-filter: blur(10px);
+
+  font-family:
+    'IBM Plex Mono',
+    monospace;
+
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.music-glb-loading-signal {
+  width: 5px;
+  height: 5px;
+
+  background: #cf4b46;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 9px rgba(207, 75, 70, 0.9);
+
+  animation:
+    music-signal-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes music-signal-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.75);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes music-grain-shift {
+  0% {
+    transform: translate3d(
+      -3%,
+      1%,
+      0
+    );
+  }
+
+  25% {
+    transform: translate3d(
+      2%,
+      -4%,
+      0
+    );
+  }
+
+  50% {
+    transform: translate3d(
+      5%,
+      2%,
+      0
+    );
+  }
+
+  75% {
+    transform: translate3d(
+      -1%,
+      5%,
+      0
+    );
+  }
+
+  100% {
+    transform: translate3d(
+      -4%,
+      -2%,
+      0
+    );
+  }
+}
+
+@media (max-width: 760px) {
+  .music-glb-scene {
+    height: 620px;
+    min-height: 620px;
+  }
+
+  .music-glb-scene::before {
+    background-size:
+      38px 38px,
+      38px 38px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-glb-scene__grain,
+  .music-glb-loading-signal {
+    animation: none;
+  }
+}
