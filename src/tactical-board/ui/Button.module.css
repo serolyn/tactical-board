@@ -1,69 +1,122 @@
 .button {
-  --button-color: var(--tb-text, #e6edf5);
-  align-items: center;
-  background: var(--tb-surface-raised, #172331);
-  border: 1px solid transparent;
-  border-radius: 0.5rem;
-  color: var(--button-color);
-  cursor: pointer;
+  --button-color: var(--tb-text, #dddde5);
+
+  position: relative;
   display: inline-flex;
-  font: 600 0.82rem/1 var(--tb-font, Inter, system-ui, sans-serif);
-  gap: 0.5rem;
-  justify-content: center;
   min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  overflow: hidden;
   padding: 0 0.9rem;
+  border: 1px solid rgb(221 221 229 / 8%);
+  border-radius: 4px;
+  color: var(--button-color);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 3%), transparent),
+    var(--tb-surface-raised, #171824);
+  cursor: pointer;
+  font: 600 0.8rem/1 var(--tb-font, sans-serif);
   transition:
     background-color 150ms ease,
     border-color 150ms ease,
     color 150ms ease,
-    transform 100ms ease;
+    box-shadow 150ms ease,
+    transform 120ms ease;
+}
+
+.button::before {
+  position: absolute;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 20%, rgb(255 255 255 / 6%), transparent 72%);
+  opacity: 0;
+  transform: translateX(-45%);
+  transition:
+    opacity 160ms ease,
+    transform 280ms ease;
+}
+
+.button svg,
+.label,
+.spinner {
+  position: relative;
+  z-index: 1;
 }
 
 .button svg {
-  flex: 0 0 auto;
-  height: 1.05rem;
   width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
 }
 
 .button:hover:not(:disabled) {
-  background: var(--tb-surface-hover, #203144);
+  border-color: rgb(145 139 234 / 20%);
+  background:
+    linear-gradient(180deg, rgb(105 100 199 / 10%), transparent),
+    var(--tb-surface-hover, #202132);
+  box-shadow: 0 8px 20px rgb(0 0 0 / 16%);
+  transform: translateY(-1px);
+}
+
+.button:hover:not(:disabled)::before {
+  opacity: 1;
+  transform: translateX(45%);
 }
 
 .button:active:not(:disabled) {
-  transform: translateY(1px);
+  box-shadow: none;
+  transform: translateY(0);
 }
 
 .button:focus-visible {
-  outline: 2px solid var(--tb-focus, #58a6ff);
+  outline: 2px solid var(--tb-focus, #918bea);
   outline-offset: 2px;
 }
 
 .button:disabled {
   cursor: not-allowed;
-  opacity: 0.46;
+  opacity: 0.42;
 }
 
 .primary {
-  background: var(--tb-accent, #1976d2);
-  color: #10150f;
+  border-color: rgb(145 139 234 / 34%);
+  color: #f5f4ff;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 8%), transparent),
+    var(--tb-accent, #6964c7);
+  box-shadow: 0 8px 22px rgb(105 100 199 / 18%);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--tb-accent-hover, #2388eb);
+  border-color: rgb(195 191 255 / 44%);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 10%), transparent),
+    var(--tb-accent-hover, #918bea);
 }
 
 .ghost {
-  background: transparent;
   border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ghost:hover:not(:disabled) {
+  border-color: rgb(145 139 234 / 14%);
+  background: var(--tb-accent-soft, rgb(105 100 199 / 14%));
+  box-shadow: none;
 }
 
 .danger {
-  --button-color: var(--tb-danger-text, #ffb8b8);
-  background: color-mix(in srgb, var(--tb-danger, #ef5350) 12%, transparent);
+  --button-color: var(--tb-danger-text, #f0a4a1);
+  border-color: rgb(207 75 70 / 14%);
+  background: color-mix(in srgb, var(--tb-danger, #cf4b46) 10%, transparent);
 }
 
 .danger:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--tb-danger, #ef5350) 20%, transparent);
+  border-color: rgb(207 75 70 / 28%);
+  background: color-mix(in srgb, var(--tb-danger, #cf4b46) 18%, transparent);
 }
 
 .iconOnly {
@@ -78,12 +131,12 @@
 }
 
 .spinner {
-  animation: spin 800ms linear infinite;
-  border: 2px solid currentColor;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid currentcolor;
   border-right-color: transparent;
   border-radius: 50%;
-  height: 0.9rem;
-  width: 0.9rem;
+  animation: spin 800ms linear infinite;
 }
 
 @keyframes spin {
@@ -94,6 +147,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .button,
+  .button::before,
   .spinner {
     animation-duration: 1ms;
     transition: none;
