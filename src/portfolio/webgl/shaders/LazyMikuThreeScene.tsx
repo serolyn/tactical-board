@@ -1,6 +1,8 @@
 import { lazy } from 'react'
 import { useNavigate } from 'react-router'
 
+import './miku-entry-link.css'
+
 /*
  * La scène Three.js n'est téléchargée que lorsque la page SRO la demande.
  * Cela évite de charger Three, React Three Fiber et Drei sur tout le portfolio.
