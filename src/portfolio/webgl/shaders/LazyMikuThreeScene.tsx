@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { useNavigate } from 'react-router'
 
 /*
  * La scène Three.js n'est téléchargée que lorsque la page SRO la demande.
@@ -7,7 +8,21 @@ import { lazy } from 'react'
 const MikuThreeScene = lazy(() => import('./mikuscene'))
 
 export function LazyMikuThreeScene() {
-  return <MikuThreeScene />
+  const navigate = useNavigate()
+
+  return (
+    <div className="miku-entry-link">
+      <MikuThreeScene />
+
+      <button
+        aria-label="Entrer dans le monde SRO"
+        className="miku-entry-link__button"
+        onClick={() => navigate('/music/sro-world')}
+        title="Entrer dans le monde SRO"
+        type="button"
+      />
+    </div>
+  )
 }
 
 export default LazyMikuThreeScene
