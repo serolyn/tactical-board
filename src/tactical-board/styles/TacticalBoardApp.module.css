@@ -2,7 +2,7 @@
   --tb-surface: var(--surface-1);
   --tb-surface-raised: var(--surface-2);
   --tb-surface-hover: var(--surface-3);
-  --tb-input: #111816;
+  --tb-input: #0d0e17;
   --tb-border: var(--border);
   --tb-border-strong: var(--border-strong);
   --tb-text: var(--text);
@@ -10,16 +10,38 @@
   --tb-accent: var(--accent);
   --tb-accent-hover: var(--accent-strong);
   --tb-accent-soft: var(--accent-soft);
-  --tb-focus: var(--accent);
+  --tb-focus: var(--accent-strong);
   --tb-danger: var(--danger);
   --tb-warning: var(--warning);
   --tb-topbar-height: 64px;
+
+  position: relative;
+  isolation: isolate;
   display: grid;
   width: 100vw;
   height: 100dvh;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
   color: var(--text);
+  background:
+    radial-gradient(circle at 50% -10%, rgb(105 100 199 / 12%), transparent 42rem),
+    radial-gradient(circle at 100% 100%, rgb(207 75 70 / 4%), transparent 30rem),
+    #07080d;
+  animation: appReveal 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.app::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  opacity: 0.22;
+  background-image:
+    linear-gradient(rgb(145 139 234 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(145 139 234 / 2%) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(circle at center, black, transparent 78%);
 }
 
 .workspace {
@@ -27,7 +49,7 @@
   min-width: 0;
   min-height: 0;
   grid-template-columns: 282px minmax(0, 1fr) 326px;
-  background: var(--surface-0);
+  background: rgb(7 8 13 / 82%);
 }
 
 .leftPanel,
@@ -36,26 +58,36 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background: #151d1b;
+  background:
+    linear-gradient(180deg, rgb(105 100 199 / 4%), transparent 18rem),
+    rgb(14 15 24 / 96%);
+  backdrop-filter: blur(18px);
 }
 
 .leftPanel {
   border-right: 1px solid var(--border);
+  animation: leftPanelEnter 560ms 100ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .rightPanel {
   border-left: 1px solid var(--border);
+  animation: rightPanelEnter 560ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .center {
+  position: relative;
   display: flex;
   min-width: 0;
   min-height: 0;
   flex-direction: column;
-  background: #0d1312;
+  background:
+    radial-gradient(circle at 50% 40%, rgb(105 100 199 / 5%), transparent 30rem),
+    #090a11;
+  animation: centerEnter 620ms 80ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .boardMeta {
+  position: relative;
   display: flex;
   min-height: 62px;
   flex: 0 0 auto;
@@ -64,8 +96,20 @@
   padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   color: var(--text-dim);
-  background: #141c1a;
+  background: rgb(14 15 24 / 88%);
+  backdrop-filter: blur(16px);
   font-size: 12px;
+}
+
+.boardMeta::after {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 1px;
+  content: '';
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(105 100 199 / 32%), transparent);
 }
 
 .scenarioSummary {
@@ -85,31 +129,35 @@
 .scenarioPulse {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  color: var(--text-soft);
-  font-weight: 600;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 620;
   white-space: nowrap;
 }
 
 .scenarioPulse::before {
-  width: 3px;
-  height: 14px;
-  border-radius: 1px;
-  background: var(--accent);
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--accent-strong);
+  box-shadow: 0 0 12px rgb(145 139 234 / 86%);
   content: '';
+  animation: scenarioPulse 2.8s ease-in-out infinite;
 }
 
 .scenarioPeriod {
   overflow: hidden;
   color: var(--text-dim);
-  font-size: 11px;
+  font-family: var(--tb-font-meta);
+  font-size: 10px;
+  letter-spacing: 0.03em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .scenarioObjective {
   overflow: hidden;
-  color: #c2c9bf;
+  color: #b7b8c5;
   font-size: 12px;
   line-height: 1.25;
   text-overflow: ellipsis;
@@ -118,13 +166,14 @@
 
 .archivedBadge {
   padding: 2px 6px;
-  border: 0;
-  border-radius: 3px;
-  color: #c2c9bf;
-  background: #29332f;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  border: 1px solid rgb(221 221 229 / 10%);
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: rgb(221 221 229 / 5%);
+  font-family: var(--tb-font-meta);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -149,21 +198,29 @@
   min-height: 44px;
   place-items: center;
   padding: 0 7px;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 4px;
   color: var(--text-soft);
   background: transparent;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 120ms ease;
 }
 
 .zoomGroup button:hover {
+  border-color: rgb(145 139 234 / 15%);
   color: var(--text);
-  background: var(--surface-3);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
 }
 
 .zoomValue {
   min-width: 48px;
   color: var(--text);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--tb-font-meta);
+  font-size: 11px;
   text-align: center;
 }
 
@@ -179,11 +236,22 @@
   color: var(--text-soft);
   background: transparent;
   font-size: 12px;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 120ms ease;
 }
 
 .metaAction:hover {
+  border-color: rgb(145 139 234 / 15%);
   color: var(--text);
-  background: var(--surface-2);
+  background: var(--accent-soft);
+  transform: translateY(-1px);
+}
+
+.metaAction:active {
+  transform: translateY(0);
 }
 
 .metaAction svg {
@@ -197,29 +265,45 @@
   height: 100dvh;
   place-items: center;
   color: var(--text-soft);
-  background: var(--bg);
+  background:
+    radial-gradient(circle at center, rgb(105 100 199 / 12%), transparent 28rem),
+    var(--bg);
 }
 
 .loadingCard {
   display: grid;
   place-items: center;
   gap: 16px;
+  animation: loadingEnter 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .loadingMark {
+  position: relative;
   display: grid;
   width: 58px;
   height: 58px;
   place-items: center;
-  border: 1px solid var(--border-strong);
-  border-radius: 8px;
-  color: var(--accent);
+  border: 1px solid rgb(145 139 234 / 28%);
+  border-radius: 50%;
+  color: var(--accent-strong);
   background: var(--accent-soft);
+  box-shadow:
+    0 0 0 8px rgb(105 100 199 / 4%),
+    0 0 28px rgb(105 100 199 / 18%);
+}
+
+.loadingMark::after {
+  position: absolute;
+  inset: -7px;
+  border: 1px solid rgb(145 139 234 / 14%);
+  border-radius: 50%;
+  content: '';
+  animation: loadingOrbit 4s linear infinite;
 }
 
 .loadingMark svg {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
 }
 
 .errorBanner {
@@ -234,11 +318,14 @@
   gap: 12px;
   margin-inline: auto;
   padding: 12px 14px;
-  border: 0;
+  border: 1px solid rgb(207 75 70 / 24%);
   border-left: 3px solid var(--danger);
-  border-radius: 3px;
-  color: #ffe2e4;
-  background: #382122;
+  border-radius: 4px;
+  color: #f5cdcb;
+  background: rgb(35 17 22 / 94%);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+  animation: notificationEnter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .errorBanner p {
@@ -250,9 +337,9 @@
 .errorBanner button {
   min-height: 44px;
   padding: 5px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 7px;
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 4px;
+  background: rgb(255 255 255 / 6%);
 }
 
 .toast {
@@ -265,21 +352,23 @@
   align-items: flex-start;
   gap: 10px;
   padding: 12px 14px;
-  border: 0;
+  border: 1px solid var(--border);
   border-left: 3px solid var(--border-strong);
   border-radius: 4px;
   color: var(--text);
-  background: #202a27;
-  box-shadow: 0 8px 20px rgb(0 0 0 / 24%);
+  background: rgb(18 19 30 / 94%);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
   font-size: 13px;
+  animation: notificationEnter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .toastSuccess {
-  border-color: var(--accent);
+  border-left-color: var(--accent-strong);
 }
 
 .toastError {
-  border-color: var(--danger);
+  border-left-color: var(--danger);
 }
 
 .toast button {
@@ -287,7 +376,7 @@
   min-height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: 4px;
   background: transparent;
 }
 
@@ -303,6 +392,7 @@
   .leftPanel,
   .rightPanel {
     display: contents;
+    animation: none;
   }
 
   .scenarioSummary {
@@ -352,7 +442,8 @@
     grid-template-columns: repeat(4, 1fr);
     padding: 4px max(6px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
     border-top: 1px solid var(--border);
-    background: #131a18;
+    background: rgb(13 14 23 / 94%);
+    backdrop-filter: blur(18px);
   }
 
   .mobileBottomBar button {
@@ -362,11 +453,20 @@
     justify-content: center;
     gap: 4px;
     padding: 4px;
-    border: 0;
+    border: 1px solid transparent;
     border-radius: 4px;
     color: var(--text-soft);
     background: transparent;
     font-size: 10px;
+    transition:
+      color 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .mobileBottomBar button:hover,
+  .mobileBottomBar button:focus-visible {
+    color: var(--text);
+    background: var(--accent-soft);
   }
 
   .mobileBottomBar svg {
@@ -395,22 +495,27 @@
   height: 44px;
   place-items: center;
   padding: 0;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 6px;
+  border: 1px solid rgb(221 221 229 / 12%);
+  border-radius: 50%;
   color: var(--text-soft);
-  background: rgb(13 19 18 / 82%);
-  box-shadow: 0 3px 12px rgb(0 0 0 / 22%);
+  background: rgb(12 13 21 / 80%);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
   opacity: 0.78;
   transition:
-    color 120ms ease,
-    background-color 120ms ease,
-    opacity 120ms ease;
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    opacity 150ms ease,
+    transform 150ms ease;
 }
 
 .boardOnlyExit:hover {
+  border-color: rgb(145 139 234 / 32%);
   color: var(--text);
-  background: rgb(28 38 35 / 94%);
+  background: rgb(25 25 40 / 94%);
   opacity: 1;
+  transform: rotate(-4deg);
 }
 
 .boardOnlyExit:focus-visible {
@@ -423,4 +528,115 @@
 .boardOnlyExit svg {
   width: 18px;
   height: 18px;
+}
+
+@keyframes appReveal {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes leftPanelEnter {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes rightPanelEnter {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes centerEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.992);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scenarioPulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.16);
+  }
+}
+
+@keyframes loadingEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes loadingOrbit {
+  from {
+    transform: rotate(0deg) scale(0.94);
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.05);
+  }
+
+  to {
+    transform: rotate(360deg) scale(0.94);
+  }
+}
+
+@keyframes notificationEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app,
+  .leftPanel,
+  .rightPanel,
+  .center,
+  .scenarioPulse,
+  .loadingCard,
+  .loadingMark::after,
+  .errorBanner,
+  .toast {
+    animation: none;
+  }
 }
