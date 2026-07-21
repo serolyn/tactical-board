@@ -13,6 +13,7 @@ import {
 import {
   Html,
   Sparkles,
+  useGLTF,
 } from '@react-three/drei'
 
 import {
@@ -24,7 +25,46 @@ import type {
   PointLight,
 } from 'three'
 
+// models/sro/bus_stop_-_low.glb est un modèle 3D de l'arrêt de bus SRO.
+const OBJECT_MODEL_URL = 
+  `${import.meta.env.BASE_URL}models/sro/bus_stop_-_low.glb` 
 
+const OBJECT_MODEL_URL2 = 
+  `${import.meta.env.BASE_URL}models/sro/tv_with_stutter.glb`
+
+function SroObject() {
+  const { scene } =
+    useGLTF(OBJECT_MODEL_URL)
+
+  return (
+    <primitive
+      object={scene}
+      position={[3, 1, -2]}
+      scale={0.10} 
+      rotation={[0, -Math.PI / 2, 0]}
+
+
+    />
+  )
+}
+
+function SroObjectTele() {
+  const { scene } =
+    useGLTF(OBJECT_MODEL_URL2)
+
+
+//
+  return (
+    <primitive
+      object={scene}
+      position={[-4, 0, 0]}
+      scale={0.03} 
+      rotation={[0, -Math.PI/1.5 , 0]}
+
+
+    />
+  )
+}
 
 /*
  * Contenu provisoire affiché sur l'écran de la télévision.
@@ -232,32 +272,35 @@ function EmptyRoom() {
       </mesh>
 
       <mesh
-        receiveShadow
-        position={[0, 2.7, -2.35]}
-      >
-        <boxGeometry args={[12, 5.4, 0.18]} />
+        receiveShadow // Mur du fond
+        position={[0, 2.7, -5.35]}
+      > 
+
+      
+
+        <boxGeometry args={[12, 5.4, 0.18]} /> 
 
         <meshStandardMaterial
-          color="#0a0b13"
+          color="#0a0b13" 
           metalness={0.06}
           roughness={0.92}
         />
       </mesh>
 
       <mesh position={[-5.9, 2.7, 1.5]}>
-        <boxGeometry args={[0.18, 5.4, 8]} />
+        <boxGeometry args={[0.18, 5.4, 13]} />
 
         <meshStandardMaterial
-          color="#080910"
-          roughness={0.95}
+          color="#080910" // Couleur du mur latéral gauche
+          roughness={0.95} 
         />
       </mesh>
 
       <mesh position={[5.9, 2.7, 1.5]}>
-        <boxGeometry args={[0.18, 5.4, 8]} />
+        <boxGeometry args={[0.18, 5.4, 13]} />
 
         <meshStandardMaterial
-          color="#080910"
+          color="#080910" // Couleur du mur latéral droit
           roughness={0.95}
         />
       </mesh>
@@ -782,9 +825,11 @@ export function SroWorldCanvas() {
 
       <hemisphereLight
         intensity={0.32}
-        color="#8d89d8"
-        groundColor="#05060a"
+        color="#e4e4e9"
+        groundColor="#010516"
       />
+
+  
 
       <spotLight
         castShadow
@@ -828,6 +873,8 @@ export function SroWorldCanvas() {
       />
 
       <EmptyRoom />
+      <SroObject />
+      <SroObjectTele />
 
       <InteractiveTelevision
         focused={focused}
