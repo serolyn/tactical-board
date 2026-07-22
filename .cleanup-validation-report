@@ -1,8 +1,8 @@
-commit=f3f3300eade18ec4dc67f61ee879ffb8682dc310
+commit=bb4146f6dfe418628accd73e85a2bf7141531641
 npm_ci=0
 typecheck=0
 lint=0
-test=1
+test=0
 build=0
 
 --- typecheck ---
@@ -17,89 +17,45 @@ build=0
 > oxlint
 
 Found 0 warnings and 0 errors.
-Finished in 17ms on 124 files with 103 rules using 4 threads.
+Finished in 18ms on 124 files with 103 rules using 4 threads.
 
 --- tests ---
-          [33mrole[39m=[32m"status"[39m
-        [36m/>[39m
-      [36m</main>[39m
-      [36m<footer[39m
-        [33mclass[39m=[32m"portfolio-footer"[39m
-      [36m>[39m
-        [36m<div[39m
-          [33mclass[39m=[32m"portfolio-footer__inner"[39m
-        [36m>[39m
-          [36m<div>[39m
-            [36m<p[39m
-              [33mclass[39m=[32m"portfolio-meta"[39m
-            [36m>[39m
-              [0mÀ PROPOS[0m
-            [36m</p>[39m
-            [36m<a[39m
-              [33mdata-discover[39m=[32m"true"[39m
-              [33mhref[39m=[32m"/tactical-board/about"[39m
-            [36m>[39m
-              [0mJe construis entre code, son et image.[0m
-            [36m</a>[39m
-          [36m</div>[39m
-          [36m<p>[39m
-            [0m© 2026 SEROLYN[0m
-          [36m</p>[39m
-          [36m<a[39m
-            [33mhref[39m=[32m"#portfolio-main"[39m
-          [36m>[39m
-            [0mRETOUR / HAUT ↑[0m
-          [36m</a>[39m
-        [36m</div>[39m
-      [36m</footer>[39m
-    [36m</div>[39m
-  [36m</div>[39m
-[36m</body>[39m
-[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
-[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
-[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
-[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
-[36m [2m❯[22m src/tests/portfolio.test.tsx:[2m132:19[22m[39m
-    [90m130|[39m     expect(await screen.findByRole('heading', { level: 1, name: 'PROJE…
-    [90m131|[39m       [33m.[39m[34mtoBeInTheDocument[39m()
-    [90m132|[39m     expect(screen.getByText('Les premiers systèmes sont encore en cour…
-    [90m   |[39m                   [31m^[39m
-    [90m133|[39m       [33m.[39m[34mtoBeInTheDocument[39m()
-    [90m134|[39m     expect(screen.queryByText('PROJET À DOCUMENTER — BROUILLON NON PUB…
 
-[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
-
-[41m[1m FAIL [22m[49m src/tests/publishedContent.test.ts[2m > [22mcontenus publiés du portfolio[2m > [22mvalide le catalogue livré et exclut les brouillons des sélecteurs publics
-[31m[1mAssertionError[22m: expected true to be false // Object.is equality[39m
-
-[32m- Expected[39m
-[31m+ Received[39m
-
-[32m- false[39m
-[31m+ true[39m
-
-[36m [2m❯[22m src/tests/publishedContent.test.ts:[2m34:33[22m[39m
-    [90m 32|[39m     expect(publishedProjects.map((entry) => entry.slug)).toEqual(['pro…
-    [90m 33|[39m     [34mexpect[39m(music[[34m0[39m][33m?.[39mpublished)[33m.[39m[34mtoBe[39m([35mtrue[39m)
-    [90m 34|[39m     [34mexpect[39m(music[[34m1[39m][33m?.[39mpublished)[33m.[39m[34mtoBe[39m([35mfalse[39m)
-    [90m   |[39m                                 [31m^[39m
-    [90m 35|[39m     [34mexpect[39m(publishedMusic[33m.[39m[34mmap[39m((entry) [33m=>[39m entry[33m.[39mslug))[33m.[39m[34mtoEqual[39m([[32m'ep-1'[39m])
-    [90m 36|[39m     expect(getPublishedProjectBySlug('project-template')).toMatchObjec…
-
-[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+> chess-strat@0.0.0 test
+> vitest run
 
 
-[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (7)[39m
-[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m33 passed[39m[22m[90m (36)[39m
-[2m   Start at [22m 20:21:06
-[2m   Duration [22m 8.62s[2m (transform 2.09s, setup 731ms, import 5.45s, tests 9.98s, environment 6.58s)[22m
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/runner/work/tactical-board/tactical-board[39m
 
+ [32m✓[39m src/tests/tacticalBoardModel.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m src/tests/persistence.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 58[2mms[22m[39m
+ [32m✓[39m src/tests/webglFallback.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 598[2mms[22m[39m
+     [33m[2m✓[22m[39m active le Canvas après la première frame et garde les diagnostics visibles [33m 321[2mms[22m[39m
+[90mstderr[2m | src/tests/portfolio.test.tsx[2m > [22m[2mportfolio et navigation principale[2m > [22m[2mrend l’accueil dans son shell avec ses liens et métadonnées
+[22m[39mYou have Reduced Motion enabled on your device. Animations may not appear as expected.. For more information and steps for solving, visit https://motion.dev/troubleshooting/reduced-motion-disabled
 
-::error file=/home/runner/work/tactical-board/tactical-board/src/tests/portfolio.test.tsx,title=src/tests/portfolio.test.tsx > portfolio et navigation principale > rend l’accueil dans son shell avec ses liens et métadonnées,line=87,column=30::AssertionError: expected 'SEROLYN — CODE ART WAR' to be 'SEROLYN — Entre plusieurs vies' // Object.is equality%0A%0AIgnored nodes: comments, script, style%0A<html>%0A  <head>%0A    <meta%0A      content="Code, sons et systèmes pour donner une forme à ce qui flotte."%0A      name="description"%0A    />%0A    <title>%0A      SEROLYN — CODE ART WAR%0A    </title>%0A  </head>%0A  <body>%0A    <div>%0A      <div%0A        class="portfolio-shell"%0A        data-portfolio-scroll="true"%0A      >%0A        <a%0A          class="portfolio-skip-link"%0A          href="#portfolio-main"%0A        >%0A          Aller au contenu%0A        </a>%0A        <header%0A          class="portfolio-header"%0A        >%0A          <div%0A            class="portfolio-header__inner"%0A          >%0A            <a%0A              aria-label="SEROLYN — accueil"%0A              class="portfolio-wordmark"%0A              data-discover="true"%0A              href="/tactical-board"%0A            >%0A              SEROLYN%0A            </a>%0A            <nav%0A              aria-label="Navigation principale"%0A            >%0A              <ul%0A                class="portfolio-navigation"%0A              >%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/projects"%0A                  >%0A                    Projets%0A                  </a>%0A                </li>%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/music"%0A                  >%0A                    Musique%0A                  </a>%0A                </li>%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/lab"%0A                  >%0A                    Lab%0A                  </a>%0A                </li>%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/about"%0A                  >%0A                    À propos%0A                  </a>%0A                </li>%0A              </ul>%0A            </nav>%0A            <p%0A              class="portfolio-header__index"%0A            >%0A              EVERYWHERE / 2026%0A            </p>%0A          </div>%0A        </header>%0A        <main%0A          class="portfolio-main"%0A          id="portfolio-main"%0A          tabindex="-1"%0A        >%0A          <div%0A            class="portfolio-page-frame"%0A            data-portfolio-page-transition=""%0A            data-route-key="default"%0A            style="opacity: 1;"%0A          >%0A            <article%0A              class="home-page"%0A            >%0A              <section%0A                aria-labelledby="home-title"%0A                class="home-hero"%0A              >%0A                <figure%0A                  class="hero-visual-slot"%0A                  data-hero-visual-slot="true"%0A                  data-webgl-active="false"%0A                  data-webgl-fallback-cause="reduced-motion"%0A                  data-webgl-fps="measuring"%0A                  data-webgl-profile="none"%0A                  data-webgl-reduced-motion="true"%0A                  data-webgl-save-data="false"%0A                  data-webgl-state="fallback"%0A                  data-webgl2="false"%0A                >%0A                  <img%0A                    alt="Ciel nocturne traversé par une lumière diffuse à l’horizon."%0A                    decoding="async"%0A                    fetchpriority="high"%0A                    height="900"%0A                    src="/src/portfolio/assets/signal-horizon.webp"%0A                    width="1600"%0A                  />%0A                  <div%0A                    aria-hidden="true"%0A                    class="hero-visual-slot__future"%0A                    data-ghost-signal-mount="true"%0A                  />%0A                  <output%0A                    aria-hidden="true"%0A                    class="ghost-signal-diagnostics"%0A                    data-ghost-diagnostics="true"%0A                  >%0A                    <strong>%0A                      GHOST / DEV%0A                    </strong>%0A                    <span>%0A                      WEBGL2 %0A                      NON%0A                    </span>%0A                    <span>%0A                      MOUVEMENT RÉDUIT %0A                      OUI%0A                    </span>%0A                    <span>%0A                      ÉCONOMIE DONNÉES %0A                      NON%0A                    </span>%0A                    <span>%0A                      PROFIL %0A                      AUCUN%0A                    </span>%0A                    <span>%0A                      CANVAS %0A                      FALLBACK%0A                    </span>%0A                    <span>%0A                      FALLBACK %0A                      reduced-motion%0A                    </span>%0A                    <span>%0A                    ...%0A%0AExpected: "SEROLYN — Entre plusieurs vies"%0AReceived: "SEROLYN — CODE ART WAR"%0A%0A ❯ src/tests/portfolio.test.tsx:87:30%0A ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12%0A ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77%0A ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16%0A%0A
+[90mstderr[2m | src/tests/routingIsolation.test.tsx[2m > [22m[2misolation des deux applications[2m > [22m[2mne charge ni Tactical Board ni IndexedDB sur les routes du portfolio
+[22m[39mYou have Reduced Motion enabled on your device. Animations may not appear as expected.. For more information and steps for solving, visit https://motion.dev/troubleshooting/reduced-motion-disabled
 
-::error file=/home/runner/work/tactical-board/tactical-board/src/tests/portfolio.test.tsx,title=src/tests/portfolio.test.tsx > portfolio et navigation principale > affiche les états vides sans rendre les brouillons ni un lecteur audio,line=132,column=19::TestingLibraryElementError: Unable to find an element with the text: Les premiers systèmes sont encore en cours de documentation.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.%0A%0AIgnored nodes: comments, script, style%0A<body>%0A  <div>%0A    <div%0A      class="portfolio-shell"%0A      data-portfolio-scroll="true"%0A    >%0A      <a%0A        class="portfolio-skip-link"%0A        href="#portfolio-main"%0A      >%0A        Aller au contenu%0A      </a>%0A      <header%0A        class="portfolio-header"%0A      >%0A        <div%0A          class="portfolio-header__inner"%0A        >%0A          <a%0A            aria-label="SEROLYN — accueil"%0A            class="portfolio-wordmark"%0A            data-discover="true"%0A            href="/tactical-board"%0A          >%0A            SEROLYN%0A          </a>%0A          <nav%0A            aria-label="Navigation principale"%0A          >%0A            <ul%0A              class="portfolio-navigation"%0A            >%0A              <li>%0A                <a%0A                  aria-current="page"%0A                  class="portfolio-navigation__link portfolio-navigation__link--active"%0A                  data-discover="true"%0A                  href="/tactical-board/projects"%0A                >%0A                  Projets%0A                  <span%0A                    aria-hidden="true"%0A                    class="portfolio-navigation__active-line"%0A                  />%0A                </a>%0A              </li>%0A              <li>%0A                <a%0A                  class="portfolio-navigation__link"%0A                  data-discover="true"%0A                  href="/tactical-board/music"%0A                >%0A                  Musique%0A                </a>%0A              </li>%0A              <li>%0A                <a%0A                  class="portfolio-navigation__link"%0A                  data-discover="true"%0A                  href="/tactical-board/lab"%0A                >%0A                  Lab%0A                </a>%0A              </li>%0A              <li>%0A                <a%0A                  class="portfolio-navigation__link"%0A                  data-discover="true"%0A                  href="/tactical-board/about"%0A                >%0A                  À propos%0A                </a>%0A              </li>%0A            </ul>%0A          </nav>%0A          <p%0A            class="portfolio-header__index"%0A          >%0A            EVERYWHERE / 2026%0A          </p>%0A        </div>%0A      </header>%0A      <main%0A        class="portfolio-main"%0A        id="portfolio-main"%0A        tabindex="-1"%0A      >%0A        <div%0A          class="portfolio-page-frame"%0A          data-portfolio-page-transition=""%0A          data-route-key="default"%0A          style="opacity: 1;"%0A        >%0A          <article%0A            class="editorial-page"%0A          >%0A            <header%0A              class="page-boundary page-intro"%0A            >%0A              <div%0A                class="page-intro__copy"%0A              >%0A                <p%0A                  class="portfolio-meta"%0A                >%0A                  INDEX / PROJETS / 00%0A                </p>%0A                <h1%0A                  tabindex="-1"%0A                >%0A                  PROJETS%0A                </h1>%0A                <p%0A                  class="page-intro__lead"%0A                >%0A                  Réalisations suffisamment construites ou documentées pour être parcourues.%0A                </p>%0A              </div>%0A              <div%0A                aria-hidden="true"%0A                class="index-atmosphere"%0A              >%0A                <p>%0A                  ARCHIVE / EN CONSTRUCTION%0A                </p>%0A              </div>%0A            </header>%0A            <section%0A              aria-labelledby="projects-index-title"%0A              class="page-boundary page-index-content"%0A            >%0A              <header%0A                class="section-heading"%0A                data-motion-state="visible"%0A                style="opacity: 1;"%0A              >%0A                <p%0A                  class="section-heading__index"%0A                >%0A                  01 / INDEX%0A                </p>%0A                <div%0A                  class="section-heading__title-group"%0A                >%0A                  <p%0A                    class="portfolio-meta"%0A                  >%0A                    ARCHIVE PUBLIQUE%0A                  </p>%0A                  <h2%0A                    id="projects-index-title"%0A                  >%0A                    SYSTÈMES DOCUMENTÉS%0A                  </h2>%0A                </div>%0A                <p%0A                  class="section-heading__introduction"%0A                >%0A                  Chaque entrée conserve un contexte, un rôle, une pile technique et une documentation extensible.%0A                </p>%0A              </header>%0A              <ol%0A                class="entry-index"%0A                data-motion-state="visible"%0A              >%0A                <li%0A                  style="opacity: 1;"%0A                >%0A                  <article%0A                    class="entry-card entry-card--project-template"%0A                  >%0A                    <a%0A                      aria-label="Découvrir Nemyl, la ville des reflets"%0A                      class="entry-card__link"%0A                      data-discover="true"%0A                      href="/tactical-board/projects/project-template"%0A                    >%0A                      <div%0A                        class="entry-card__visual"%0A                      >%0A                        <img%0A                          alt="Couverture du livre intégré au projet modèle."%0A                          decoding="async"%0A                          loading="lazy"%0A                          src="/src/assets/effects/book/cover.webp"%0A                        />%0A                        <span%0A                          class="entry-card__number"%0A                        >%0A                          01%0A                        </span>%0A                      </div>%0A                      <div%0A                        class="entry-card__body"%0A                      >%0A                        <p%0A                          class="portfolio-meta"%0A                        >%0A                          2026%0A                           / %0A                          Brouillon%0A                        </p>%0A                        <h3>%0A                          Nemyl, la ville des reflets%0A                        </h3>%0A                        <p>%0A                          Exemple de structure à remplacer par un projet réel documenté.%0A                        </p>%0A                        <ul%0A                          aria-label="Technologies et thèmes"%0A                          class="entry-card__tags"%0A                        >%0A                          <li>%0A                            À renseigner%0A                          </li>%0A                        </ul>%0A                        <span%0A                          class="entry-card__action"%0A                        >%0A                          OUVRIR %0A                          <i%0A                            aria-hidden="true"%0A                          >%0A                            ↘%0A                          </i>%0A                        </span>%0A                      </div>%0A                    </a>%0A                  </article>%0A                </li>%0A              </ol>%0A            </section>%0A          </article>%0A        </div>%0A        <p%0A          aria-atomic="true"%0A          aria-live="polite"%0A          class="visually-hidden"%0A          data-route-announcement=""%0A          role="status"%0A        />%0A      </main>%0A      <footer%0A        class="portfolio-footer"%0A      >%0A        <div%0A          class="portfolio-footer__inner"%0A        >%0A          <div>%0A            <p%0A              class="portfolio-meta"%0A            >%0A              À PROPOS%0A            </p>%0A            <a%0A              data-discover="true"%0A              href="/tactical-board/about"%0A            >%0A              Je construis entre code, son et image.%0A            </a>%0A          </div>%0A          <p>%0A            © 2026 SEROLYN%0A          </p>%0A          <a%0A            href="#portfolio-main"%0A          >%0A            RETOUR / HAUT ↑%0A          </a>%0A        </div>%0A      </footer>%0A    </div>%0A  </div>%0A</body>%0A ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19%0A ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38%0A ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17%0A ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19%0A ❯ src/tests/portfolio.test.tsx:132:19%0A%0A
+ [32m✓[39m src/tests/portfolio.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 2939[2mms[22m[39m
+     [33m[2m✓[22m[39m rend l’accueil dans son shell avec ses liens et métadonnées [33m 386[2mms[22m[39m
+     [33m[2m✓[22m[39m navigue entre les quatre rubriques avec route active, focus et scroll réinitialisé [33m 1830[2mms[22m[39m
+     [33m[2m✓[22m[39m rend les deux fiches Lab avec leurs destinations compatibles avec le base path [33m 424[2mms[22m[39m
+ [32m✓[39m src/tests/routingIsolation.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1507[2mms[22m[39m
+     [33m[2m✓[22m[39m ne charge ni Tactical Board ni IndexedDB sur les routes du portfolio [33m 815[2mms[22m[39m
+     [33m[2m✓[22m[39m charge /board sans conserver le shell, les transitions ou le WebGL du portfolio [33m 317[2mms[22m[39m
+     [33m[2m✓[22m[39m ne charge le module Ghost Signal que sur l’accueil éligible [33m 368[2mms[22m[39m
+ [32m✓[39m src/tests/tacticalBoard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 4517[2mms[22m[39m
+     [33m[2m✓[22m[39m hydrate une base vide avec un unique scénario initial et rend le plateau [33m 1109[2mms[22m[39m
+     [33m[2m✓[22m[39m restaure la bataille active, déplace une unité et conserve l’interaction en mode plateau seul [33m 1954[2mms[22m[39m
+     [33m[2m✓[22m[39m applique statut et faction à une multi-sélection dans l’inspecteur avec undo atomique [33m 1452[2mms[22m[39m
+ [32m✓[39m src/tests/publishedContent.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
 
-::error file=/home/runner/work/tactical-board/tactical-board/src/tests/publishedContent.test.ts,title=src/tests/publishedContent.test.ts > contenus publiés du portfolio > valide le catalogue livré et exclut les brouillons des sélecteurs publics,line=34,column=33::AssertionError: expected true to be false // Object.is equality%0A%0A- Expected%0A+ Received%0A%0A- false%0A+ true%0A%0A ❯ src/tests/publishedContent.test.ts:34:33%0A%0A
+[2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[32m36 passed[39m[22m[90m (36)[39m
+[2m   Start at [22m 20:25:43
+[2m   Duration [22m 8.31s[2m (transform 2.15s, setup 836ms, import 5.41s, tests 9.65s, environment 6.77s)[22m
+
 
 --- build ---
 
@@ -163,7 +119,7 @@ dist/assets/TacticalBoardApp-BFFHGTRE.js                      284.26 kB │ gzip
 dist/assets/index-CuCL0tAS.js                                 342.09 kB │ gzip: 110.69 kB
 dist/assets/events-b389eeca.esm-CvviAGpc.js                   880.17 kB │ gzip: 234.28 kB
 
-[32m✓ built in 952ms[39m
+[32m✓ built in 911ms[39m
 [33m[plugin builtin:vite-reporter] 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
@@ -177,7 +133,7 @@ dist/assets/events-b389eeca.esm-CvviAGpc.js                   880.17 kB │ gzip
 
 --- npm ci ---
 
-added 196 packages, and audited 197 packages in 7s
+added 196 packages, and audited 197 packages in 6s
 
 34 packages are looking for funding
   run `npm fund` for details
