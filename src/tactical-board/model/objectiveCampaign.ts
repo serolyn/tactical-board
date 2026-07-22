@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Modèle métier pur de Tactical Board.
- *
- * Ce dossier décrit les règles du jeu de données: documents, sélection,
- * historique, unités, campagnes et migrations. Il ne dépend pas de React.
- */
-
 /** Matérialise la campagne prédéfinie à partir de sa définition déclarative. */
 import { BUILT_IN_UNIT_TYPE_BY_ID } from './unitCatalog'
 import { createDefaultScenario } from './scenarioDocument'
@@ -34,35 +26,14 @@ const LEGACY_CAMPAIGN_SIGNATURE_IDS = [
 
 export const OBJECTIVE_CAMPAIGN_VERSION_SETTING = 'objectiveCampaignVersion'
 export const OBJECTIVE_CAMPAIGN_SCENARIO_ID_SETTING = 'objectiveCampaignScenarioId'
-/**
- * Cette fonction intervient sur le sujet “cell Key” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaign.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord cellKey dans objectiveCampaign.ts.
- */
-
 
 function cellKey(position: Position) {
   return `${position.row}:${position.column}`
 }
-/**
- * Cette fonction nettoie le sujet “name” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaign.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord normalizeName dans objectiveCampaign.ts.
- */
-
 
 function normalizeName(name: string) {
   return name.trim().toLocaleLowerCase('fr')
 }
-/**
- * Cette fonction intervient sur le sujet “find Free Position” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaign.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord findFreePosition dans objectiveCampaign.ts.
- */
-
 
 function findFreePosition(preferred: Position, occupied: ReadonlySet<string>): Position {
   if (!occupied.has(cellKey(preferred))) return preferred
@@ -100,13 +71,6 @@ function findFreePosition(preferred: Position, occupied: ReadonlySet<string>): P
   }
   throw new Error('Le plateau de campagne ne contient plus de case libre.')
 }
-/**
- * Cette fonction construit le sujet “campaign Unit” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaign.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord createCampaignUnit dans objectiveCampaign.ts.
- */
-
 
 function createCampaignUnit(
   key: string,
@@ -223,13 +187,6 @@ export function applyObjectiveCampaign(
     annotations,
   }
 }
-/**
- * Cette fonction détecte le sujet “historical Campaign Signature” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaign.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord hasHistoricalCampaignSignature dans objectiveCampaign.ts.
- */
-
 
 function hasHistoricalCampaignSignature(document: ScenarioDocumentV2): boolean {
   const entityIds = new Set([
@@ -238,13 +195,6 @@ function hasHistoricalCampaignSignature(document: ScenarioDocumentV2): boolean {
   ])
   return LEGACY_CAMPAIGN_SIGNATURE_IDS.filter((id) => entityIds.has(id)).length >= 3
 }
-/**
- * Cette fonction intervient sur le sujet “find Objective Campaign Candidate” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaign.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord findObjectiveCampaignCandidate dans objectiveCampaign.ts.
- */
-
 
 export function findObjectiveCampaignCandidate(
   documents: readonly ScenarioDocumentV2[],

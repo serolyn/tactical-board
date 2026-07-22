@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Modèle métier pur de Tactical Board.
- *
- * Ce dossier décrit les règles du jeu de données: documents, sélection,
- * historique, unités, campagnes et migrations. Il ne dépend pas de React.
- */
-
 /** Contrats métier persistés et commandes comprises par le reducer Tactical Board. */
 export const LEGACY_SCENARIO_FORMAT_VERSION = 1 as const
 export const SCENARIO_FORMAT_VERSION = 2 as const

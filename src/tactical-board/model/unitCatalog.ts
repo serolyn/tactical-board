@@ -1,20 +1,5 @@
-/**
- * @packageDocumentation
- * Modèle métier pur de Tactical Board.
- *
- * Ce dossier décrit les règles du jeu de données: documents, sélection,
- * historique, unités, campagnes et migrations. Il ne dépend pas de React.
- */
-
 /** Catalogue immuable des types d'unités livrés avec l'application. */
 import type { BuiltInUnitType, UnitType } from './tacticalBoardTypes'
-/**
- * Cette fonction intervient sur le sujet “built In” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/unitCatalog.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord builtIn dans unitCatalog.ts.
- */
-
 
 const builtIn = (
   id: string,
@@ -60,13 +45,6 @@ export const BUILT_IN_UNIT_TYPES: readonly BuiltInUnitType[] = Object.freeze([
 export const BUILT_IN_UNIT_TYPE_BY_ID: ReadonlyMap<string, BuiltInUnitType> = new Map(
   BUILT_IN_UNIT_TYPES.map((unitType) => [unitType.id, unitType]),
 )
-/**
- * Cette fonction intervient sur le sujet “find Unit Type” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/unitCatalog.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord findUnitType dans unitCatalog.ts.
- */
-
 
 export function findUnitType(
   typeId: string,

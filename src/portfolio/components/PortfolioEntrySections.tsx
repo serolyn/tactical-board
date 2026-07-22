@@ -1,22 +1,6 @@
-/**
- * @packageDocumentation
- * Composant visuel réutilisable du portfolio.
- *
- * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
- * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
- * voit à l'écran, c'est souvent ici qu'il faut commencer.
- */
-
 import type { ContentLink, ContentSection, MetadataSection } from '../content/portfolioContentTypes'
 import { Reveal } from '../motion/Reveal'
 import { ContentLinkAction, EntryLinks } from './PortfolioEntryLinks'
-/**
- * Cette fonction intervient sur le sujet “signal Palette” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntrySections.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord SignalPalette dans EntrySections.tsx.
- */
-
 
 function SignalPalette({ section }: { section: MetadataSection }) {
   const paletteClasses = [
@@ -40,13 +24,6 @@ function SignalPalette({ section }: { section: MetadataSection }) {
     </ul>
   )
 }
-/**
- * Cette fonction intervient sur le sujet “signal Typography” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntrySections.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord SignalTypography dans EntrySections.tsx.
- */
-
 
 function SignalTypography({ section }: { section: MetadataSection }) {
   return (
@@ -62,13 +39,6 @@ interface EntrySectionsProps {
   sections: readonly ContentSection[]
   links?: readonly ContentLink[]
 }
-/**
- * Cette fonction intervient sur le sujet “entry Sections” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntrySections.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord EntrySections dans EntrySections.tsx.
- */
-
 
 export function EntrySections({ sections, links = [] }: EntrySectionsProps) {
   return (

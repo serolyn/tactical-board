@@ -1,10 +1,3 @@
-/**
- * @packageDocumentation
- * Racine UI de Tactical Board.
- *
- * Ce module assemble les panneaux, le plateau, les raccourcis clavier,
- * l'autosauvegarde et les flux d'import/export autour du scénario actif.
- */
 import {
   CalendarDays,
   Crosshair,
@@ -252,7 +245,6 @@ export default function TacticalBoardApp() {
     const timer = window.setTimeout(clearNotification, 3600)
     return () => window.clearTimeout(timer)
   }, [clearNotification, notification])
-
 
   const unitTypes = useMemo<readonly UnitType[]>(
     () => [...BUILT_IN_UNIT_TYPES, ...(activeScenario?.customUnitTypes ?? [])],

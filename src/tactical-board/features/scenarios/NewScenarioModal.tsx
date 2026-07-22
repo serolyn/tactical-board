@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Barre et modales de scénario Tactical Board.
- *
- * Ce dossier gère les actions de haut niveau: créer un scénario, passer au
- * suivant, consulter les détails ou suivre la progression. Il relie le métier
- * du board aux actions visibles dans l'interface.
- */
-
 import { useEffect, useState } from 'react'
 import { Button } from '@/tactical-board/ui/Button'
 import { Modal } from '@/tactical-board/ui/Modal'
@@ -30,13 +21,6 @@ export interface NewScenarioMetadata {
     target?: string
   }
 }
-/**
- * Cette fonction intervient sur le sujet “new Scenario Modal” dans tactical-board.
- *
- * Fichier: src/tactical-board/features/scenarios/NewScenarioModal.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord NewScenarioModal dans NewScenarioModal.tsx.
- */
-
 
 export function NewScenarioModal({ onClose, onCreate, open }: NewScenarioModalProps) {
   const [name, setName] = useState('Nouveau scénario')

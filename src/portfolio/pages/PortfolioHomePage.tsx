@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Page routée du portfolio.
- *
- * Une page assemble plusieurs composants pour former un écran complet. Si tu
- * veux comprendre la structure d'une route comme l'accueil, le lab ou un détail,
- * lis ce fichier en premier.
- */
-
 import { useCallback, useState } from 'react'
 import { m, useReducedMotion } from 'motion/react'
 import { EmptyState } from '../components/PortfolioEmptyState'
@@ -25,13 +16,6 @@ import {
   publishedProjects,
   siteContent,
 } from '../content/portfolioContent'
-/**
- * Cette fonction intervient sur le sujet “home Page” dans portfolio.
- *
- * Fichier: src/portfolio/pages/HomePage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord HomePage dans HomePage.tsx.
- */
-
 
 export function HomePage() {
   const [ghostSignalActive, setGhostSignalActive] = useState(false)

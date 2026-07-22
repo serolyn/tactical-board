@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Animation du portfolio.
- *
- * Ce fichier explique comment les éléments apparaissent, se déplacent ou se
- * révèlent à l'écran. Lis-le pour comprendre pourquoi certaines transitions sont
- * visibles et d'autres très discrètes.
- */
-
 import { AnimatePresence, useReducedMotion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -35,13 +26,6 @@ interface AnimatedRouteFrameProps {
   scrollContainerSelector: string
   formatAnnouncement?: AnimatedRoutesProps['formatAnnouncement']
 }
-/**
- * Cette fonction intervient sur le sujet “reset Route Scroll” dans portfolio.
- *
- * Fichier: src/portfolio/motion/AnimatedRoutes.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord resetRouteScroll dans AnimatedRoutes.tsx.
- */
-
 
 function resetRouteScroll(scrollContainerSelector: string) {
   const scrollContainer = document.querySelector<HTMLElement>(scrollContainerSelector)
@@ -49,26 +33,12 @@ function resetRouteScroll(scrollContainerSelector: string) {
   document.documentElement.scrollTop = 0
   document.body.scrollTop = 0
 }
-/**
- * Cette fonction intervient sur le sujet “default Announcement” dans portfolio.
- *
- * Fichier: src/portfolio/motion/AnimatedRoutes.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord defaultAnnouncement dans AnimatedRoutes.tsx.
- */
-
 
 function defaultAnnouncement(_location: Location, heading: HTMLElement | null) {
   return heading?.getAttribute('aria-label')
     || heading?.textContent?.trim()
     || document.title
 }
-/**
- * Cette fonction intervient sur le sujet “animated Route Frame” dans portfolio.
- *
- * Fichier: src/portfolio/motion/AnimatedRoutes.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord AnimatedRouteFrame dans AnimatedRoutes.tsx.
- */
-
 
 function AnimatedRouteFrame({
   children,

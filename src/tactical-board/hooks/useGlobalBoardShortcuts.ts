@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Hooks de comportement Tactical Board.
- *
- * Ces fonctions réutilisables branchent la logique au cycle de vie React:
- * autosave, raccourcis clavier, mode plein plateau ou URLs des assets.
- */
-
 import { useEffect, useRef } from 'react'
 
 export interface GlobalBoardShortcutOptions {
@@ -19,13 +11,6 @@ export interface GlobalBoardShortcutOptions {
   onShiftStart(): void
   onUndo(): void
 }
-/**
- * Cette fonction teste le sujet “editable Target” dans tactical-board.
- *
- * Fichier: src/tactical-board/hooks/useGlobalBoardShortcuts.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord isEditableTarget dans useGlobalBoardShortcuts.ts.
- */
-
 
 function isEditableTarget(target: EventTarget | null) {
   return (

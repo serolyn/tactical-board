@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Composant visuel réutilisable du portfolio.
- *
- * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
- * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
- * voit à l'écran, c'est souvent ici qu'il faut commencer.
- */
-
 import type { ContentLink } from '../content/portfolioContentTypes'
 import { ContentLinkAction } from './PortfolioEntryLinks'
 import { EntryMetadata, type MetadataItem } from './PortfolioEntryMetadata'
@@ -24,13 +15,6 @@ interface EntryHeroProps {
   primaryAction?: ContentLink
   notice?: string
 }
-/**
- * Cette fonction intervient sur le sujet “entry Hero” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntryHero.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord EntryHero dans EntryHero.tsx.
- */
-
 
 export function EntryHero({
   eyebrow,

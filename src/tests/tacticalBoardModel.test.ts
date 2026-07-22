@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Tests automatiques du projet.
- *
- * Ce fichier vérifie un comportement précis pour éviter les régressions.
- * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
- * rester vrai.
- */
-
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -34,13 +25,6 @@ import {
 } from '@/tactical-board/model/tacticalBoardTypes'
 
 const TEST_DATE = '2026-07-18T00:00:00.000Z'
-/**
- * Cette fonction intervient sur le sujet “scenario” dans tests.
- *
- * Fichier: src/tests/tacticalBoardModel.test.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord scenario dans tacticalBoardModel.test.ts.
- */
-
 
 function scenario(): ScenarioDocumentV1 {
   return createDefaultScenario('Opération test', {
@@ -50,13 +34,6 @@ function scenario(): ScenarioDocumentV1 {
     redFactionId: 'red',
   })
 }
-/**
- * Cette fonction intervient sur le sujet “place” dans tests.
- *
- * Fichier: src/tests/tacticalBoardModel.test.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord place dans tacticalBoardModel.test.ts.
- */
-
 
 function place(
   document: ScenarioDocumentV1,

@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Point d'entrée du routage applicatif.
- *
- * Ce module est l'unique endroit autorisé à choisir entre les deux applications
- * (`portfolio` et `tactical-board`). Il déclare les routes publiques, applique
- * les effets de route communs, et monte `BrowserRouter` avec le basename
- * compatible GitHub Pages.
- */
 import { lazy, Suspense, type ReactNode } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
 import { PortfolioShell } from '@/portfolio/PortfolioShell'

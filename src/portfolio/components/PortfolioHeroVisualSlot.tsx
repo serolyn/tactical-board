@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Composant visuel réutilisable du portfolio.
- *
- * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
- * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
- * voit à l'écran, c'est souvent ici qu'il faut commencer.
- */
-
 import {
   lazy,
   Suspense,

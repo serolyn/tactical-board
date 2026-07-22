@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Modèle métier pur de Tactical Board.
- *
- * Ce dossier décrit les règles du jeu de données: documents, sélection,
- * historique, unités, campagnes et migrations. Il ne dépend pas de React.
- */
-
 export const OBJECTIVE_CAMPAIGN_VERSION = 3
 
 export const OBJECTIVE_CAMPAIGN_NAME = 'L’objectif'
@@ -98,13 +90,6 @@ export interface CampaignArrowSpec {
   style: 'attack' | 'movement' | 'support'
   color: string
 }
-/**
- * Cette fonction intervient sur le sujet “route” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaignDefinition.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord route dans objectiveCampaignDefinition.ts.
- */
-
 
 const route = (key: string, from: string, to: string): CampaignArrowSpec => ({
   key,
@@ -113,13 +98,6 @@ const route = (key: string, from: string, to: string): CampaignArrowSpec => ({
   style: 'movement',
   color: '#d4a72c',
 })
-/**
- * Cette fonction intervient sur le sujet “threat” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaignDefinition.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord threat dans objectiveCampaignDefinition.ts.
- */
-
 
 const threat = (key: string, from: string, to: string): CampaignArrowSpec => ({
   key,
@@ -128,13 +106,6 @@ const threat = (key: string, from: string, to: string): CampaignArrowSpec => ({
   style: 'attack',
   color: '#ef4444',
 })
-/**
- * Cette fonction intervient sur le sujet “rally Attack” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaignDefinition.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord rallyAttack dans objectiveCampaignDefinition.ts.
- */
-
 
 const rallyAttack = (key: string, from: string, to: string): CampaignArrowSpec => ({
   key,
@@ -143,13 +114,6 @@ const rallyAttack = (key: string, from: string, to: string): CampaignArrowSpec =
   style: 'attack',
   color: '#f59e0b',
 })
-/**
- * Cette fonction intervient sur le sujet “support” dans tactical-board.
- *
- * Fichier: src/tactical-board/model/objectiveCampaignDefinition.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord support dans objectiveCampaignDefinition.ts.
- */
-
 
 const support = (key: string, from: string, to: string): CampaignArrowSpec => ({
   key,

@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Interface du plateau tactique.
- *
- * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
- * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
- * ici qu'il faut commencer.
- */
-
 import type {
   ArrowAnnotation,
   ArrowStyle,
@@ -25,13 +16,6 @@ export interface ArrowLayerProps {
   rows: number
   selectedAnnotationId: string | null
 }
-/**
- * Cette fonction intervient sur le sujet “arrow Layer” dans tactical-board.
- *
- * Fichier: src/tactical-board/features/battlefield/ArrowLayer.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord ArrowLayer dans ArrowLayer.tsx.
- */
-
 
 export function ArrowLayer({
   annotations,

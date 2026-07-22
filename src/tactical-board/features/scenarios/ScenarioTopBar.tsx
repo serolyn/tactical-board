@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Barre et modales de scénario Tactical Board.
- *
- * Ce dossier gère les actions de haut niveau: créer un scénario, passer au
- * suivant, consulter les détails ou suivre la progression. Il relie le métier
- * du board aux actions visibles dans l'interface.
- */
-
 import { useRef, useState, type ChangeEvent } from 'react'
 import {
   Archive,
@@ -72,13 +63,6 @@ export interface ScenarioTopBarProps {
   saveState: SaveState
   scenarios: ScenarioOption[]
 }
-/**
- * Cette fonction intervient sur le sujet “scenario Top Bar” dans tactical-board.
- *
- * Fichier: src/tactical-board/features/scenarios/ScenarioTopBar.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord ScenarioTopBar dans ScenarioTopBar.tsx.
- */
-
 
 export function ScenarioTopBar({
   activeScenarioId,

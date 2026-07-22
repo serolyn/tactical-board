@@ -1,10 +1,3 @@
-/**
- * @packageDocumentation
- * Shell structurel du portfolio.
- *
- * Ce module fournit le cadre partagé des routes portfolio : lien d'évitement,
- * en-tête éditorial, zone principale animée et pied de page.
- */
 import { Link } from 'react-router'
 import { EditorialHeader } from './components/PortfolioEditorialHeader'
 import { AnimatedRoutes } from './motion/AnimatedRoutes'

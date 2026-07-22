@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Tests automatiques du projet.
- *
- * Ce fichier vérifie un comportement précis pour éviter les régressions.
- * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
- * rester vrai.
- */
-
 import { cleanup, render, screen } from '@testing-library/react'
 import { useEffect } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -38,13 +29,6 @@ vi.mock('@/portfolio/webgl/GhostSignalCanvas', () => {
 })
 
 const BASE_PATH = '/tactical-board'
-/**
- * Cette fonction intervient sur le sujet “install Capabilities” dans tests.
- *
- * Fichier: src/tests/routingIsolation.test.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord installCapabilities dans routingIsolation.test.tsx.
- */
-
 
 function installCapabilities({ reducedMotion = true, webgl2 = false } = {}) {
   Object.defineProperty(window, 'matchMedia', {

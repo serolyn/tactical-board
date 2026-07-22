@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Composant visuel réutilisable du portfolio.
- *
- * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
- * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
- * voit à l'écran, c'est souvent ici qu'il faut commencer.
- */
-
 import { Link } from 'react-router'
 
 export interface EntryCardData {
@@ -28,13 +19,6 @@ interface EntryCardProps {
   routeBase: '/projects' | '/music' | '/lab'
   priority?: boolean
 }
-/**
- * Cette fonction intervient sur le sujet “entry Card” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntryCard.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord EntryCard dans EntryCard.tsx.
- */
-
 
 export function EntryCard({ entry, index, routeBase, priority = false }: EntryCardProps) {
   const entryNumber = String(index + 1).padStart(2, '0')

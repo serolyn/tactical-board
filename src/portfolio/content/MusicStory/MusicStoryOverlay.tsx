@@ -131,7 +131,6 @@ export function MusicStoryOverlay() {
         },
       );
 
-
       /*
        * Petite respiration du corbeau avant l'impact.
        * Elle sert également de pause dramatique.

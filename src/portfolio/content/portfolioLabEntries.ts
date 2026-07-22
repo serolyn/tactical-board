@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Données éditoriales du portfolio.
- *
- * Ce fichier contient le texte publié, pas la mise en page. C'est ici que tu
- * modifies les titres, résumés, listes et règles de validation du contenu.
- */
-
 import fogReflections from '@/portfolio/assets/fog-reflections.webp'
 import moonlitHarbor from '@/portfolio/assets/moonlit-harbor.webp'
 import signalHorizon from '@/portfolio/assets/signal-horizon.webp'

@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Persistance locale de Tactical Board.
- *
- * Ce dossier explique comment le board enregistre ses scénarios dans IndexedDB,
- * recharge les données au démarrage et garde un journal de récupération.
- */
-
 /** Sérialise les écritures différées et expose un état observable de sauvegarde. */
 export type SaveState = 'idle' | 'pending' | 'saving' | 'saved' | 'error'
 

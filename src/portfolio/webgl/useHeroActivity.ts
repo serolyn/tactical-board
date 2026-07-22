@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Effets WebGL du portfolio.
- *
- * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
- * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
- * faire à la place.
- */
-
 import { useEffect, useState, type RefObject } from 'react'
 
 /** Maintient la boucle de rendu seulement lorsque le hero et l'onglet sont visibles. */

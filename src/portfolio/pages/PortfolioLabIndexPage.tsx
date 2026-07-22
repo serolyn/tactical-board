@@ -1,22 +1,6 @@
-/**
- * @packageDocumentation
- * Page routée du portfolio.
- *
- * Une page assemble plusieurs composants pour former un écran complet. Si tu
- * veux comprendre la structure d'une route comme l'accueil, le lab ou un détail,
- * lis ce fichier en premier.
- */
-
 import { EntryIndex } from '../components/PortfolioEntryIndex'
 import { SectionHeading } from '../components/PortfolioSectionHeading'
 import { publishedLab } from '../content/portfolioContent'
-/**
- * Cette fonction intervient sur le sujet “lab Page” dans portfolio.
- *
- * Fichier: src/portfolio/pages/LabPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord LabPage dans LabPage.tsx.
- */
-
 
 export function LabPage() {
   return (

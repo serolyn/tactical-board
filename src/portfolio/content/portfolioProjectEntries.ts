@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Données éditoriales du portfolio.
- *
- * Ce fichier contient le texte publié, pas la mise en page. C'est ici que tu
- * modifies les titres, résumés, listes et règles de validation du contenu.
- */
-
 import bookCover from '@/assets/effects/book/cover.webp'
 
 import { LazyPdfBook } from './books/LazyPdfBook'

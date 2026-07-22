@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Composant visuel réutilisable du portfolio.
- *
- * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
- * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
- * voit à l'écran, c'est souvent ici qu'il faut commencer.
- */
-
 import { Reveal } from '../motion/Reveal'
 
 interface SectionHeadingProps {
@@ -16,13 +7,6 @@ interface SectionHeadingProps {
   introduction?: string
   id?: string
 }
-/**
- * Cette fonction intervient sur le sujet “section Heading” dans portfolio.
- *
- * Fichier: src/portfolio/components/SectionHeading.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord SectionHeading dans SectionHeading.tsx.
- */
-
 
 export function SectionHeading({
   index,
