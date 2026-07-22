@@ -113,6 +113,11 @@ export type MusicEntry = BaseEntry & {
 /** Un brouillon peut omettre son visuel plutôt que présenter une fausse pochette. */
   readonly artwork: ContentImage | null
   readonly storyOverlay?: ComponentType
+  /**
+   * Une scène "hero" est un calque absolu, comme Nemyl.
+   * Une scène "afterHero" garde sa propre boîte dans le flux, comme Miku.
+   */
+  readonly storyOverlayPlacement?: 'hero' | 'afterHero'
   readonly audioSrc?: string
   readonly duration?: string
   readonly credits: readonly ContentCredit[]

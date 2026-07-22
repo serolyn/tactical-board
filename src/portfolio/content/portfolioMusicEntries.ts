@@ -35,6 +35,7 @@ export const music = [
     },
 
     storyOverlay: MusicStoryOverlay,
+    storyOverlayPlacement: 'hero',
     audioSrc: nemylAudio,
 
     credits: [],
@@ -77,6 +78,7 @@ export const music = [
     },
 
     storyOverlay: LazyMikuThreeScene,
+    storyOverlayPlacement: 'afterHero',
 
     credits: [],
     links: [],
