@@ -1,0 +1,60 @@
+name: Valider le correctif visuel et le nettoyage ciblé
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-commit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer la branche corrective
+        uses: actions/checkout@v4
+        with:
+          ref: fix/visual-preserving-cleanup
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Appliquer les transformations contrôlées
+        run: node scripts/visual-preserving-cleanup.mjs
+
+      - name: Retirer uniquement les artefacts générés
+        run: |
+          rm -rf docs/api
+          rm -f typedoc.json scripts/add-package-docs.mjs scripts/add-function-docs.mjs
+          npm install --package-lock-only --ignore-scripts
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Vérifier les types
+        run: npm run typecheck
+
+      - name: Vérifier le lint
+        run: npm run lint
+
+      - name: Exécuter les tests
+        run: npm run test
+
+      - name: Construire le site
+        run: npm run build
+
+      - name: Enregistrer le correctif validé et retirer les outils temporaires
+        run: |
+          rm -f .github/workflows/visual-preserving-cleanup.yml
+          rm -f .github/workflows/visual-preserving-pr.yml
+          rm -f scripts/visual-preserving-cleanup.mjs
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: preserve the full visual experience and clean invisible artifacts"
+          git push
