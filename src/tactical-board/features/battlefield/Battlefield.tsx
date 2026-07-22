@@ -53,6 +53,7 @@ import { UnitVisual } from './UnitVisual'
 import { statusDetails, unitClassName } from './unitVisualModel'
 import { useArrowDrawing } from './useArrowDrawing'
 import styles from './Battlefield.module.css'
+import './Battlefield.performance.css'
 
 export interface BattlefieldProps {
   scenario: ScenarioDocumentV1
