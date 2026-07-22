@@ -1,94 +1,81 @@
 /*
  * Profil visuel et de performance du plateau.
  *
- * Le battlefield doit rester lisible avant d'être spectaculaire : les effets
- * continus sont donc supprimés, tandis que les interactions utiles restent
- * assurées par les transitions courtes définies dans les CSS Modules.
+ * Le Board garde du relief et un peu de mouvement, mais les effets continus
+ * coûteux sont remplacés par des transitions courtes et une animation SVG légère.
  */
 
 /*
- * MODIFIÉ : l'ancien halo animé traversait tout le viewport en permanence.
- * On le retire pour calmer l'arrière-plan et éviter une recomposition continue.
+ * MODIFIÉ : le halo du viewport reste présent, mais il ne traverse plus l'écran.
+ * Une lueur fixe coûte beaucoup moins cher qu'un grand box-shadow animé.
  */
 [aria-label='Zone du plateau'][data-tool]::before {
   animation: none;
-  box-shadow: none;
-  opacity: 0;
+  box-shadow: 0 0 56px 24px rgb(105 100 199 / 4%);
+  opacity: 0.45;
   transform: none;
 }
 
 /*
- * MODIFIÉ : le filtre global assombrissait aussi les annotations SVG.
- * Le relief vient maintenant d'une ombre simple qui ne touche pas les enfants.
+ * CORRECTION FIREFOX : le filtre et translateZ(0) forçaient le battlefield dans
+ * un calque GPU séparé. Les SVG pouvaient alors disparaître jusqu'au prochain repaint.
  */
 [data-board-export][data-board-surface='terrain'] {
   filter: none;
+  transform: none;
   box-shadow:
-    0 8px 0 #080911,
-    0 18px 36px rgb(0 0 0 / 42%);
+    0 7px 0 #080911,
+    0 18px 34px rgb(0 0 0 / 38%);
 }
 
 /*
- * MODIFIÉ : le mode de fusion éclairait toute la texture et brouillait la grille.
- * Une couche normale conserve l'ambiance sans modifier les couleurs des unités.
+ * MODIFIÉ : le voile sombre reste statique et n'utilise plus de mode de fusion.
  */
 [data-board-export][data-board-surface='terrain']::before {
   mix-blend-mode: normal;
-  opacity: 0.34;
+  opacity: 0.24;
 }
 
 /*
- * MODIFIÉ : le balayage décoratif partageait le même z-index que les flèches.
- * Il devient fixe et beaucoup plus discret afin de ne plus masquer les annotations.
+ * MODIFIÉ : le balayage lumineux était une animation permanente sur toute la carte.
+ * La couche reste sous la grille avec une opacité faible et sans mouvement.
  */
 [data-board-export][data-board-surface='terrain']::after {
-  z-index: 2;
+  z-index: 0;
   animation: none;
-  opacity: 0.2;
+  opacity: 0.12;
 }
 
 /*
- * MODIFIÉ : toutes les animations infinies du plateau sont neutralisées.
- * Les transitions de survol et de déplacement restent actives, mais rien ne pulse
- * ou ne flotte en permanence pendant que l'utilisateur prépare sa stratégie.
+ * MODIFIÉ : les cases gardent un retour visuel court, mais sans déplacement 3D.
+ * Cela réduit les changements de calques pendant les déplacements de souris.
  */
-[data-board-export] *,
-[data-board-export] *::before,
-[data-board-export] *::after {
+[data-board-export] [role='gridcell'] {
+  transition:
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+[data-board-export] [role='gridcell']:hover,
+[data-board-export] [role='gridcell']:focus-visible {
+  filter: none;
+  transform: none;
+}
+
+/*
+ * MODIFIÉ : les cases de destination restent clairement signalées sans pulsation.
+ */
+[data-board-export] [data-drag-target] {
   animation: none !important;
 }
 
 /*
- * CORRECTION FLÈCHES : la couche SVG avait le même niveau que le voile ::after.
- * Elle passe au-dessus du décor et des unités, tout en restant sous le drag ghost.
- */
-[data-board-export] > svg {
-  z-index: 4;
-  isolation: isolate;
-}
-
-/*
- * CORRECTION FLÈCHES : une ombre courte suffit à détacher les lignes du terrain.
- * L'opacité renforcée évite qu'une couleur sombre disparaisse dans la texture.
- */
-[data-board-export] > svg line {
-  opacity: 0.96;
-  animation: none;
-  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 85%));
-}
-
-/*
- * MODIFIÉ : la prévisualisation reste légèrement différente sans flux animé.
- */
-[data-board-export] > svg line[data-png-hide='true'] {
-  opacity: 0.78;
-}
-
-/*
- * MODIFIÉ : les pions gardent un léger relief, mais sans halo ni grand saut.
+ * MODIFIÉ : les pions conservent une petite élévation au survol, sans filtre ni
+ * animation infinie sur la sélection.
  */
 [data-board-export] button[aria-pressed] {
   filter: none;
+  animation: none !important;
   transform: translateY(-1px);
 }
 
@@ -98,39 +85,98 @@
 }
 
 /*
- * MODIFIÉ : l'ombre floue sous chaque pion coûtait cher et surchargeait la scène.
+ * MODIFIÉ : l'ombre au sol des pions devient simple, sans blur recalculé.
  */
 [data-board-export] button[aria-pressed]::before {
   filter: none;
-  box-shadow: 0 3px 6px rgb(0 0 0 / 48%);
-  opacity: 0.5;
+  box-shadow: 0 3px 6px rgb(0 0 0 / 46%);
+  opacity: 0.46;
 }
 
 /*
- * MODIFIÉ : les dizaines de labels n'ont pas besoin d'un flou d'arrière-plan.
+ * MODIFIÉ : les labels du Board n'ont pas besoin d'un backdrop-filter individuel.
  */
 [data-board-export] button[aria-pressed] span {
   backdrop-filter: none;
 }
 
 /*
- * MODIFIÉ : les marqueurs restent lisibles mais cessent de flotter et de luire.
+ * MODIFIÉ : le drag ghost reste visible mais ne flotte plus en permanence.
+ */
+[data-board-export] [data-drag-source],
+[data-board-export] [data-drag-target] {
+  animation: none !important;
+}
+
+/*
+ * CORRECTION FIREFOX : la couche SVG reste dans le contexte 2D normal.
+ * On évite isolation, transform, will-change et filtres sur les lignes SVG.
+ */
+[data-board-export] > svg {
+  z-index: 4;
+  isolation: auto;
+  transform: none;
+  will-change: auto;
+  opacity: 1;
+}
+
+/*
+ * ANIMATION CHILL : seules les pointillés avancent lentement via stroke-dashoffset.
+ * Les flèches pleines restent stables, et aucun filtre GPU n'est appliqué au SVG.
+ */
+[data-board-export] > svg line {
+  opacity: 0.96;
+  filter: none !important;
+  animation: battlefieldArrowDrift 7s linear infinite !important;
+}
+
+/*
+ * MODIFIÉ : la flèche en cours de dessin reste un peu plus vive et plus rapide,
+ * sans halo ni pulsation d'opacité.
+ */
+[data-board-export] > svg line[data-png-hide='true'] {
+  opacity: 0.82;
+  animation-duration: 2.2s !important;
+}
+
+/*
+ * MODIFIÉ : les marqueurs restent nets et cessent de flotter ou de luire.
  */
 [data-board-export] [role='img'][style*='--marker-color'] {
-  animation: none;
-  box-shadow: 0 3px 7px rgb(0 0 0 / 44%);
+  animation: none !important;
+  box-shadow: 0 3px 7px rgb(0 0 0 / 42%);
 }
 
 [data-board-export] [role='img'][style*='--marker-color'] span {
   backdrop-filter: none;
 }
 
+/*
+ * L'animation modifie uniquement un nombre SVG peu coûteux.
+ * Sur une ligne pleine sans stroke-dasharray, elle n'a aucun effet visible.
+ */
+@keyframes battlefieldArrowDrift {
+  to {
+    stroke-dashoffset: -30;
+  }
+}
+
 @media (max-width: 900px) {
   /*
-   * MODIFIÉ : sur mobile, on retire aussi les ombres SVG pour préserver la netteté
-   * et limiter le coût de composition sans cacher les lignes elles-mêmes.
+   * MODIFIÉ : sur mobile, le relief du cadre est réduit pour limiter la composition.
+   */
+  [data-board-export][data-board-surface='terrain'] {
+    box-shadow:
+      0 5px 0 #080911,
+      0 12px 22px rgb(0 0 0 / 34%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /*
+   * ACCESSIBILITÉ : les flèches restent parfaitement visibles sans déplacement.
    */
   [data-board-export] > svg line {
-    filter: none;
+    animation: none !important;
   }
 }
