@@ -73,12 +73,19 @@ export function MusicDetailView({ entry }: MusicDetailViewProps) {
   /*
    * Prépare la scène animée.
    * Elle reste vide si aucune scène n'est associée à la musique.
+   *
+   * La scène est transmise directement au hero. Son calque absolu utilise donc
+   * toujours la hauteur du hero comme référence, y compris sur Safari mobile.
    */
   let storyOverlay: ReactNode = null
 
   if (entry.storyOverlay) {
     const StoryOverlay = entry.storyOverlay
-    storyOverlay = <StoryOverlay />
+    storyOverlay = (
+      <Suspense fallback={null}>
+        <StoryOverlay />
+      </Suspense>
+    )
   }
 
   /*
@@ -125,13 +132,10 @@ export function MusicDetailView({ entry }: MusicDetailViewProps) {
             value: audioAvailability,
           },
         ]}
+        overlay={storyOverlay}
         summary={entry.summary}
         title={entry.title}
       />
-
-      <Suspense fallback={null}>
-        {storyOverlay}
-      </Suspense>
 
       {audioPlayer}
 
