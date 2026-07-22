@@ -48,29 +48,10 @@ jobs:
       - name: Construire le site
         run: npm run build
 
-      - name: Tenter l’enregistrement et produire un diagnostic
+      - name: Enregistrer le correctif validé
         run: |
-          set +e
-          {
-            echo '--- avant git add ---'
-            git status --short
-            echo '--- diff stat ---'
-            git diff --stat
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -A
-            echo '--- après git add ---'
-            git status --short
-            git commit -m "fix: preserve the full visual experience and clean invisible artifacts"
-            echo "commit_code=$?"
-            git push
-            echo "push_code=$?"
-          } > final-git-diagnostic.txt 2>&1
-          cat final-git-diagnostic.txt
-          exit 0
-
-      - name: Publier le diagnostic Git
-        uses: actions/upload-artifact@v4
-        with:
-          name: final-git-diagnostic
-          path: final-git-diagnostic.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "fix: preserve the full visual experience and clean invisible artifacts"
+          git push
