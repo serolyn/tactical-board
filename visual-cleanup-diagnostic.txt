@@ -1,16 +1,11 @@
-motion config: 1
-ghost eligibility: 1
-ghost fallback: 1
-src/portfolio/motion/AnimatedLink.tsx useReducedMotion: 2
-src/portfolio/motion/PageTransition.tsx useReducedMotion: 2
-src/portfolio/motion/Reveal.tsx useReducedMotion: 2
-src/portfolio/motion/StaggerGroup.tsx useReducedMotion: 3
-src/portfolio/motion/AnimatedRoutes.tsx useReducedMotion: 2
-src/portfolio/pages/PortfolioHomePage.tsx useReducedMotion: 2
-music story import: 1
-music story reduced constant: 1
-portfolio reduced css: 1
-music story reduced css: 0
-miku reduced css: 0
-sro reduced css: 1
-webgl reduced test: 1
+
+> chess-strat@0.0.0 typecheck
+> tsc -b --pretty false
+
+src/portfolio/motion/PortfolioMotionProvider.tsx(33,19): error TS1005: ')' expected.
+src/portfolio/motion/PortfolioMotionProvider.tsx(33,41): error TS1005: ';' expected.
+src/portfolio/motion/PortfolioMotionProvider.tsx(33,70): error TS1005: ',' expected.
+src/portfolio/motion/PortfolioMotionProvider.tsx(37,5): error TS1128: Declaration or statement expected.
+src/portfolio/motion/PortfolioMotionProvider.tsx(38,3): error TS1109: Expression expected.
+
+exit_code=2
