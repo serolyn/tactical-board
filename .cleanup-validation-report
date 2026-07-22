@@ -1,4 +1,4 @@
-commit=bb4146f6dfe418628accd73e85a2bf7141531641
+commit=c43ded480992dbf5768f3631816fa8936a0c829f
 npm_ci=0
 typecheck=0
 lint=0
@@ -17,7 +17,7 @@ build=0
 > oxlint
 
 Found 0 warnings and 0 errors.
-Finished in 18ms on 124 files with 103 rules using 4 threads.
+Finished in 18ms on 123 files with 103 rules using 4 threads.
 
 --- tests ---
 
@@ -27,34 +27,34 @@ Finished in 18ms on 124 files with 103 rules using 4 threads.
 
 [1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/runner/work/tactical-board/tactical-board[39m
 
- [32m✓[39m src/tests/tacticalBoardModel.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 26[2mms[22m[39m
- [32m✓[39m src/tests/persistence.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 58[2mms[22m[39m
- [32m✓[39m src/tests/webglFallback.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 598[2mms[22m[39m
-     [33m[2m✓[22m[39m active le Canvas après la première frame et garde les diagnostics visibles [33m 321[2mms[22m[39m
+ [32m✓[39m src/tests/tacticalBoardModel.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m src/tests/persistence.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 52[2mms[22m[39m
+ [32m✓[39m src/tests/webglFallback.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 529[2mms[22m[39m
+     [33m[2m✓[22m[39m active le Canvas après la première frame et garde les diagnostics visibles [33m 316[2mms[22m[39m
 [90mstderr[2m | src/tests/portfolio.test.tsx[2m > [22m[2mportfolio et navigation principale[2m > [22m[2mrend l’accueil dans son shell avec ses liens et métadonnées
 [22m[39mYou have Reduced Motion enabled on your device. Animations may not appear as expected.. For more information and steps for solving, visit https://motion.dev/troubleshooting/reduced-motion-disabled
 
 [90mstderr[2m | src/tests/routingIsolation.test.tsx[2m > [22m[2misolation des deux applications[2m > [22m[2mne charge ni Tactical Board ni IndexedDB sur les routes du portfolio
 [22m[39mYou have Reduced Motion enabled on your device. Animations may not appear as expected.. For more information and steps for solving, visit https://motion.dev/troubleshooting/reduced-motion-disabled
 
- [32m✓[39m src/tests/portfolio.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 2939[2mms[22m[39m
-     [33m[2m✓[22m[39m rend l’accueil dans son shell avec ses liens et métadonnées [33m 386[2mms[22m[39m
-     [33m[2m✓[22m[39m navigue entre les quatre rubriques avec route active, focus et scroll réinitialisé [33m 1830[2mms[22m[39m
-     [33m[2m✓[22m[39m rend les deux fiches Lab avec leurs destinations compatibles avec le base path [33m 424[2mms[22m[39m
- [32m✓[39m src/tests/routingIsolation.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1507[2mms[22m[39m
-     [33m[2m✓[22m[39m ne charge ni Tactical Board ni IndexedDB sur les routes du portfolio [33m 815[2mms[22m[39m
-     [33m[2m✓[22m[39m charge /board sans conserver le shell, les transitions ou le WebGL du portfolio [33m 317[2mms[22m[39m
-     [33m[2m✓[22m[39m ne charge le module Ghost Signal que sur l’accueil éligible [33m 368[2mms[22m[39m
- [32m✓[39m src/tests/tacticalBoard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 4517[2mms[22m[39m
-     [33m[2m✓[22m[39m hydrate une base vide avec un unique scénario initial et rend le plateau [33m 1109[2mms[22m[39m
-     [33m[2m✓[22m[39m restaure la bataille active, déplace une unité et conserve l’interaction en mode plateau seul [33m 1954[2mms[22m[39m
-     [33m[2m✓[22m[39m applique statut et faction à une multi-sélection dans l’inspecteur avec undo atomique [33m 1452[2mms[22m[39m
- [32m✓[39m src/tests/publishedContent.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/tests/portfolio.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 2861[2mms[22m[39m
+     [33m[2m✓[22m[39m rend l’accueil dans son shell avec ses liens et métadonnées [33m 317[2mms[22m[39m
+     [33m[2m✓[22m[39m navigue entre les quatre rubriques avec route active, focus et scroll réinitialisé [33m 1848[2mms[22m[39m
+     [33m[2m✓[22m[39m rend les deux fiches Lab avec leurs destinations compatibles avec le base path [33m 428[2mms[22m[39m
+ [32m✓[39m src/tests/routingIsolation.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1408[2mms[22m[39m
+     [33m[2m✓[22m[39m ne charge ni Tactical Board ni IndexedDB sur les routes du portfolio [33m 705[2mms[22m[39m
+     [33m[2m✓[22m[39m charge /board sans conserver le shell, les transitions ou le WebGL du portfolio [33m 320[2mms[22m[39m
+     [33m[2m✓[22m[39m ne charge le module Ghost Signal que sur l’accueil éligible [33m 372[2mms[22m[39m
+ [32m✓[39m src/tests/tacticalBoard.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[33m 4086[2mms[22m[39m
+     [33m[2m✓[22m[39m hydrate une base vide avec un unique scénario initial et rend le plateau [33m 1021[2mms[22m[39m
+     [33m[2m✓[22m[39m restaure la bataille active, déplace une unité et conserve l’interaction en mode plateau seul [33m 1771[2mms[22m[39m
+     [33m[2m✓[22m[39m applique statut et faction à une multi-sélection dans l’inspecteur avec undo atomique [33m 1292[2mms[22m[39m
+ [32m✓[39m src/tests/publishedContent.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m7 passed[39m[22m[90m (7)[39m
-[2m      Tests [22m [1m[32m36 passed[39m[22m[90m (36)[39m
-[2m   Start at [22m 20:25:43
-[2m   Duration [22m 8.31s[2m (transform 2.15s, setup 836ms, import 5.41s, tests 9.65s, environment 6.77s)[22m
+[2m      Tests [22m [1m[32m35 passed[39m[22m[90m (35)[39m
+[2m   Start at [22m 20:29:07
+[2m   Duration [22m 8.44s[2m (transform 2.48s, setup 745ms, import 5.76s, tests 8.97s, environment 7.19s)[22m
 
 
 --- build ---
@@ -63,7 +63,7 @@ Finished in 18ms on 124 files with 103 rules using 4 threads.
 > tsc -b && vite build
 
 [36mvite v8.1.5 [32mbuilding client environment for production...[36m[39m
-[2Ktransforming...✓ 3036 modules transformed.
+[2Ktransforming...✓ 3035 modules transformed.
 rendering chunks...
 computing gzip size...
 dist/index.html                                                 1.18 kB │ gzip:   0.49 kB
@@ -100,26 +100,26 @@ dist/assets/TacticalBoardApp-DRUv__vQ.css                      62.42 kB │ gzip
 dist/assets/extends-CvVTau-c.js                                 0.23 kB │ gzip:   0.18 kB
 dist/assets/vanilla-DZJGj1NY.js                                 0.32 kB │ gzip:   0.23 kB
 dist/assets/jsx-runtime-DYfQNk55.js                             0.42 kB │ gzip:   0.29 kB
-dist/assets/PortfolioProjectDetailPage-Bx25E-EQ.js              0.70 kB │ gzip:   0.44 kB
-dist/assets/PortfolioLabDetailPage-vZq4Fw4g.js                  0.96 kB │ gzip:   0.56 kB
-dist/assets/PortfolioMusicDetailPage-YLUTXHJJ.js                1.33 kB │ gzip:   0.74 kB
+dist/assets/PortfolioProjectDetailPage-BFYrLxnO.js              0.70 kB │ gzip:   0.44 kB
+dist/assets/PortfolioLabDetailPage-BIpieXEb.js                  0.96 kB │ gzip:   0.57 kB
+dist/assets/PortfolioMusicDetailPage-CPVvXgkW.js                1.33 kB │ gzip:   0.75 kB
 dist/assets/MusicModel-B_IIjUWz.js                              1.66 kB │ gzip:   0.93 kB
-dist/assets/SroWorldPage-BlJH9evV.js                            1.87 kB │ gzip:   0.86 kB
+dist/assets/SroWorldPage-Cbmj8ecv.js                            1.87 kB │ gzip:   0.85 kB
 dist/assets/react-dom-BRSbvI1o.js                               3.53 kB │ gzip:   1.33 kB
-dist/assets/PortfolioEntrySections-Swv2pa7E.js                  4.83 kB │ gzip:   1.50 kB
-dist/assets/SroWorldCanvas--I7FhH9Z.js                          5.50 kB │ gzip:   2.04 kB
+dist/assets/PortfolioEntrySections-DI0tVK1S.js                  4.83 kB │ gzip:   1.50 kB
+dist/assets/SroWorldCanvas-1WHfF0Gl.js                          5.50 kB │ gzip:   2.04 kB
 dist/assets/react-Ca03aNmg.js                                   8.34 kB │ gzip:   3.23 kB
-dist/assets/mikuscene-DCk0eJqc.js                               9.93 kB │ gzip:   3.25 kB
-dist/assets/Sparkles-fqVWwxHE.js                               11.13 kB │ gzip:   4.16 kB
-dist/assets/domAnimationFeatures-Cax1AQ9T.js                   11.20 kB │ gzip:   4.24 kB
-dist/assets/GhostSignalCanvas-BCs_de8w.js                      17.01 kB │ gzip:   6.46 kB
-dist/assets/PdfBook-CKGRwK9W.js                                45.12 kB │ gzip:  11.00 kB
+dist/assets/mikuscene-C3tRwhV2.js                               9.93 kB │ gzip:   3.24 kB
+dist/assets/Sparkles-oUVsir3A.js                               11.13 kB │ gzip:   4.16 kB
+dist/assets/domAnimationFeatures-mVIWgzWw.js                   11.20 kB │ gzip:   4.24 kB
+dist/assets/GhostSignalCanvas-9EYBS6Ka.js                      17.01 kB │ gzip:   6.46 kB
+dist/assets/PdfBook-Dg1HW4Rp.js                                45.12 kB │ gzip:  11.00 kB
 dist/assets/Gltf-BBcW4JJH.js                                   71.35 kB │ gzip:  20.98 kB
 dist/assets/TacticalBoardApp-BFFHGTRE.js                      284.26 kB │ gzip:  86.84 kB
-dist/assets/index-CuCL0tAS.js                                 342.09 kB │ gzip: 110.69 kB
+dist/assets/index-DOMDi9oR.js                                 338.75 kB │ gzip: 109.49 kB
 dist/assets/events-b389eeca.esm-CvviAGpc.js                   880.17 kB │ gzip: 234.28 kB
 
-[32m✓ built in 911ms[39m
+[32m✓ built in 875ms[39m
 [33m[plugin builtin:vite-reporter] 
 (!) Some chunks are larger than 500 kB after minification. Consider:
 - Using dynamic import() to code-split the application
@@ -133,7 +133,7 @@ dist/assets/events-b389eeca.esm-CvviAGpc.js                   880.17 kB │ gzip
 
 --- npm ci ---
 
-added 196 packages, and audited 197 packages in 6s
+added 196 packages, and audited 197 packages in 5s
 
 34 packages are looking for funding
   run `npm fund` for details
