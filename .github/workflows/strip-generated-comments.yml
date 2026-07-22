@@ -1,4 +1,4 @@
-name: Retirer les commentaires générés
+name: Finaliser le regroupement du battlefield
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  clean-comments:
+  finalize-cleanup:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -24,47 +24,31 @@ jobs:
           node-version: '22'
           cache: npm
 
-      - name: Retirer uniquement les blocs injectés automatiquement
+      - name: Charger le CSS du battlefield avec son composant
         run: |
           node --input-type=module <<'NODE'
-          import { readdir, readFile, writeFile } from 'node:fs/promises'
-          import path from 'node:path'
+          import { readFile, writeFile } from 'node:fs/promises'
 
-          async function collect(directory) {
-            const entries = await readdir(directory, { withFileTypes: true })
-            const files = []
+          const mainPath = 'src/main.tsx'
+          const battlefieldPath = 'src/tactical-board/features/battlefield/Battlefield.tsx'
+          const performanceImport = "import './Battlefield.performance.css'"
 
-            for (const entry of entries) {
-              const absolute = path.join(directory, entry.name)
-              if (entry.isDirectory()) files.push(...await collect(absolute))
-              else if (/\.(ts|tsx)$/.test(entry.name)) files.push(absolute)
-            }
+          const main = await readFile(mainPath, 'utf8')
+          const nextMain = main.replace(
+            "import '@/tactical-board/features/battlefield/Battlefield.performance.css'\n",
+            '',
+          )
+          await writeFile(mainPath, nextMain, 'utf8')
 
-            return files
-          }
-
-          let changed = 0
-          for (const file of await collect('src')) {
-            const source = await readFile(file, 'utf8')
-            const cleaned = source
-              .replace(/\/\*\*[\s\S]*?\*\//g, (block) => {
-                const generatedPackageDoc = block.includes('@packageDocumentation')
-                const generatedFunctionDoc =
-                  block.includes('Fichier:')
-                  && block.includes('Si tu lis ce fichier pour apprendre')
-
-                return generatedPackageDoc || generatedFunctionDoc ? '' : block
-              })
-              .replace(/\n{3,}/g, '\n\n')
-              .replace(/^\s*\n/, '')
-
-            if (cleaned !== source) {
-              await writeFile(file, cleaned, 'utf8')
-              changed += 1
-            }
-          }
-
-          console.log(`Commentaires générés retirés dans ${changed} fichiers.`)
+          const battlefield = await readFile(battlefieldPath, 'utf8')
+          const stylesImport = "import styles from './Battlefield.module.css'"
+          const nextBattlefield = battlefield.includes(performanceImport)
+            ? battlefield
+            : battlefield.replace(
+                stylesImport,
+                `${stylesImport}\n${performanceImport}`,
+              )
+          await writeFile(battlefieldPath, nextBattlefield, 'utf8')
           NODE
 
       - name: Installer les dépendances
@@ -82,11 +66,11 @@ jobs:
       - name: Construire le site
         run: npm run build
 
-      - name: Enregistrer le nettoyage validé
+      - name: Enregistrer le regroupement et supprimer ce workflow temporaire
         run: |
+          rm -f .github/workflows/strip-generated-comments.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src
-          git diff --cached --quiet && exit 0
-          git commit -m "chore: remove generated documentation comments"
+          git add -A
+          git commit -m "refactor: finalize cleanup while preserving the UI"
           git push
