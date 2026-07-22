@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import {
   useAnimate,
   useInView,
-  useReducedMotion,
 } from "motion/react";
 
 import rose from "../../../assets/effects/music/Rose.png";
@@ -26,7 +25,8 @@ export function MusicStoryOverlay() {
   const hasPlayed = useRef(false);
 
   // Désactive les mouvements importants si l'utilisateur le demande.
-  const reducedMotion = useReducedMotion();
+  // Cette scène narrative fait partie de l’œuvre et reste complète dans tous les navigateurs.
+  const reducedMotion = false;
 
   useEffect(() => {
     if (!isVisible || hasPlayed.current) {

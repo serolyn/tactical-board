@@ -103,7 +103,8 @@ export function readGhostSignalCapabilities(): GhostSignalCapabilities {
 
 /** Centralise la décision d'activer le rendu temps réel ou son image de repli. */
 export function canRunGhostSignal(capabilities: GhostSignalCapabilities): boolean {
-  return capabilities.webgl2 && !capabilities.reducedMotion
+  // La préférence détectée reste visible dans le diagnostic, mais ne masque plus l’œuvre.
+  return capabilities.webgl2
 }
 /**
  * Cette fonction intervient sur le sujet “get Capability Fallback Cause” dans portfolio.
@@ -116,7 +117,6 @@ export function canRunGhostSignal(capabilities: GhostSignalCapabilities): boolea
 export function getCapabilityFallbackCause(
   capabilities: GhostSignalCapabilities,
 ): GhostSignalFallbackCause | null {
-  if (capabilities.reducedMotion) return 'reduced-motion'
   if (!capabilities.webgl2) return 'webgl2-unavailable'
   return null
 }

@@ -31,9 +31,7 @@ jobs:
       - name: Installer les dépendances
         run: npm ci
 
-      - name: Vérifier les types
-        run: npm run typecheck
-
+      # `npm run build` exécute déjà `tsc -b`, donc le typecheck n'est pas répété.
       - name: Construire le site
         run: npm run build -- --base=/tactical-board/
 

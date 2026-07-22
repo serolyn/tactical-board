@@ -25,21 +25,28 @@ import {
 import type { PortfolioContent } from '@/portfolio/content/portfolioContentTypes'
 
 describe('contenus publiés du portfolio', () => {
-  it('valide le catalogue livré et exclut les brouillons des sélecteurs publics', () => {
+  it('valide le catalogue réellement livré et expose toutes les entrées publiées', () => {
     expect(validatePortfolioContent(portfolioContent)).toEqual([])
+
     expect(projects[0]?.published).toBe(true)
     expect(projects[0]?.sections.some((section) => section.type === 'component')).toBe(true)
     expect(publishedProjects.map((entry) => entry.slug)).toEqual(['project-template'])
-    expect(music[0]?.published).toBe(true)
-    expect(music[1]?.published).toBe(false)
-    expect(publishedMusic.map((entry) => entry.slug)).toEqual(['ep-1'])
     expect(getPublishedProjectBySlug('project-template')).toMatchObject({
-      title: 'PROJET À DOCUMENTER — BROUILLON NON PUBLIÉ',
+      title: 'Nemyl, la ville des reflets',
     })
+
+    expect(music[0]?.published).toBe(true)
+    expect(music[1]?.published).toBe(true)
+    expect(publishedMusic.map((entry) => entry.slug)).toEqual([
+      'ep-1',
+      'music-template-2',
+    ])
     expect(getPublishedMusicBySlug('ep-1')).toMatchObject({
       title: 'Nemyl',
     })
-    expect(getPublishedMusicBySlug('music-template-2')).toBeUndefined()
+    expect(getPublishedMusicBySlug('music-template-2')).toMatchObject({
+      title: 'SRO',
+    })
   })
 
   it('conserve les contrats essentiels des deux entrées Lab publiées', () => {

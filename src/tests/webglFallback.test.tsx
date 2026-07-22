@@ -84,18 +84,18 @@ afterEach(() => {
 })
 
 describe('fallback progressif de Ghost Signal', () => {
-  it('reste statique avec mouvement réduit sans évaluer le Canvas', async () => {
+  it('garde Ghost Signal actif même si Firefox annonce un mouvement réduit', async () => {
     installMotionPreference(true)
     installWebGL(true)
 
     const { container } = render(<HeroVisualSlot alt="Ciel nocturne" src="/sky.webp" />)
-    const slot = container.querySelector('[data-webgl-state]')
 
-    await waitFor(() => expect(slot).toHaveAttribute('data-webgl-state', 'fallback'))
-    expect(slot).toHaveAttribute('data-webgl-fallback-cause', 'reduced-motion')
+    expect(await screen.findByTestId('ghost-canvas')).toBeInTheDocument()
+    const slot = container.querySelector('[data-webgl-state]')
+    await waitFor(() => expect(slot).toHaveAttribute('data-webgl-state', 'ready'))
+    expect(slot).toHaveAttribute('data-webgl-fallback-cause', 'none')
+    expect(slot).toHaveAttribute('data-webgl-reduced-motion', 'true')
     expect(slot).toHaveAttribute('data-webgl2', 'true')
-    expect(screen.getByRole('img', { name: 'Ciel nocturne' })).toBeInTheDocument()
-    expect(dynamicModuleEvaluated).not.toHaveBeenCalled()
   })
 
   it('utilise le fallback exact quand WebGL2 est absent ou sa création échoue', async () => {

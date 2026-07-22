@@ -225,10 +225,3 @@
       38px 38px;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .music-glb-scene__grain,
-  .music-glb-loading-signal {
-    animation: none;
-  }
-}

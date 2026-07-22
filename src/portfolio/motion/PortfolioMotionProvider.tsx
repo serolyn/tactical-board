@@ -29,7 +29,7 @@ export interface PortfolioMotionProviderProps {
 /** Limite Motion au portfolio afin que le plateau n'en dépende jamais. */
 export function PortfolioMotionProvider({ children }: PortfolioMotionProviderProps) {
   return (
-    <MotionConfig reducedMotion="user" transition={motionTransitions.interface}>
+    <MotionConfig reducedMotion="never" transition={motionTransitions.interface}>
       <LazyMotion features={loadMotionFeatures} strict>
         {children}
       </LazyMotion>

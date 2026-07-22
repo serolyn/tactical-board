@@ -7,7 +7,7 @@
  * visibles et d'autres très discrètes.
  */
 
-import { AnimatePresence, useReducedMotion } from 'motion/react'
+import { AnimatePresence } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import {
   useLocation,
@@ -79,7 +79,7 @@ function AnimatedRouteFrame({
   pageClassName,
   scrollContainerSelector,
 }: AnimatedRouteFrameProps) {
-  const reducedMotion = Boolean(useReducedMotion())
+  const reducedMotion = false
   const frameRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {

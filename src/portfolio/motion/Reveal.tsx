@@ -7,7 +7,7 @@
  * visibles et d'autres très discrètes.
  */
 
-import { m, useReducedMotion, type HTMLMotionProps } from 'motion/react'
+import { m, type HTMLMotionProps } from 'motion/react'
 import type { ReactNode } from 'react'
 
 import { getRevealVariants } from './motionTokens'
@@ -47,7 +47,7 @@ export function Reveal({
   threshold,
   ...motionProps
 }: RevealProps) {
-  const reducedMotion = Boolean(useReducedMotion())
+  const reducedMotion = false
   const { isVisible, observerAvailable, revealNow, setTarget } = useViewportReveal({
     disabled,
     once,
