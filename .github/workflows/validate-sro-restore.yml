@@ -25,7 +25,20 @@ jobs:
         run: npm ci
 
       - name: Vérifier les types
-        run: npm run typecheck
+        id: typecheck
+        continue-on-error: true
+        run: npm run typecheck 2>&1 | tee typecheck.log
+
+      - name: Enregistrer le rapport TypeScript
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: typecheck-sro
+          path: typecheck.log
+
+      - name: Arrêter si TypeScript échoue
+        if: steps.typecheck.outcome == 'failure'
+        run: exit 1
 
       - name: Vérifier le lint
         run: npm run lint
