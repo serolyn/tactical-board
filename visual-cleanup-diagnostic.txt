@@ -1,0 +1,16 @@
+motion config: 1
+ghost eligibility: 1
+ghost fallback: 1
+src/portfolio/motion/AnimatedLink.tsx useReducedMotion: 2
+src/portfolio/motion/PageTransition.tsx useReducedMotion: 2
+src/portfolio/motion/Reveal.tsx useReducedMotion: 2
+src/portfolio/motion/StaggerGroup.tsx useReducedMotion: 3
+src/portfolio/motion/AnimatedRoutes.tsx useReducedMotion: 2
+src/portfolio/pages/PortfolioHomePage.tsx useReducedMotion: 2
+music story import: 1
+music story reduced constant: 1
+portfolio reduced css: 1
+music story reduced css: 0
+miku reduced css: 0
+sro reduced css: 1
+webgl reduced test: 1
