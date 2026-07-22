@@ -52,10 +52,8 @@ jobs:
       - name: Construire le site
         run: npm run build
 
-      - name: Enregistrer le correctif validé et retirer les outils temporaires
+      - name: Enregistrer le correctif validé
         run: |
-          rm -f .github/workflows/visual-preserving-pr.yml
-          rm -f scripts/visual-preserving-cleanup.mjs
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
