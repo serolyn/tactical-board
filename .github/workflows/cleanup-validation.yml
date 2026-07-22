@@ -6,14 +6,17 @@ on:
       - cleanup/preserve-ui
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Récupérer le projet
         uses: actions/checkout@v4
+        with:
+          ref: cleanup/preserve-ui
 
       - name: Installer Node.js
         uses: actions/setup-node@v4
@@ -35,3 +38,12 @@ jobs:
 
       - name: Construire le site
         run: npm run build
+
+      - name: Marquer la validation réussie
+        run: |
+          printf '%s\n' "$GITHUB_SHA" > .cleanup-validation-passed
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .cleanup-validation-passed
+          git commit -m "ci: mark cleanup validation passed"
+          git push
