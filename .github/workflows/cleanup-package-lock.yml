@@ -1,0 +1,37 @@
+name: Synchroniser le package lock du nettoyage
+
+on:
+  push:
+    branches:
+      - cleanup/preserve-ui
+
+permissions:
+  contents: write
+
+jobs:
+  sync-lock:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer la branche
+        uses: actions/checkout@v4
+        with:
+          ref: cleanup/preserve-ui
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Mettre à jour uniquement package-lock.json
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Enregistrer le lock synchronisé
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: sync package lock after cleanup"
+          git push

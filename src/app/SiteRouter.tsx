@@ -16,7 +16,6 @@ import { LabPage } from '@/portfolio/pages/PortfolioLabIndexPage'
 import { MusicPage } from '@/portfolio/pages/PortfolioMusicIndexPage'
 import { NotFoundPage } from '@/portfolio/pages/PortfolioNotFoundPage'
 import { ProjectsPage } from '@/portfolio/pages/PortfolioProjectsIndexPage'
-import { ScreenGlitch } from './effects/ScreenGlitch'
 import { SiteRouteEffects } from './SiteRouteEffects'
 import { normalizeSiteBasename } from './normalizeSiteBasename'
 
@@ -67,7 +66,6 @@ export function SiteRouteTree() {
   return (
     <>
       <SiteRouteEffects />
-      <ScreenGlitch enabled={false} />
       <Routes>
         <Route
           path="/board"
