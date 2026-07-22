@@ -1,0 +1,185 @@
+commit=f3f3300eade18ec4dc67f61ee879ffb8682dc310
+npm_ci=0
+typecheck=0
+lint=0
+test=1
+build=0
+
+--- typecheck ---
+
+> chess-strat@0.0.0 typecheck
+> tsc -b --pretty false
+
+
+--- lint ---
+
+> chess-strat@0.0.0 lint
+> oxlint
+
+Found 0 warnings and 0 errors.
+Finished in 17ms on 124 files with 103 rules using 4 threads.
+
+--- tests ---
+          [33mrole[39m=[32m"status"[39m
+        [36m/>[39m
+      [36m</main>[39m
+      [36m<footer[39m
+        [33mclass[39m=[32m"portfolio-footer"[39m
+      [36m>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"portfolio-footer__inner"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"portfolio-meta"[39m
+            [36m>[39m
+              [0mÀ PROPOS[0m
+            [36m</p>[39m
+            [36m<a[39m
+              [33mdata-discover[39m=[32m"true"[39m
+              [33mhref[39m=[32m"/tactical-board/about"[39m
+            [36m>[39m
+              [0mJe construis entre code, son et image.[0m
+            [36m</a>[39m
+          [36m</div>[39m
+          [36m<p>[39m
+            [0m© 2026 SEROLYN[0m
+          [36m</p>[39m
+          [36m<a[39m
+            [33mhref[39m=[32m"#portfolio-main"[39m
+          [36m>[39m
+            [0mRETOUR / HAUT ↑[0m
+          [36m</a>[39m
+        [36m</div>[39m
+      [36m</footer>[39m
+    [36m</div>[39m
+  [36m</div>[39m
+[36m</body>[39m
+[90m [2m❯[22m Object.getElementError node_modules/@testing-library/dom/dist/config.js:[2m37:19[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m76:38[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m52:17[22m[39m
+[90m [2m❯[22m node_modules/@testing-library/dom/dist/query-helpers.js:[2m95:19[22m[39m
+[36m [2m❯[22m src/tests/portfolio.test.tsx:[2m132:19[22m[39m
+    [90m130|[39m     expect(await screen.findByRole('heading', { level: 1, name: 'PROJE…
+    [90m131|[39m       [33m.[39m[34mtoBeInTheDocument[39m()
+    [90m132|[39m     expect(screen.getByText('Les premiers systèmes sont encore en cour…
+    [90m   |[39m                   [31m^[39m
+    [90m133|[39m       [33m.[39m[34mtoBeInTheDocument[39m()
+    [90m134|[39m     expect(screen.queryByText('PROJET À DOCUMENTER — BROUILLON NON PUB…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/tests/publishedContent.test.ts[2m > [22mcontenus publiés du portfolio[2m > [22mvalide le catalogue livré et exclut les brouillons des sélecteurs publics
+[31m[1mAssertionError[22m: expected true to be false // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- false[39m
+[31m+ true[39m
+
+[36m [2m❯[22m src/tests/publishedContent.test.ts:[2m34:33[22m[39m
+    [90m 32|[39m     expect(publishedProjects.map((entry) => entry.slug)).toEqual(['pro…
+    [90m 33|[39m     [34mexpect[39m(music[[34m0[39m][33m?.[39mpublished)[33m.[39m[34mtoBe[39m([35mtrue[39m)
+    [90m 34|[39m     [34mexpect[39m(music[[34m1[39m][33m?.[39mpublished)[33m.[39m[34mtoBe[39m([35mfalse[39m)
+    [90m   |[39m                                 [31m^[39m
+    [90m 35|[39m     [34mexpect[39m(publishedMusic[33m.[39m[34mmap[39m((entry) [33m=>[39m entry[33m.[39mslug))[33m.[39m[34mtoEqual[39m([[32m'ep-1'[39m])
+    [90m 36|[39m     expect(getPublishedProjectBySlug('project-template')).toMatchObjec…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m5 passed[39m[22m[90m (7)[39m
+[2m      Tests [22m [1m[31m3 failed[39m[22m[2m | [22m[1m[32m33 passed[39m[22m[90m (36)[39m
+[2m   Start at [22m 20:21:06
+[2m   Duration [22m 8.62s[2m (transform 2.09s, setup 731ms, import 5.45s, tests 9.98s, environment 6.58s)[22m
+
+
+::error file=/home/runner/work/tactical-board/tactical-board/src/tests/portfolio.test.tsx,title=src/tests/portfolio.test.tsx > portfolio et navigation principale > rend l’accueil dans son shell avec ses liens et métadonnées,line=87,column=30::AssertionError: expected 'SEROLYN — CODE ART WAR' to be 'SEROLYN — Entre plusieurs vies' // Object.is equality%0A%0AIgnored nodes: comments, script, style%0A<html>%0A  <head>%0A    <meta%0A      content="Code, sons et systèmes pour donner une forme à ce qui flotte."%0A      name="description"%0A    />%0A    <title>%0A      SEROLYN — CODE ART WAR%0A    </title>%0A  </head>%0A  <body>%0A    <div>%0A      <div%0A        class="portfolio-shell"%0A        data-portfolio-scroll="true"%0A      >%0A        <a%0A          class="portfolio-skip-link"%0A          href="#portfolio-main"%0A        >%0A          Aller au contenu%0A        </a>%0A        <header%0A          class="portfolio-header"%0A        >%0A          <div%0A            class="portfolio-header__inner"%0A          >%0A            <a%0A              aria-label="SEROLYN — accueil"%0A              class="portfolio-wordmark"%0A              data-discover="true"%0A              href="/tactical-board"%0A            >%0A              SEROLYN%0A            </a>%0A            <nav%0A              aria-label="Navigation principale"%0A            >%0A              <ul%0A                class="portfolio-navigation"%0A              >%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/projects"%0A                  >%0A                    Projets%0A                  </a>%0A                </li>%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/music"%0A                  >%0A                    Musique%0A                  </a>%0A                </li>%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/lab"%0A                  >%0A                    Lab%0A                  </a>%0A                </li>%0A                <li>%0A                  <a%0A                    class="portfolio-navigation__link"%0A                    data-discover="true"%0A                    href="/tactical-board/about"%0A                  >%0A                    À propos%0A                  </a>%0A                </li>%0A              </ul>%0A            </nav>%0A            <p%0A              class="portfolio-header__index"%0A            >%0A              EVERYWHERE / 2026%0A            </p>%0A          </div>%0A        </header>%0A        <main%0A          class="portfolio-main"%0A          id="portfolio-main"%0A          tabindex="-1"%0A        >%0A          <div%0A            class="portfolio-page-frame"%0A            data-portfolio-page-transition=""%0A            data-route-key="default"%0A            style="opacity: 1;"%0A          >%0A            <article%0A              class="home-page"%0A            >%0A              <section%0A                aria-labelledby="home-title"%0A                class="home-hero"%0A              >%0A                <figure%0A                  class="hero-visual-slot"%0A                  data-hero-visual-slot="true"%0A                  data-webgl-active="false"%0A                  data-webgl-fallback-cause="reduced-motion"%0A                  data-webgl-fps="measuring"%0A                  data-webgl-profile="none"%0A                  data-webgl-reduced-motion="true"%0A                  data-webgl-save-data="false"%0A                  data-webgl-state="fallback"%0A                  data-webgl2="false"%0A                >%0A                  <img%0A                    alt="Ciel nocturne traversé par une lumière diffuse à l’horizon."%0A                    decoding="async"%0A                    fetchpriority="high"%0A                    height="900"%0A                    src="/src/portfolio/assets/signal-horizon.webp"%0A                    width="1600"%0A                  />%0A                  <div%0A                    aria-hidden="true"%0A                    class="hero-visual-slot__future"%0A                    data-ghost-signal-mount="true"%0A                  />%0A                  <output%0A                    aria-hidden="true"%0A                    class="ghost-signal-diagnostics"%0A                    data-ghost-diagnostics="true"%0A                  >%0A                    <strong>%0A                      GHOST / DEV%0A                    </strong>%0A                    <span>%0A                      WEBGL2 %0A                      NON%0A                    </span>%0A                    <span>%0A                      MOUVEMENT RÉDUIT %0A                      OUI%0A                    </span>%0A                    <span>%0A                      ÉCONOMIE DONNÉES %0A                      NON%0A                    </span>%0A                    <span>%0A                      PROFIL %0A                      AUCUN%0A                    </span>%0A                    <span>%0A                      CANVAS %0A                      FALLBACK%0A                    </span>%0A                    <span>%0A                      FALLBACK %0A                      reduced-motion%0A                    </span>%0A                    <span>%0A                    ...%0A%0AExpected: "SEROLYN — Entre plusieurs vies"%0AReceived: "SEROLYN — CODE ART WAR"%0A%0A ❯ src/tests/portfolio.test.tsx:87:30%0A ❯ runWithExpensiveErrorDiagnosticsDisabled node_modules/@testing-library/dom/dist/config.js:47:12%0A ❯ checkCallback node_modules/@testing-library/dom/dist/wait-for.js:124:77%0A ❯ Timeout.checkRealTimersCallback node_modules/@testing-library/dom/dist/wait-for.js:118:16%0A%0A
+
+::error file=/home/runner/work/tactical-board/tactical-board/src/tests/portfolio.test.tsx,title=src/tests/portfolio.test.tsx > portfolio et navigation principale > affiche les états vides sans rendre les brouillons ni un lecteur audio,line=132,column=19::TestingLibraryElementError: Unable to find an element with the text: Les premiers systèmes sont encore en cours de documentation.. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.%0A%0AIgnored nodes: comments, script, style%0A<body>%0A  <div>%0A    <div%0A      class="portfolio-shell"%0A      data-portfolio-scroll="true"%0A    >%0A      <a%0A        class="portfolio-skip-link"%0A        href="#portfolio-main"%0A      >%0A        Aller au contenu%0A      </a>%0A      <header%0A        class="portfolio-header"%0A      >%0A        <div%0A          class="portfolio-header__inner"%0A        >%0A          <a%0A            aria-label="SEROLYN — accueil"%0A            class="portfolio-wordmark"%0A            data-discover="true"%0A            href="/tactical-board"%0A          >%0A            SEROLYN%0A          </a>%0A          <nav%0A            aria-label="Navigation principale"%0A          >%0A            <ul%0A              class="portfolio-navigation"%0A            >%0A              <li>%0A                <a%0A                  aria-current="page"%0A                  class="portfolio-navigation__link portfolio-navigation__link--active"%0A                  data-discover="true"%0A                  href="/tactical-board/projects"%0A                >%0A                  Projets%0A                  <span%0A                    aria-hidden="true"%0A                    class="portfolio-navigation__active-line"%0A                  />%0A                </a>%0A              </li>%0A              <li>%0A                <a%0A                  class="portfolio-navigation__link"%0A                  data-discover="true"%0A                  href="/tactical-board/music"%0A                >%0A                  Musique%0A                </a>%0A              </li>%0A              <li>%0A                <a%0A                  class="portfolio-navigation__link"%0A                  data-discover="true"%0A                  href="/tactical-board/lab"%0A                >%0A                  Lab%0A                </a>%0A              </li>%0A              <li>%0A                <a%0A                  class="portfolio-navigation__link"%0A                  data-discover="true"%0A                  href="/tactical-board/about"%0A                >%0A                  À propos%0A                </a>%0A              </li>%0A            </ul>%0A          </nav>%0A          <p%0A            class="portfolio-header__index"%0A          >%0A            EVERYWHERE / 2026%0A          </p>%0A        </div>%0A      </header>%0A      <main%0A        class="portfolio-main"%0A        id="portfolio-main"%0A        tabindex="-1"%0A      >%0A        <div%0A          class="portfolio-page-frame"%0A          data-portfolio-page-transition=""%0A          data-route-key="default"%0A          style="opacity: 1;"%0A        >%0A          <article%0A            class="editorial-page"%0A          >%0A            <header%0A              class="page-boundary page-intro"%0A            >%0A              <div%0A                class="page-intro__copy"%0A              >%0A                <p%0A                  class="portfolio-meta"%0A                >%0A                  INDEX / PROJETS / 00%0A                </p>%0A                <h1%0A                  tabindex="-1"%0A                >%0A                  PROJETS%0A                </h1>%0A                <p%0A                  class="page-intro__lead"%0A                >%0A                  Réalisations suffisamment construites ou documentées pour être parcourues.%0A                </p>%0A              </div>%0A              <div%0A                aria-hidden="true"%0A                class="index-atmosphere"%0A              >%0A                <p>%0A                  ARCHIVE / EN CONSTRUCTION%0A                </p>%0A              </div>%0A            </header>%0A            <section%0A              aria-labelledby="projects-index-title"%0A              class="page-boundary page-index-content"%0A            >%0A              <header%0A                class="section-heading"%0A                data-motion-state="visible"%0A                style="opacity: 1;"%0A              >%0A                <p%0A                  class="section-heading__index"%0A                >%0A                  01 / INDEX%0A                </p>%0A                <div%0A                  class="section-heading__title-group"%0A                >%0A                  <p%0A                    class="portfolio-meta"%0A                  >%0A                    ARCHIVE PUBLIQUE%0A                  </p>%0A                  <h2%0A                    id="projects-index-title"%0A                  >%0A                    SYSTÈMES DOCUMENTÉS%0A                  </h2>%0A                </div>%0A                <p%0A                  class="section-heading__introduction"%0A                >%0A                  Chaque entrée conserve un contexte, un rôle, une pile technique et une documentation extensible.%0A                </p>%0A              </header>%0A              <ol%0A                class="entry-index"%0A                data-motion-state="visible"%0A              >%0A                <li%0A                  style="opacity: 1;"%0A                >%0A                  <article%0A                    class="entry-card entry-card--project-template"%0A                  >%0A                    <a%0A                      aria-label="Découvrir Nemyl, la ville des reflets"%0A                      class="entry-card__link"%0A                      data-discover="true"%0A                      href="/tactical-board/projects/project-template"%0A                    >%0A                      <div%0A                        class="entry-card__visual"%0A                      >%0A                        <img%0A                          alt="Couverture du livre intégré au projet modèle."%0A                          decoding="async"%0A                          loading="lazy"%0A                          src="/src/assets/effects/book/cover.webp"%0A                        />%0A                        <span%0A                          class="entry-card__number"%0A                        >%0A                          01%0A                        </span>%0A                      </div>%0A                      <div%0A                        class="entry-card__body"%0A                      >%0A                        <p%0A                          class="portfolio-meta"%0A                        >%0A                          2026%0A                           / %0A                          Brouillon%0A                        </p>%0A                        <h3>%0A                          Nemyl, la ville des reflets%0A                        </h3>%0A                        <p>%0A                          Exemple de structure à remplacer par un projet réel documenté.%0A                        </p>%0A                        <ul%0A                          aria-label="Technologies et thèmes"%0A                          class="entry-card__tags"%0A                        >%0A                          <li>%0A                            À renseigner%0A                          </li>%0A                        </ul>%0A                        <span%0A                          class="entry-card__action"%0A                        >%0A                          OUVRIR %0A                          <i%0A                            aria-hidden="true"%0A                          >%0A                            ↘%0A                          </i>%0A                        </span>%0A                      </div>%0A                    </a>%0A                  </article>%0A                </li>%0A              </ol>%0A            </section>%0A          </article>%0A        </div>%0A        <p%0A          aria-atomic="true"%0A          aria-live="polite"%0A          class="visually-hidden"%0A          data-route-announcement=""%0A          role="status"%0A        />%0A      </main>%0A      <footer%0A        class="portfolio-footer"%0A      >%0A        <div%0A          class="portfolio-footer__inner"%0A        >%0A          <div>%0A            <p%0A              class="portfolio-meta"%0A            >%0A              À PROPOS%0A            </p>%0A            <a%0A              data-discover="true"%0A              href="/tactical-board/about"%0A            >%0A              Je construis entre code, son et image.%0A            </a>%0A          </div>%0A          <p>%0A            © 2026 SEROLYN%0A          </p>%0A          <a%0A            href="#portfolio-main"%0A          >%0A            RETOUR / HAUT ↑%0A          </a>%0A        </div>%0A      </footer>%0A    </div>%0A  </div>%0A</body>%0A ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19%0A ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38%0A ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17%0A ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19%0A ❯ src/tests/portfolio.test.tsx:132:19%0A%0A
+
+::error file=/home/runner/work/tactical-board/tactical-board/src/tests/publishedContent.test.ts,title=src/tests/publishedContent.test.ts > contenus publiés du portfolio > valide le catalogue livré et exclut les brouillons des sélecteurs publics,line=34,column=33::AssertionError: expected true to be false // Object.is equality%0A%0A- Expected%0A+ Received%0A%0A- false%0A+ true%0A%0A ❯ src/tests/publishedContent.test.ts:34:33%0A%0A
+
+--- build ---
+
+> chess-strat@0.0.0 build
+> tsc -b && vite build
+
+[36mvite v8.1.5 [32mbuilding client environment for production...[36m[39m
+[2Ktransforming...✓ 3036 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                                 1.18 kB │ gzip:   0.49 kB
+dist/assets/cover-Dk3MgneS.webp                                 8.29 kB
+dist/assets/IBMPlexMono-Regular-400-latin-DMJ8VG8y.woff2       14.70 kB
+dist/assets/signal-horizon-BzKd3NaG.webp                       17.81 kB
+dist/assets/Newsreader-Italic-400-latin-CEihAR-f.woff2         24.34 kB
+dist/assets/Arrow-BdgvpjBN.png                                 24.38 kB
+dist/assets/Manrope-Variable-400-700-latin-DHIcAJRg.woff2      24.83 kB
+dist/assets/fog-reflections-D2zsgRjT.webp                      25.36 kB
+dist/assets/low_poly_miku_hatsune-Dql_u_9P.glb                 27.26 kB
+dist/assets/clouds-BMJ_EYUt.glb                                28.64 kB
+dist/assets/Crow-zRop8DHX.png                                  28.87 kB
+dist/assets/back-cover-k_ZMDToP.webp                           35.87 kB
+dist/assets/page-01-_NnMqlNx.webp                              36.31 kB
+dist/assets/page-04-DiheozCD.webp                              39.20 kB
+dist/assets/page-02-Brc0mYjX.webp                              41.35 kB
+dist/assets/page-03-Dcf9s2kC.webp                              43.63 kB
+dist/assets/Rose-Be9ThlVj.png                                  91.93 kB
+dist/assets/moonlit-harbor-ccqEX2FE.webp                      134.26 kB
+dist/assets/obstacle-icon-game-BG61kB0F.png                   193.33 kB
+dist/assets/signal-preview-mobile-JvE6-tLt.png                208.48 kB
+dist/assets/SRO-ClWxYXBF.webp                                 279.04 kB
+dist/assets/base-icon-game-Cu4pwc6p.png                       280.84 kB
+dist/assets/tactical-terrain-dZKR1O_s.webp                    382.04 kB
+dist/assets/signal-preview-desktop-hvlbe1pv.png               701.57 kB
+dist/assets/Nuages-gfM5StAm.png                             1,467.31 kB
+dist/assets/Project_WE310-oqzR34Sj.wav                     21,506.81 kB
+dist/assets/PdfBook-Cl5OSk3V.css                                1.51 kB │ gzip:   0.74 kB
+dist/assets/mikuscene-vPGJpuPG.css                              2.55 kB │ gzip:   1.15 kB
+dist/assets/SroWorldPage-CAgmVcKT.css                           4.95 kB │ gzip:   1.67 kB
+dist/assets/index-vAhAP_jc.css                                 35.09 kB │ gzip:   7.73 kB
+dist/assets/TacticalBoardApp-DRUv__vQ.css                      62.42 kB │ gzip:  13.37 kB
+dist/assets/extends-CvVTau-c.js                                 0.23 kB │ gzip:   0.18 kB
+dist/assets/vanilla-DZJGj1NY.js                                 0.32 kB │ gzip:   0.23 kB
+dist/assets/jsx-runtime-DYfQNk55.js                             0.42 kB │ gzip:   0.29 kB
+dist/assets/PortfolioProjectDetailPage-Bx25E-EQ.js              0.70 kB │ gzip:   0.44 kB
+dist/assets/PortfolioLabDetailPage-vZq4Fw4g.js                  0.96 kB │ gzip:   0.56 kB
+dist/assets/PortfolioMusicDetailPage-YLUTXHJJ.js                1.33 kB │ gzip:   0.74 kB
+dist/assets/MusicModel-B_IIjUWz.js                              1.66 kB │ gzip:   0.93 kB
+dist/assets/SroWorldPage-BlJH9evV.js                            1.87 kB │ gzip:   0.86 kB
+dist/assets/react-dom-BRSbvI1o.js                               3.53 kB │ gzip:   1.33 kB
+dist/assets/PortfolioEntrySections-Swv2pa7E.js                  4.83 kB │ gzip:   1.50 kB
+dist/assets/SroWorldCanvas--I7FhH9Z.js                          5.50 kB │ gzip:   2.04 kB
+dist/assets/react-Ca03aNmg.js                                   8.34 kB │ gzip:   3.23 kB
+dist/assets/mikuscene-DCk0eJqc.js                               9.93 kB │ gzip:   3.25 kB
+dist/assets/Sparkles-fqVWwxHE.js                               11.13 kB │ gzip:   4.16 kB
+dist/assets/domAnimationFeatures-Cax1AQ9T.js                   11.20 kB │ gzip:   4.24 kB
+dist/assets/GhostSignalCanvas-BCs_de8w.js                      17.01 kB │ gzip:   6.46 kB
+dist/assets/PdfBook-CKGRwK9W.js                                45.12 kB │ gzip:  11.00 kB
+dist/assets/Gltf-BBcW4JJH.js                                   71.35 kB │ gzip:  20.98 kB
+dist/assets/TacticalBoardApp-BFFHGTRE.js                      284.26 kB │ gzip:  86.84 kB
+dist/assets/index-CuCL0tAS.js                                 342.09 kB │ gzip: 110.69 kB
+dist/assets/events-b389eeca.esm-CvviAGpc.js                   880.17 kB │ gzip: 234.28 kB
+
+[32m✓ built in 952ms[39m
+[33m[plugin builtin:vite-reporter] 
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+
+> chess-strat@0.0.0 postbuild
+> node scripts/copy-spa-fallback.mjs
+
+[spa-fallback] dist/404.html créé à partir de dist/index.html.
+
+--- npm ci ---
+
+added 196 packages, and audited 197 packages in 7s
+
+34 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
