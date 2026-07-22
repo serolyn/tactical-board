@@ -9,7 +9,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import SiteRouter from '@/app/SiteRouter'
-import '@/tactical-board/styles/tactical-board-performance.css'
+import '@/tactical-board/features/battlefield/Battlefield.performance.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
