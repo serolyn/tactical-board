@@ -1,13 +1,10 @@
 /**
- * @packageDocumentation
- * Effets WebGL du portfolio.
+ * Profils graphiques utilisés par Ghost Signal.
  *
- * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
- * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
- * faire à la place.
+ * Le choix est effectué une seule fois au chargement. Les mêmes valeurs de rendu
+ * sont conservées, mais le site ne change plus automatiquement de profil pendant
+ * l'utilisation.
  */
-
-/** Budgets graphiques utilisés avant et pendant la mesure de performance du canvas. */
 export type GhostSignalQuality = 'high' | 'low'
 
 export interface GhostSignalQualityProfile {
@@ -18,9 +15,8 @@ export interface GhostSignalQualityProfile {
   readonly fragments: 10 | 18
   readonly backShell: boolean
   readonly atmosphericLines: boolean
-  readonly estimatedDrawCalls: number
-  readonly estimatedTriangles: number
 }
+
 export const GHOST_SIGNAL_PROFILES = {
   high: {
     id: 'high',
@@ -30,8 +26,6 @@ export const GHOST_SIGNAL_PROFILES = {
     fragments: 18,
     backShell: true,
     atmosphericLines: true,
-    estimatedDrawCalls: 7,
-    estimatedTriangles: 15_672,
   },
   low: {
     id: 'low',
@@ -41,10 +35,8 @@ export const GHOST_SIGNAL_PROFILES = {
     fragments: 10,
     backShell: false,
     atmosphericLines: false,
-    estimatedDrawCalls: 4,
-    estimatedTriangles: 3_976,
   },
-} as const satisfies Record<'high' | 'low', GhostSignalQualityProfile>
+} as const satisfies Record<GhostSignalQuality, GhostSignalQualityProfile>
 
 export interface GhostSignalQualitySignals {
   readonly viewportWidth: number
@@ -52,7 +44,10 @@ export interface GhostSignalQualitySignals {
   readonly deviceMemory?: number
 }
 
-/** Choisit un profil initial prudent avant que la mesure des images prenne le relais. */
+/**
+ * Conserve le choix initial historique : petit écran ou matériel modeste utilise
+ * le profil bas, les autres appareils utilisent le profil haut.
+ */
 export function selectInitialQuality({
   viewportWidth,
   hardwareConcurrency,
@@ -67,58 +62,4 @@ export function selectInitialQuality({
   }
 
   return 'high'
-}
-/**
- * Cette fonction intervient sur le sujet “degrade Quality” dans portfolio.
- *
- * Fichier: src/portfolio/webgl/ghostSignalQualityProfile.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord degradeQuality dans ghostSignalQualityProfile.ts.
- */
-
-
-export function degradeQuality(quality: GhostSignalQuality): GhostSignalQuality {
-  return quality === 'high' ? 'low' : 'low'
-}
-
-export const GHOST_SIGNAL_PERFORMANCE_POLICY = {
-  warmupSeconds: 3,
-  sampleSeconds: 1,
-  highDeclineFps: 30,
-  fallbackFps: 24,
-  declineWindows: 2,
-  fallbackWindows: 4,
-} as const
-
-export interface GhostSignalPerformanceState {
-  readonly declineWindows: number
-  readonly fallbackWindows: number
-}
-
-export interface GhostSignalPerformanceDecision extends GhostSignalPerformanceState {
-  readonly action: 'none' | 'degrade' | 'fallback'
-}
-
-/**
- * Politique pure d'évaluation : le profil bas persiste et seule une cadence
- * durablement inférieure à 24 IPS peut désactiver WebGL.
- */
-export function evaluatePerformanceWindow(
-  profile: GhostSignalQuality,
-  fps: number,
-  state: GhostSignalPerformanceState,
-): GhostSignalPerformanceDecision {
-  const fallbackWindows = fps < GHOST_SIGNAL_PERFORMANCE_POLICY.fallbackFps
-    ? state.fallbackWindows + 1
-    : 0
-  const declineWindows = profile === 'high' && fps < GHOST_SIGNAL_PERFORMANCE_POLICY.highDeclineFps
-    ? state.declineWindows + 1
-    : 0
-
-  if (profile === 'low' && fallbackWindows >= GHOST_SIGNAL_PERFORMANCE_POLICY.fallbackWindows) {
-    return { action: 'fallback', declineWindows, fallbackWindows }
-  }
-  if (profile === 'high' && declineWindows >= GHOST_SIGNAL_PERFORMANCE_POLICY.declineWindows) {
-    return { action: 'degrade', declineWindows, fallbackWindows }
-  }
-  return { action: 'none', declineWindows, fallbackWindows }
 }

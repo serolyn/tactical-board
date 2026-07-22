@@ -1,24 +1,18 @@
 /**
- * @packageDocumentation
- * Effets WebGL du portfolio.
+ * Canvas de Ghost Signal.
  *
- * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
- * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
- * faire à la place.
+ * Le profil graphique est choisi une seule fois au chargement. Le compteur FPS
+ * reste disponible pour le diagnostic, mais il ne modifie plus le rendu en cours.
  */
-
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { WebGLRenderer } from 'three'
+
 import { bindWebGLContextLifecycle } from './webglContextLifecycle'
 import { GhostSignalScene } from './GhostSignalScene'
 import {
-  GHOST_SIGNAL_PERFORMANCE_POLICY,
   GHOST_SIGNAL_PROFILES,
-  degradeQuality,
-  evaluatePerformanceWindow,
   selectInitialQuality,
-  type GhostSignalPerformanceDecision,
   type GhostSignalQuality,
 } from './ghostSignalQualityProfile'
 import type { GhostSignalFallbackCause } from './ghostSignalCapabilities'
@@ -50,13 +44,9 @@ interface GhostSignalFrameLifecycleProps {
   readonly onSuspended: () => void
 }
 
-interface GhostSignalPerformanceGuardProps {
+interface GhostSignalFpsMeterProps {
   readonly active: boolean
-  readonly enabled: boolean
-  readonly onDecline: () => void
-  readonly onFailure: (cause: GhostSignalFallbackCause) => void
   readonly onFps: (fps: number | null) => void
-  readonly profile: GhostSignalQuality
 }
 
 /** Surveille le premier rendu et les pertes de contexte du canvas. */
@@ -96,14 +86,17 @@ function GhostSignalFrameLifecycle({
 
   useFrame(() => {
     if (ready.current || readyFrame.current !== null) return
+
     readyFrame.current = requestAnimationFrame(() => {
       readyFrame.current = null
       const context = gl.getContext()
+
       if (context.isContextLost()) return
       if (context.getError() !== context.NO_ERROR) {
         onFailure('gl-error')
         return
       }
+
       ready.current = true
       onReady()
     })
@@ -112,36 +105,24 @@ function GhostSignalFrameLifecycle({
   return null
 }
 
-/** Dégrade progressivement la qualité avant de choisir le repli statique. */
-function GhostSignalPerformanceGuard({
-  active,
-  enabled,
-  onDecline,
-  onFailure,
-  onFps,
-  profile,
-}: GhostSignalPerformanceGuardProps) {
+/**
+ * Mesure uniquement les FPS pour la fenêtre de diagnostic.
+ * Cette mesure n'altère ni le profil, ni les objets, ni les animations.
+ */
+function GhostSignalFpsMeter({ active, onFps }: GhostSignalFpsMeterProps) {
   const warmupElapsed = useRef(0)
   const sampleElapsed = useRef(0)
   const sampleFrames = useRef(0)
-  const failed = useRef(false)
-  const policyState = useRef<GhostSignalPerformanceDecision>({
-    action: 'none',
-    declineWindows: 0,
-    fallbackWindows: 0,
-  })
 
   useEffect(() => {
     warmupElapsed.current = 0
     sampleElapsed.current = 0
     sampleFrames.current = 0
-    failed.current = false
-    policyState.current = { action: 'none', declineWindows: 0, fallbackWindows: 0 }
     onFps(null)
-  }, [active, enabled, onFps, profile])
+  }, [active, onFps])
 
   useFrame((_, delta) => {
-    if (!active || !enabled || failed.current) return
+    if (!active) return
 
     if (!Number.isFinite(delta) || delta <= 0) {
       sampleElapsed.current = 0
@@ -149,44 +130,29 @@ function GhostSignalPerformanceGuard({
       return
     }
 
-    if (warmupElapsed.current < GHOST_SIGNAL_PERFORMANCE_POLICY.warmupSeconds) {
+    // Même délai qu'avant : le canvas se stabilise trois secondes avant la mesure.
+    if (warmupElapsed.current < 3) {
       warmupElapsed.current += delta
       return
     }
 
     sampleElapsed.current += delta
     sampleFrames.current += 1
-    if (sampleElapsed.current < GHOST_SIGNAL_PERFORMANCE_POLICY.sampleSeconds) return
+
+    if (sampleElapsed.current < 1) return
 
     const fps = sampleFrames.current / sampleElapsed.current
     sampleElapsed.current = 0
     sampleFrames.current = 0
     onFps(Math.round(fps * 10) / 10)
-
-    const decision = evaluatePerformanceWindow(profile, fps, policyState.current)
-    policyState.current = decision
-    if (decision.action === 'degrade') {
-      onDecline()
-      return
-    }
-    if (decision.action === 'fallback') {
-      failed.current = true
-      onFailure('sustained-fps-below-24')
-    }
   })
 
   return null
 }
-/**
- * Cette fonction extrait le sujet “initial Ghost Signal Quality” dans portfolio.
- *
- * Fichier: src/portfolio/webgl/GhostSignalCanvas.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord selectInitialGhostSignalQuality dans GhostSignalCanvas.tsx.
- */
-
 
 function selectInitialGhostSignalQuality(): GhostSignalQuality {
   const deviceMemory = (navigator as NavigatorWithDeviceMemory).deviceMemory
+
   return selectInitialQuality({
     viewportWidth: window.innerWidth,
     hardwareConcurrency: navigator.hardwareConcurrency,
@@ -194,7 +160,7 @@ function selectInitialGhostSignalQuality(): GhostSignalQuality {
   })
 }
 
-/** Orchestre le canvas, sa qualité adaptative et son repli sans exposer Three au reste du site. */
+/** Orchestre le canvas sans exposer Three au reste du site. */
 export default function GhostSignalCanvas({
   active,
   host,
@@ -205,16 +171,12 @@ export default function GhostSignalCanvas({
   onSignalChange,
   onSuspended,
 }: GhostSignalCanvasProps) {
-  const [quality, setQuality] = useState<GhostSignalQuality>(selectInitialGhostSignalQuality)
+  const [quality] = useState<GhostSignalQuality>(selectInitialGhostSignalQuality)
   const [monitoring, setMonitoring] = useState(false)
   const pointer = useRef({ x: 0, y: 0 })
   const scroll = useRef(0)
   const profile = GHOST_SIGNAL_PROFILES[quality]
   const compact = typeof window !== 'undefined' && window.innerWidth < 768
-
-  const decline = useCallback(() => {
-    setQuality((current) => degradeQuality(current))
-  }, [])
 
   const handleReady = useCallback(() => {
     setMonitoring(true)
@@ -241,12 +203,14 @@ export default function GhostSignalCanvas({
 
   useEffect(() => {
     if (!host) return undefined
+
     const scrollContainer = host.closest<HTMLElement>('[data-portfolio-scroll]')
 
     const updateScroll = () => {
       const bounds = host.getBoundingClientRect()
       scroll.current = Math.max(0, Math.min(1, -bounds.top / Math.max(1, bounds.height)))
     }
+
     updateScroll()
     scrollContainer?.addEventListener('scroll', updateScroll, { passive: true })
 
@@ -259,11 +223,19 @@ export default function GhostSignalCanvas({
     const handlePointerMove = (event: PointerEvent) => {
       const bounds = host.getBoundingClientRect()
       if (bounds.width <= 0 || bounds.height <= 0) return
-      pointer.current.x = Math.max(-1, Math.min(1, ((event.clientX - bounds.left) / bounds.width) * 2 - 1))
-      pointer.current.y = Math.max(-1, Math.min(1, -(((event.clientY - bounds.top) / bounds.height) * 2 - 1)))
+
+      pointer.current.x = Math.max(
+        -1,
+        Math.min(1, ((event.clientX - bounds.left) / bounds.width) * 2 - 1),
+      )
+      pointer.current.y = Math.max(
+        -1,
+        Math.min(1, -(((event.clientY - bounds.top) / bounds.height) * 2 - 1)),
+      )
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
+
     return () => {
       window.removeEventListener('pointermove', handlePointerMove)
       scrollContainer?.removeEventListener('scroll', updateScroll)
@@ -304,13 +276,9 @@ export default function GhostSignalCanvas({
         onRestoring={handleLoading}
         onSuspended={handleSuspended}
       />
-      <GhostSignalPerformanceGuard
-        active={active}
-        enabled={monitoring}
-        onDecline={decline}
-        onFailure={onFailure}
+      <GhostSignalFpsMeter
+        active={active && monitoring}
         onFps={publishFps}
-        profile={quality}
       />
     </Canvas>
   )

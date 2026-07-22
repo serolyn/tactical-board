@@ -1,19 +1,12 @@
 /**
- * @packageDocumentation
- * Tests automatiques du projet.
- *
- * Ce fichier vérifie un comportement précis pour éviter les régressions.
- * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
- * rester vrai.
+ * Vérifie les fallbacks visibles et les diagnostics de Ghost Signal.
  */
-
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import { useEffect } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { HeroVisualSlot } from '@/portfolio/components/PortfolioHeroVisualSlot'
 import type { GhostSignalCanvasProps } from '@/portfolio/webgl/GhostSignalCanvas'
-import { evaluatePerformanceWindow } from '@/portfolio/webgl/ghostSignalQualityProfile'
 import { bindWebGLContextLifecycle } from '@/portfolio/webgl/webglContextLifecycle'
 
 const dynamicModuleEvaluated = vi.hoisted(() => vi.fn())
@@ -21,6 +14,7 @@ const canvasMode = vi.hoisted(() => ({ value: 'ready' as 'ready' | 'failure' }))
 
 vi.mock('@/portfolio/webgl/GhostSignalCanvas', () => {
   dynamicModuleEvaluated()
+
   return {
     default: function GhostSignalCanvasMock({
       onDiagnostics,
@@ -32,17 +26,11 @@ vi.mock('@/portfolio/webgl/GhostSignalCanvas', () => {
         if (canvasMode.value === 'failure') onFailure('shader-error')
         else onReady()
       }, [onDiagnostics, onFailure, onReady])
+
       return <span data-testid="ghost-canvas" />
     },
   }
 })
-/**
- * Cette fonction intervient sur le sujet “install Motion Preference” dans tests.
- *
- * Fichier: src/tests/webglFallback.test.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord installMotionPreference dans webglFallback.test.tsx.
- */
-
 
 function installMotionPreference(reduced: boolean) {
   Object.defineProperty(window, 'matchMedia', {
@@ -54,13 +42,6 @@ function installMotionPreference(reduced: boolean) {
     })),
   })
 }
-/**
- * Cette fonction intervient sur le sujet “install Web GL” dans tests.
- *
- * Fichier: src/tests/webglFallback.test.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord installWebGL dans webglFallback.test.tsx.
- */
-
 
 function installWebGL(available: boolean, throws = false) {
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation((kind) => {
@@ -83,7 +64,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('fallback progressif de Ghost Signal', () => {
+describe('fallback et diagnostics de Ghost Signal', () => {
   it('reste statique avec mouvement réduit sans évaluer le Canvas', async () => {
     installMotionPreference(true)
     installWebGL(true)
@@ -102,6 +83,7 @@ describe('fallback progressif de Ghost Signal', () => {
     installMotionPreference(false)
     installWebGL(false)
     const first = render(<HeroVisualSlot alt="Premier ciel" src="/first.webp" />)
+
     await waitFor(() => expect(first.container.querySelector('[data-webgl-state]'))
       .toHaveAttribute('data-webgl-fallback-cause', 'webgl2-unavailable'))
     expect(dynamicModuleEvaluated).not.toHaveBeenCalled()
@@ -111,12 +93,13 @@ describe('fallback progressif de Ghost Signal', () => {
     installMotionPreference(false)
     installWebGL(false, true)
     const second = render(<HeroVisualSlot alt="Second ciel" src="/second.webp" />)
+
     await waitFor(() => expect(second.container.querySelector('[data-webgl-state]'))
       .toHaveAttribute('data-webgl-fallback-cause', 'webgl2-unavailable'))
     expect(screen.getByRole('img', { name: 'Second ciel' })).toBeInTheDocument()
   })
 
-  it('active le Canvas après la première frame et garde save-data informatif', async () => {
+  it('active le Canvas après la première frame et garde les diagnostics visibles', async () => {
     installMotionPreference(false)
     installWebGL(true)
     Object.defineProperty(navigator, 'connection', {
@@ -154,7 +137,7 @@ describe('fallback progressif de Ghost Signal', () => {
     expect(container.querySelector('.hero-visual-slot__future--ready')).not.toBeInTheDocument()
   })
 
-  it('restaure un contexte bref et ne bascule pour les FPS qu’après quatre fenêtres basses', () => {
+  it('restaure un contexte WebGL brièvement perdu', () => {
     vi.useFakeTimers()
     const canvas = document.createElement('canvas')
     const callbacks = {
@@ -168,19 +151,11 @@ describe('fallback progressif de Ghost Signal', () => {
     vi.advanceTimersByTime(1_000)
     canvas.dispatchEvent(new Event('webglcontextrestored'))
     vi.advanceTimersByTime(2_000)
+
     expect(callbacks.onLost).toHaveBeenCalledOnce()
     expect(callbacks.onRestored).toHaveBeenCalledOnce()
     expect(callbacks.onPermanentFailure).not.toHaveBeenCalled()
+
     release()
-
-    let state = { action: 'none' as const, declineWindows: 0, fallbackWindows: 0 }
-    for (let index = 0; index < 3; index += 1) {
-      const decision = evaluatePerformanceWindow('low', 23, state)
-      expect(decision.action).toBe('none')
-      state = { ...decision, action: 'none' }
-    }
-    expect(evaluatePerformanceWindow('low', 23, state).action).toBe('fallback')
-    expect(evaluatePerformanceWindow('low', 24, state).fallbackWindows).toBe(0)
-
   })
 })
