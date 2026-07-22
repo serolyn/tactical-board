@@ -1,0 +1,30 @@
+name: Diagnostiquer les remplacements visuels
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer la branche
+        uses: actions/checkout@v4
+        with:
+          ref: fix/visual-preserving-cleanup
+
+      - name: Produire le rapport
+        run: node scripts/diagnose-visual-cleanup.mjs
+
+      - name: Enregistrer le rapport
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add visual-cleanup-diagnostic.txt
+          git commit -m "ci: publish visual cleanup diagnostics"
+          git push
