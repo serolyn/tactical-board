@@ -1,4 +1,4 @@
-name: Diagnostiquer les remplacements visuels
+name: Diagnostiquer le typecheck du correctif visuel
 
 on:
   pull_request:
@@ -18,13 +18,34 @@ jobs:
         with:
           ref: fix/visual-preserving-cleanup
 
-      - name: Produire le rapport
-        run: node scripts/diagnose-visual-cleanup.mjs
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
 
-      - name: Enregistrer le rapport
+      - name: Reproduire les transformations
         run: |
+          node scripts/visual-preserving-cleanup.mjs
+          rm -rf docs/api
+          rm -f typedoc.json scripts/add-package-docs.mjs scripts/add-function-docs.mjs
+          npm install --package-lock-only --ignore-scripts
+          npm ci
+
+      - name: Capturer le typecheck
+        run: |
+          set +e
+          npm run typecheck > visual-cleanup-diagnostic.txt 2>&1
+          code=$?
+          printf '\nexit_code=%s\n' "$code" >> visual-cleanup-diagnostic.txt
+          exit 0
+
+      - name: Enregistrer uniquement le rapport
+        run: |
+          git restore . ':!visual-cleanup-diagnostic.txt'
+          git clean -fd -e visual-cleanup-diagnostic.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add visual-cleanup-diagnostic.txt
-          git commit -m "ci: publish visual cleanup diagnostics"
+          git commit -m "ci: publish visual cleanup typecheck diagnostics"
           git push
