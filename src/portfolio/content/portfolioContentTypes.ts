@@ -1,8 +1,9 @@
-
-
-// ici les types utilise sont cree et initialise avec leurs regles comme dans un DTD
-
 import type { ComponentType } from 'react'
+
+/*
+ * Ces types décrivent les objets écrits dans les trois fichiers de contenu.
+ * Ils servent surtout à détecter les fautes de structure pendant le développement.
+ */
 
 export type EntryStatus =
   | 'Brouillon'
@@ -61,26 +62,18 @@ export type MetadataSection = {
   readonly items: readonly MetadataItem[]
 }
 
-export type LinkSection = {
-  readonly id: string
-  readonly type: 'link'
-  readonly title?: string
-  readonly description?: string
-  readonly link: ContentLink
-}
-
 export type ComponentSection = {
   readonly id: string
   readonly type: 'component'
   readonly component: ComponentType
 }
 
+/* Seuls les formats réellement utilisés par le portfolio sont conservés. */
 export type ContentSection =
   | TextSection
   | ImageSection
   | QuoteSection
   | MetadataSection
-  | LinkSection
   | ComponentSection
 
 export type ContentCredit = {
@@ -96,6 +89,11 @@ type BaseEntry = {
   readonly status: EntryStatus
   readonly summary: string
   readonly sections: readonly ContentSection[]
+
+  /*
+   * true  : l'entrée apparaît dans le portfolio.
+   * false : elle reste disponible dans le code comme brouillon, sans être publiée.
+   */
   readonly published: boolean
 }
 
@@ -109,13 +107,13 @@ export type ProjectEntry = BaseEntry & {
 }
 
 export type MusicEntry = BaseEntry & {
-  
-/** Un brouillon peut omettre son visuel plutôt que présenter une fausse pochette. */
+  /** Un brouillon peut omettre son visuel plutôt que présenter une fausse pochette. */
   readonly artwork: ContentImage | null
   readonly storyOverlay?: ComponentType
+
   /**
-   * Une scène "hero" est un calque absolu, comme Nemyl.
-   * Une scène "afterHero" garde sa propre boîte dans le flux, comme Miku.
+   * `hero` convient aux calques absolus comme la scène Nemyl.
+   * `afterHero` convient aux scènes autonomes possédant leur propre boîte, comme Miku.
    */
   readonly storyOverlayPlacement?: 'hero' | 'afterHero'
   readonly audioSrc?: string
@@ -136,12 +134,6 @@ export type LabEntry = BaseEntry & {
 }
 
 export type PortfolioEntry = ProjectEntry | MusicEntry | LabEntry
-
-export type PortfolioContent = {
-  readonly projects: readonly ProjectEntry[]
-  readonly music: readonly MusicEntry[]
-  readonly lab: readonly LabEntry[]
-}
 
 export type SiteIdentity = {
   readonly name: string
@@ -180,8 +172,8 @@ export type SiteContent = {
     readonly current: string
     readonly technologies: readonly string[]
   }
-  
-/** Les emplacements vides sont volontaires : les liens absents restent masqués. */
+
+  /** Les tableaux vides sont volontaires : aucun lien vide n'est rendu à l'écran. */
   readonly socialLinks: readonly ContentLink[]
   readonly contactLinks: readonly ContentLink[]
 }
