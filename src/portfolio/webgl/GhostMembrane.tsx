@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Effets WebGL du portfolio.
- *
- * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
- * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
- * faire à la place.
- */
-
 import { useFrame } from '@react-three/fiber'
 import { useEffect, useMemo, type MutableRefObject } from 'react'
 import type { BufferGeometry, Vector3Tuple } from 'three'

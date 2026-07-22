@@ -1,25 +1,9 @@
-/**
- * @packageDocumentation
- * Effets WebGL du portfolio.
- *
- * Ce dossier contient la partie visuelle avancée du hero: shaders, scènes et
- * fallback. Si WebGL n'est pas disponible, ces fichiers expliquent aussi quoi
- * faire à la place.
- */
-
 import { lazy, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 
 const MusicModel = lazy(() =>
   import('./MusicModel').then(({ MusicModel: Model }) => ({ default: Model })),
 )
-/**
- * Cette fonction intervient sur le sujet “can Render Music Scene” dans portfolio.
- *
- * Fichier: src/portfolio/webgl/musicScene.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord canRenderMusicScene dans musicScene.tsx.
- */
-
 
 function canRenderMusicScene() {
   if (
@@ -33,13 +17,6 @@ function canRenderMusicScene() {
   const canvas = document.createElement('canvas')
   return Boolean(canvas.getContext('webgl2') ?? canvas.getContext('webgl'))
 }
-/**
- * Cette fonction intervient sur le sujet “music Scene” dans portfolio.
- *
- * Fichier: src/portfolio/webgl/musicScene.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord MusicScene dans musicScene.tsx.
- */
-
 
 export default function MusicScene() {
   if (!canRenderMusicScene()) {

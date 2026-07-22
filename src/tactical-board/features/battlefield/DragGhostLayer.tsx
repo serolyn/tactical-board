@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Interface du plateau tactique.
- *
- * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
- * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
- * ici qu'il faut commencer.
- */
-
 import type { CSSProperties } from 'react'
 import type { Faction, TacticalUnit } from '@/tactical-board/model/tacticalBoardTypes'
 import { UnitVisual } from './UnitVisual'
@@ -20,13 +11,6 @@ export interface DragGhostLayerProps {
   units: readonly TacticalUnit[]
   valid: boolean
 }
-/**
- * Cette fonction intervient sur le sujet “drag Ghost Layer” dans tactical-board.
- *
- * Fichier: src/tactical-board/features/battlefield/DragGhostLayer.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord DragGhostLayer dans DragGhostLayer.tsx.
- */
-
 
 export function DragGhostLayer({
   assetUrls,

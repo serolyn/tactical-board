@@ -1,18 +1,8 @@
-/**
- * @packageDocumentation
- * Page routée du portfolio.
- *
- * Une page assemble plusieurs composants pour former un écran complet. Si tu
- * veux comprendre la structure d'une route comme l'accueil, le lab ou un détail,
- * lis ce fichier en premier.
- */
-
 import { useParams } from 'react-router'
 import { EntryHero } from '../components/PortfolioEntryHero'
 import { EntrySections } from '../components/PortfolioEntrySections'
 import { getPublishedProjectBySlug, type ProjectEntry } from '../content/portfolioContent'
 import { NotFoundPage } from './PortfolioNotFoundPage'
-
 
 export function ProjectDetailView({ entry }: { entry: ProjectEntry }) {
   return (
@@ -33,7 +23,6 @@ export function ProjectDetailView({ entry }: { entry: ProjectEntry }) {
     </article>
   )
 }
-
 
 export function ProjectDetailPage() {
   const { slug = '' } = useParams()

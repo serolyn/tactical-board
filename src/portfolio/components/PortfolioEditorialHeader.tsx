@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Composant visuel réutilisable du portfolio.
- *
- * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
- * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
- * voit à l'écran, c'est souvent ici qu'il faut commencer.
- */
-
 import { m } from 'motion/react'
 import { Link, NavLink } from 'react-router'
 import { motionTransitions } from '../motion/motionTokens'
@@ -17,13 +8,6 @@ const navigation = [
   { to: '/lab', label: 'Lab' },
   { to: '/about', label: 'À propos' },
 ] as const
-/**
- * Cette fonction intervient sur le sujet “editorial Header” dans portfolio.
- *
- * Fichier: src/portfolio/components/EditorialHeader.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord EditorialHeader dans EditorialHeader.tsx.
- */
-
 
 export function EditorialHeader() {
   return (

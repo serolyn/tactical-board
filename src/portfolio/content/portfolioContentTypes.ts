@@ -1,5 +1,3 @@
-
-
 // ici les types utilise sont cree et initialise avec leurs regles comme dans un DTD
 
 import type { ComponentType } from 'react'

@@ -1,21 +1,6 @@
-/**
- * @packageDocumentation
- * Hooks de comportement Tactical Board.
- *
- * Ces fonctions réutilisables branchent la logique au cycle de vie React:
- * autosave, raccourcis clavier, mode plein plateau ou URLs des assets.
- */
-
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ImageAssetRecord } from '@/tactical-board/persistence/imageAssetRecord'
 import { tacticalBoardRepository } from '@/tactical-board/persistence/tacticalBoardRepository'
-/**
- * Cette fonction intervient sur le sujet “make Asset Url Map” dans tactical-board.
- *
- * Fichier: src/tactical-board/hooks/useBoardAssetUrls.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord makeAssetUrlMap dans useBoardAssetUrls.ts.
- */
-
 
 function makeAssetUrlMap(assets: readonly ImageAssetRecord[]) {
   return Object.fromEntries(assets.map((asset) => [asset.id, URL.createObjectURL(asset.blob)]))

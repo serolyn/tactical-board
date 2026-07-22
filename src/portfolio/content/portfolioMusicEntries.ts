@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Données éditoriales du portfolio.
- *
- * Ce fichier contient le texte publié, pas la mise en page. C'est ici que tu
- * modifies les titres, résumés, listes et règles de validation du contenu.
- */
-
 import SROCOVER from '@/assets/effects/music/SRO.webp'
 import fogReflections from '@/portfolio/assets/fog-reflections.webp'
 import nemylAudio from '@/portfolio/assets/Project_WE310.wav'

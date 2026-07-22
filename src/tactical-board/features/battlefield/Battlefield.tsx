@@ -1,10 +1,3 @@
-/**
- * @packageDocumentation
- * Surface interactive du plateau tactique.
- *
- * Ce module gère le rendu DOM/SVG de la grille, des unités et annotations,
- * ainsi que les interactions de placement, sélection, déplacement et dessin.
- */
 import {
   CircleOff,
   EyeOff,
@@ -60,6 +53,7 @@ import { UnitVisual } from './UnitVisual'
 import { statusDetails, unitClassName } from './unitVisualModel'
 import { useArrowDrawing } from './useArrowDrawing'
 import styles from './Battlefield.module.css'
+import './Battlefield.performance.css'
 
 export interface BattlefieldProps {
   scenario: ScenarioDocumentV1
@@ -101,13 +95,6 @@ interface DragState {
   selectOnDrag: boolean
   selectionChanged: boolean
 }
-/**
- * Cette fonction intervient sur le sujet “marker Type From Toolbar” dans tactical-board.
- *
- * Fichier: src/tactical-board/features/battlefield/Battlefield.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord markerTypeFromToolbar dans Battlefield.tsx.
- */
-
 
 function markerTypeFromToolbar(kind: MarkerKind): MarkerAnnotation['markerType'] {
   if (kind === 'warning') return 'danger'
@@ -641,13 +628,6 @@ export const Battlefield = forwardRef<HTMLDivElement, BattlefieldProps>(function
     </div>
   )
 })
-/**
- * Cette fonction intervient sur le sujet “selection Icon” dans tactical-board.
- *
- * Fichier: src/tactical-board/features/battlefield/Battlefield.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord SelectionIcon dans Battlefield.tsx.
- */
-
 
 export function SelectionIcon({ kind }: { kind: TacticalUnit['status'] }) {
   if (kind === 'neutralized') return <CircleOff aria-hidden />

@@ -1,23 +1,7 @@
-/**
- * @packageDocumentation
- * Page routée du portfolio.
- *
- * Une page assemble plusieurs composants pour former un écran complet. Si tu
- * veux comprendre la structure d'une route comme l'accueil, le lab ou un détail,
- * lis ce fichier en premier.
- */
-
 import { EmptyState } from '../components/PortfolioEmptyState'
 import { EntryIndex } from '../components/PortfolioEntryIndex'
 import { SectionHeading } from '../components/PortfolioSectionHeading'
 import { publishedProjects, siteContent } from '../content/portfolioContent'
-/**
- * Cette fonction intervient sur le sujet “projects Page” dans portfolio.
- *
- * Fichier: src/portfolio/pages/ProjectsPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord ProjectsPage dans ProjectsPage.tsx.
- */
-
 
 export function ProjectsPage() {
   return (

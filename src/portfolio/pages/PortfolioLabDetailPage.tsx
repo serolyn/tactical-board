@@ -1,24 +1,8 @@
-/**
- * @packageDocumentation
- * Page routée du portfolio.
- *
- * Une page assemble plusieurs composants pour former un écran complet. Si tu
- * veux comprendre la structure d'une route comme l'accueil, le lab ou un détail,
- * lis ce fichier en premier.
- */
-
 import { useParams } from 'react-router'
 import { EntryHero } from '../components/PortfolioEntryHero'
 import { EntrySections } from '../components/PortfolioEntrySections'
 import { getPublishedLabBySlug, type LabEntry } from '../content/portfolioContent'
 import { NotFoundPage } from './PortfolioNotFoundPage'
-/**
- * Cette fonction intervient sur le sujet “lab Detail View” dans portfolio.
- *
- * Fichier: src/portfolio/pages/LabDetailPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord LabDetailView dans LabDetailPage.tsx.
- */
-
 
 export function LabDetailView({ entry }: { entry: LabEntry }) {
   const primaryAction = entry.slug === 'tactical-board'
@@ -49,13 +33,6 @@ export function LabDetailView({ entry }: { entry: LabEntry }) {
     </article>
   )
 }
-/**
- * Cette fonction intervient sur le sujet “lab Detail Page” dans portfolio.
- *
- * Fichier: src/portfolio/pages/LabDetailPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord LabDetailPage dans LabDetailPage.tsx.
- */
-
 
 export function LabDetailPage() {
   const { slug = '' } = useParams()

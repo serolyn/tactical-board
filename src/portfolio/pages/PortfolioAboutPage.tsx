@@ -1,21 +1,5 @@
-/**
- * @packageDocumentation
- * Page routée du portfolio.
- *
- * Une page assemble plusieurs composants pour former un écran complet. Si tu
- * veux comprendre la structure d'une route comme l'accueil, le lab ou un détail,
- * lis ce fichier en premier.
- */
-
 import { siteContent } from '../content/portfolioContent'
 import { Reveal } from '../motion/Reveal'
-/**
- * Cette fonction intervient sur le sujet “about Page” dans portfolio.
- *
- * Fichier: src/portfolio/pages/AboutPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord AboutPage dans AboutPage.tsx.
- */
-
 
 export function AboutPage() {
   const optionalLinks = [...siteContent.socialLinks, ...siteContent.contactLinks]

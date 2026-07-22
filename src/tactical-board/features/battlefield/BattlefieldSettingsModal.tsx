@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Interface du plateau tactique.
- *
- * Ce fichier gère la grille, les unités, les flèches et les marqueurs. Si tu
- * veux comprendre ce que voit l'utilisateur quand il manipule le plateau, c'est
- * ici qu'il faut commencer.
- */
-
 import { useEffect, useState } from 'react'
 import type { GridConfig } from '@/tactical-board/model/tacticalBoardTypes'
 import { Button } from '@/tactical-board/ui/Button'
@@ -22,13 +13,6 @@ export interface BattlefieldSettingsModalProps {
   unitCount: number
   annotationCount: number
 }
-/**
- * Cette fonction intervient sur le sujet “battlefield Settings Modal” dans tactical-board.
- *
- * Fichier: src/tactical-board/features/battlefield/BattlefieldSettingsModal.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord BattlefieldSettingsModal dans BattlefieldSettingsModal.tsx.
- */
-
 
 export function BattlefieldSettingsModal({
   grid,

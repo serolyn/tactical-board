@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Persistance locale de Tactical Board.
- *
- * Ce dossier explique comment le board enregistre ses scénarios dans IndexedDB,
- * recharge les données au démarrage et garde un journal de récupération.
- */
-
 /** Sécurise les modifications récentes pendant le délai de l'autosauvegarde IndexedDB. */
 import {
   legacyScenarioDocumentSchema,
@@ -20,13 +12,6 @@ import type {
 export const RECOVERY_JOURNAL_KEY = 'tactical-board:scenario-recovery:v1'
 
 export type RecoveryStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
-/**
- * Cette classe structure le sujet “recovery Journal Error” dans tactical-board.
- *
- * Fichier: src/tactical-board/persistence/recoveryJournal.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord RecoveryJournalError dans recoveryJournal.ts.
- */
-
 
 export class RecoveryJournalError extends Error {
   constructor(message: string) {
@@ -34,13 +19,6 @@ export class RecoveryJournalError extends Error {
     this.name = 'RecoveryJournalError'
   }
 }
-/**
- * Cette fonction intervient sur le sujet “browser Storage” dans tactical-board.
- *
- * Fichier: src/tactical-board/persistence/recoveryJournal.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord browserStorage dans recoveryJournal.ts.
- */
-
 
 function browserStorage(): RecoveryStorage {
   if (typeof window === 'undefined' || !window.localStorage) {
@@ -48,13 +26,6 @@ function browserStorage(): RecoveryStorage {
   }
   return window.localStorage
 }
-/**
- * Cette fonction vérifie le sujet “d Json” dans tactical-board.
- *
- * Fichier: src/tactical-board/persistence/recoveryJournal.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord validatedJson dans recoveryJournal.ts.
- */
-
 
 function validatedJson(document: ScenarioDocumentV1): string {
   const parsed = scenarioDocumentSchema.safeParse(document)

@@ -1,10 +1,3 @@
-/**
- * @packageDocumentation
- * Contenu éditorial global du portfolio.
- *
- * Ce module centralise les textes et repères transverses (home, about,
- * libellés d'actions), indépendamment de la structure des pages React.
- */
 import fogReflections from '@/portfolio/assets/fog-reflections.webp'
 import signalHorizon from '@/portfolio/assets/signal-horizon.webp'
 

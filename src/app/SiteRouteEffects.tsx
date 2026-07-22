@@ -1,10 +1,3 @@
-/**
- * @packageDocumentation
- * Synchronise les métadonnées HTML avec la route active.
- *
- * Ce module met à jour le `<title>` et la meta description à chaque navigation,
- * puis restaure l'état initial lors du démontage du routeur.
- */
 import { useEffect, useRef } from 'react'
 import { useLocation } from 'react-router'
 import { getSiteRouteMetadata } from './siteRouteMetadata'

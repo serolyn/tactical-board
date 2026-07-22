@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Tests automatiques du projet.
- *
- * Ce fichier vérifie un comportement précis pour éviter les régressions.
- * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
- * rester vrai.
- */
-
 import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -14,25 +5,11 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import SiteRouter from '@/app/SiteRouter'
 
 const BASE_PATH = '/tactical-board'
-/**
- * Cette fonction intervient sur le sujet “visit” dans tests.
- *
- * Fichier: src/tests/portfolio.test.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord visit dans portfolio.test.tsx.
- */
-
 
 function visit(pathname: string, basename = `${BASE_PATH}/`) {
   window.history.replaceState({}, '', pathname)
   return render(<SiteRouter basename={basename} />)
 }
-/**
- * Cette fonction intervient sur le sujet “description Meta” dans tests.
- *
- * Fichier: src/tests/portfolio.test.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord descriptionMeta dans portfolio.test.tsx.
- */
-
 
 function descriptionMeta() {
   return document.head.querySelector<HTMLMetaElement>('meta[name="description"]')
@@ -84,7 +61,7 @@ describe('portfolio et navigation principale', () => {
     expect(container.querySelector('[data-portfolio-scroll]')).toBeInTheDocument()
 
     await waitFor(() => {
-      expect(document.title).toBe('SEROLYN — Entre plusieurs vies')
+      expect(document.title).toBe('SEROLYN — CODE ART WAR')
       expect(descriptionMeta()).toHaveAttribute(
         'content',
         'Code, sons et systèmes pour donner une forme à ce qui flotte.',
@@ -124,22 +101,30 @@ describe('portfolio et navigation principale', () => {
     }
   })
 
-  it('affiche les états vides sans rendre les brouillons ni un lecteur audio', async () => {
+  it('affiche les templates de projets et les scènes musicales publiées', async () => {
     const { unmount } = visit(`${BASE_PATH}/projects`)
 
     expect(await screen.findByRole('heading', { level: 1, name: 'PROJETS' }))
       .toBeInTheDocument()
-    expect(screen.getByText('Les premiers systèmes sont encore en cours de documentation.'))
+    expect(
+      screen.getByRole('link', { name: 'Découvrir Nemyl, la ville des reflets' }),
+    ).toHaveAttribute('href', `${BASE_PATH}/projects/project-template`)
+    expect(screen.getByText('Exemple de structure à remplacer par un projet réel documenté.'))
       .toBeInTheDocument()
-    expect(screen.queryByText('PROJET À DOCUMENTER — BROUILLON NON PUBLIÉ'))
-      .not.toBeInTheDocument()
 
     unmount()
     visit(`${BASE_PATH}/music`)
+
     expect(await screen.findByRole('heading', { level: 1, name: 'SCÈNES SONORES' }))
       .toBeInTheDocument()
-    expect(screen.getByText('Les premières scènes seront ajoutées ici.')).toBeInTheDocument()
-    expect(screen.queryByText('À TITRER — BROUILLON NON PUBLIÉ')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Découvrir Nemyl' })).toHaveAttribute(
+      'href',
+      `${BASE_PATH}/music/ep-1`,
+    )
+    expect(screen.getByRole('link', { name: 'Découvrir SRO' })).toHaveAttribute(
+      'href',
+      `${BASE_PATH}/music/music-template-2`,
+    )
     expect(document.querySelector('audio')).not.toBeInTheDocument()
   })
 

@@ -1,24 +1,8 @@
-/**
- * @packageDocumentation
- * Page routée du portfolio.
- *
- * Une page assemble plusieurs composants pour former un écran complet. Si tu
- * veux comprendre la structure d'une route comme l'accueil, le lab ou un détail,
- * lis ce fichier en premier.
- */
-
 import { Link } from 'react-router'
 
 interface NotFoundPageProps {
   detail?: boolean
 }
-/**
- * Cette fonction intervient sur le sujet “not Found Page” dans portfolio.
- *
- * Fichier: src/portfolio/pages/NotFoundPage.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord NotFoundPage dans NotFoundPage.tsx.
- */
-
 
 export function NotFoundPage({ detail = false }: NotFoundPageProps) {
   return (

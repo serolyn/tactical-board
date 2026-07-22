@@ -1,12 +1,5 @@
 /** Valide et remappe les paquets JSON échangés sans écriture partielle. */
-/**
- * @packageDocumentation
- * Import/export des scénarios Tactical Board.
- *
- * Ce module valide les formats JSON, remappe les identifiants importés,
- * reconstruit les assets associés et protège l'application contre les imports
- * partiels ou incompatibles.
- */
+
 import { z } from 'zod'
 import {
   documentIdSchema,
@@ -131,13 +124,6 @@ export interface ImportScenarioOptions {
 /** Nom résolu avant l'ouverture de la transaction atomique scénario/assets. */
   overrideName?: string | ((sourceName: string) => string)
 }
-/**
- * Cette classe structure le sujet “scenario Import Error” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord ScenarioImportError dans scenarioExchange.ts.
- */
-
 
 export class ScenarioImportError extends Error {
   readonly issues: readonly string[]
@@ -148,13 +134,6 @@ export class ScenarioImportError extends Error {
     this.issues = issues
   }
 }
-/**
- * Cette fonction intervient sur le sujet “assert Unique Ids” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord assertUniqueIds dans scenarioExchange.ts.
- */
-
 
 function assertUniqueIds(
   entries: readonly { id: string }[],
@@ -167,13 +146,6 @@ function assertUniqueIds(
     seen.add(entry.id)
   }
 }
-/**
- * Cette fonction teste le sujet “inside” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord isInside dans scenarioExchange.ts.
- */
-
 
 function isInside(position: Position, rows: number, columns: number): boolean {
   return (
@@ -183,24 +155,10 @@ function isInside(position: Position, rows: number, columns: number): boolean {
     position.column < columns
   )
 }
-/**
- * Cette fonction rassemble le sujet “icon Asset Id” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord collectIconAssetId dans scenarioExchange.ts.
- */
-
 
 function collectIconAssetId(icon: IconRef, target: Set<string>): void {
   if (icon.kind === 'asset') target.add(icon.assetId)
 }
-/**
- * Cette fonction vérifie le sujet “scenario References” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord validateScenarioReferences dans scenarioExchange.ts.
- */
-
 
 function validateScenarioReferences(
   scenario: ScenarioDocumentV1,
@@ -263,37 +221,16 @@ function validateScenarioReferences(
     throw new ScenarioImportError('Le scénario contient des références invalides.', issues)
   }
 }
-/**
- * Cette fonction intervient sur le sujet “make Id Map” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord makeIdMap dans scenarioExchange.ts.
- */
-
 
 function makeIdMap(ids: readonly string[]): Map<string, string> {
   return new Map(ids.map((id) => [id, crypto.randomUUID()]))
 }
-/**
- * Cette fonction intervient sur le sujet “remap Icon” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord remapIcon dans scenarioExchange.ts.
- */
-
 
 function remapIcon(icon: IconRef, assetIds: ReadonlyMap<string, string>): IconRef {
   return icon.kind === 'asset'
     ? { kind: 'asset', assetId: assetIds.get(icon.assetId) ?? icon.assetId }
     : icon
 }
-/**
- * Cette fonction intervient sur le sujet “remap Scenario” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord remapScenario dans scenarioExchange.ts.
- */
-
 
 function remapScenario(
   source: ScenarioDocumentV1,
@@ -341,13 +278,6 @@ function remapScenario(
     })),
   }
 }
-/**
- * Cette fonction formate le sujet “zod Issues” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord formatZodIssues dans scenarioExchange.ts.
- */
-
 
 function formatZodIssues(error: z.ZodError): string[] {
   return error.issues.map((issue) => {
@@ -355,13 +285,6 @@ function formatZodIssues(error: z.ZodError): string[] {
     return `${location} : ${issue.message}`
   })
 }
-/**
- * Cette fonction intervient sur le sujet “source To Value” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord sourceToValue dans scenarioExchange.ts.
- */
-
 
 async function sourceToValue(source: string | Blob | unknown): Promise<unknown> {
   if (source instanceof Blob) {
@@ -382,13 +305,6 @@ async function sourceToValue(source: string | Blob | unknown): Promise<unknown> 
     throw new ScenarioImportError('Le fichier sélectionné n’est pas un JSON valide.')
   }
 }
-/**
- * Cette fonction construit le sujet “exported Assets” dans tactical-board.
- *
- * Fichier: src/tactical-board/import-export/scenarioExchange.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord createExportedAssets dans scenarioExchange.ts.
- */
-
 
 async function createExportedAssets(
   scenarios: readonly ScenarioDocumentV1[],

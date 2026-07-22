@@ -1,11 +1,3 @@
-/**
- * @packageDocumentation
- * Modèle métier pur de Tactical Board.
- *
- * Ce module décrit le mécanisme d'annulation/rétablissement du board.
- * Il ne dépend pas de React: il ne manipule que des états de scénario.
- */
-
 import { applyCommand } from './applyScenarioCommand'
 import type {
   CommandResult,

@@ -1,10 +1,3 @@
-/**
- * @packageDocumentation
- * Source unique des métadonnées SEO/navigation par route.
- *
- * Ce module associe chaque pathname public à un titre et une description,
- * et fournit un fallback stable pour les routes inconnues.
- */
 export type SiteRouteMetadata = {
   title: string
   description: string
@@ -57,25 +50,11 @@ export const siteRouteMetadata: Readonly<Record<string, SiteRouteMetadata>> = {
     description: 'Je construis entre code, son et image.',
   },
 }
-/**
- * Cette fonction nettoie le sujet “route Pathname” dans app.
- *
- * Fichier: src/app/siteRouteMetadata.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord normalizeRoutePathname dans siteRouteMetadata.ts.
- */
-
 
 function normalizeRoutePathname(pathname: string) {
   if (pathname === '/') return pathname
   return pathname.replace(/\/+$/, '')
 }
-/**
- * Cette fonction intervient sur le sujet “get Site Route Metadata” dans app.
- *
- * Fichier: src/app/siteRouteMetadata.ts
- * Si tu lis ce fichier pour apprendre, regarde d’abord getSiteRouteMetadata dans siteRouteMetadata.ts.
- */
-
 
 export function getSiteRouteMetadata(pathname: string): SiteRouteMetadata {
   return siteRouteMetadata[normalizeRoutePathname(pathname)] ?? fallbackSiteRouteMetadata
