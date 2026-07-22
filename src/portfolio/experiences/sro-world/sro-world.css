@@ -381,10 +381,3 @@
     padding: 16px 18px;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .sro-world-page__grain,
-  .sro-world-page__loading span {
-    animation: none;
-  }
-}

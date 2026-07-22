@@ -7,7 +7,7 @@
  * visibles et d'autres très discrètes.
  */
 
-import { m, useReducedMotion } from 'motion/react'
+import { m } from 'motion/react'
 import type { ReactNode } from 'react'
 import { Link, type LinkProps } from 'react-router'
 
@@ -33,7 +33,7 @@ export function AnimatedLink({
   indicator = false,
   ...linkProps
 }: AnimatedLinkProps) {
-  const reducedMotion = Boolean(useReducedMotion())
+  const reducedMotion = false
   const indicatorVariants = getLinkIndicatorVariants(reducedMotion)
 
   return (

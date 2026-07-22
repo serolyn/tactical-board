@@ -7,7 +7,7 @@
  * visibles et d'autres très discrètes.
  */
 
-import { m, useReducedMotion, type HTMLMotionProps } from 'motion/react'
+import { m, type HTMLMotionProps } from 'motion/react'
 import type { ReactNode } from 'react'
 
 import {
@@ -61,7 +61,7 @@ export function StaggerGroup({
   threshold,
   ...motionProps
 }: StaggerGroupProps) {
-  const reducedMotion = Boolean(useReducedMotion())
+  const reducedMotion = false
   const { isVisible, observerAvailable, revealNow, setTarget } = useViewportReveal({
     disabled,
     once,
@@ -101,7 +101,7 @@ export function StaggerItem({
   children,
   ...motionProps
 }: StaggerItemProps) {
-  const reducedMotion = Boolean(useReducedMotion())
+  const reducedMotion = false
   const MotionElement = itemElements[as] as typeof m.div
 
   return (

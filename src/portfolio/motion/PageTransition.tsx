@@ -7,7 +7,7 @@
  * visibles et d'autres très discrètes.
  */
 
-import { m, useReducedMotion, type HTMLMotionProps } from 'motion/react'
+import { m, type HTMLMotionProps } from 'motion/react'
 import type { ReactNode } from 'react'
 
 import { getPageTransitionVariants } from './motionTokens'
@@ -30,7 +30,7 @@ export function PageTransition({
   routeKey,
   ...motionProps
 }: PageTransitionProps) {
-  const reducedMotion = Boolean(useReducedMotion())
+  const reducedMotion = false
 
   return (
     <m.div

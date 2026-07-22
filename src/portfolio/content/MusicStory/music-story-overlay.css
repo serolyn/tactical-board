@@ -147,16 +147,3 @@
     width: 34vw;
   }
 }
-
-
-@media (prefers-reduced-motion: reduce) {
-  .arrow-flight,
-  .crow-impact {
-    display: none;
-  }
-
-  .rose,
-  .crow {
-    will-change: auto;
-  }
-}

@@ -1761,25 +1761,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .portfolio-shell {
-    scroll-behavior: auto;
-  }
-
-  .portfolio-shell *,
-  .portfolio-shell *::before,
-  .portfolio-shell *::after {
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-  }
-
-  .hero-visual-slot__future {
-    display: none;
-  }
-}
-
 .music-page__visual {
   width: min(100%, 34rem);
   margin-block: 0.5rem 1.4rem;

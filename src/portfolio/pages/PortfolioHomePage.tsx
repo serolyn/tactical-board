@@ -8,7 +8,7 @@
  */
 
 import { useCallback, useState } from 'react'
-import { m, useReducedMotion } from 'motion/react'
+import { m } from 'motion/react'
 import { EmptyState } from '../components/PortfolioEmptyState'
 import { EntryIndex } from '../components/PortfolioEntryIndex'
 import { HeroVisualSlot } from '../components/PortfolioHeroVisualSlot'
@@ -35,7 +35,7 @@ import {
 
 export function HomePage() {
   const [ghostSignalActive, setGhostSignalActive] = useState(false)
-  const reducedMotion = Boolean(useReducedMotion())
+  const reducedMotion = false
   const handleGhostSignalChange = useCallback((active: boolean) => {
     setGhostSignalActive(active)
   }, [])
