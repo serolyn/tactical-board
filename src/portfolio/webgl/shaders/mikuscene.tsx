@@ -18,9 +18,10 @@ import {
 import {
   AdditiveBlending,
   MathUtils,
+  Vector3,
 } from 'three'
 
-import type { Group } from 'three'
+import type { Group, Mesh, } from 'three'
 
 import MikuModel from './mikumodel'
 
@@ -31,19 +32,55 @@ import '@/portfolio/styles/miku.css'
  */
 const MODEL_POSITION: [number, number, number] = [
   0,
-  -0.15,
+  -0.90,
   0,
 ]
 
 const MODEL_SCALE = 1
 
+function TrainingSignal(){ //fonctionm de reference 
+
+  const signalRef = useRef<Mesh | null>(null,) //j commence par mettre la ref dans une constante une fonction qui prends comme arg une fonction et qui return un mesh
+
+  useFrame(({clock,}) => { //use frame sactualise chaque frame
+    const signal = signalRef.current // current sera la mesh courante si elle existe 
+    if(!signal){
+      return
+    }
+
+    const time = clock.elapsedTime //donne le temps qui est passe a chaque frame
+
+    //signal.position.x = 1+ Math.cos(time)   aller et retour sur l'axe x
+    signal.rotateOnAxis (new Vector3(0,1,0), 0.01) //rotation sur l'axe y avec un angle de 0.01 radian par frame
+    signal.rotateOnAxis (new Vector3(1,0,0), 0.01) //rotation sur l'axe x avec un angle de 0.01 radian par frame
+    
+
+
+  }) //fin de la fonction en argument
+
+  return ( //return un mesh avec une torus geometry et un material basique
+    <mesh
+      ref = {signalRef}
+      position = {[2,1,0]}
+      
+    >
+      <torusGeometry args={[0.2, 0.05, 16, 100]} />
+
+      <meshBasicMaterial color = "#5718e9" reflectivity = {0.5} transparent = {true}
+       opacity = {0.5}
+      />
+    </mesh>
+  )
+}
 /*
  * Déplace très légèrement la caméra selon la souris.
  *
  * Le mouvement reste volontairement faible pour éviter l'effet
  * "modèle 3D qui essaie de s'échapper de la page".
  */
-function CameraRig() {
+function CameraRig({entering,}: MikuThreeSceneProps) {
+
+    //console.log('CameraRig entering :', entering)
   useFrame(
     (
       {
@@ -55,8 +92,20 @@ function CameraRig() {
       const smoothing =
         1 - Math.exp(-3.5 * delta)
 
-      const targetX = pointer.x * 0.34
-      const targetY = 0.1 + pointer.y * 0.18
+      const targetX = entering         
+      ? 0
+      : pointer.x * 0.34
+      
+      const targetY = entering
+      ? 0
+      : 0.1 + pointer.y * 0.18
+
+      const targetZ = entering
+      ?  1.4
+      : 6.4
+
+      
+        
 
       camera.position.x = MathUtils.lerp(
         camera.position.x,
@@ -69,6 +118,8 @@ function CameraRig() {
         targetY,
         smoothing,
       )
+
+      camera.position.z = MathUtils.lerp(camera.position.z, targetZ, smoothing)
 
       camera.lookAt(0, 0, 0)
     },
@@ -166,11 +217,11 @@ function SpectralHalo() {
       return
     }
 
-    group.rotation.z += delta * 0.025
+    group.rotation.z += delta * -0.125
 
     group.position.y =
       Math.sin(
-        clock.elapsedTime * 0.3,
+        clock.elapsedTime * 0.2,
       ) * 0.025
   })
 
@@ -207,6 +258,27 @@ function SpectralHalo() {
 
         <meshBasicMaterial
           color="#8580e8"
+          transparent
+          opacity={0.48}
+          depthWrite={false}
+          toneMapped={false}
+          blending={AdditiveBlending}
+        />
+      </mesh>
+        {
+            // anneau horizontale
+            }
+      <mesh position={[0, 0, -0.04]} rotation={[2, 2, 3.55]}>
+        <ringGeometry
+          args={[
+            2.08,
+            2.105,
+            160,
+          ]}
+        />
+
+        <meshBasicMaterial
+          color="#80e889"
           transparent
           opacity={0.48}
           depthWrite={false}
@@ -334,7 +406,7 @@ function SignalFragments() {
     group.rotation.z =
       Math.sin(
         clock.elapsedTime * 0.18,
-      ) * 0.025
+      ) * 0.967
   })
 
   return (
@@ -402,10 +474,11 @@ function LoadingModel() {
   )
 }
 
-function SceneContent() {
+function SceneContent({entering,} : MikuThreeSceneProps) { 
+
   return (
     <>
-      <CameraRig />
+      <CameraRig entering = {entering}/>
 
       {/*
        * Brume légère au fond de la scène.
@@ -463,6 +536,7 @@ function SceneContent() {
       <SpectralHalo />
 
       <SignalFragments />
+      <TrainingSignal />
 
       {/*
        * Particules violettes principales.
@@ -507,8 +581,10 @@ function SceneContent() {
     </>
   )
 }
-
-export function MikuThreeScene() {
+interface MikuThreeSceneProps {
+  entering: boolean
+}
+export function MikuThreeScene({entering,} : MikuThreeSceneProps) {
   return (
     <section
       className="music-glb-scene"
@@ -528,7 +604,9 @@ export function MikuThreeScene() {
         shadows
         camera={{
           position: [0, 0.1, 6.4],
-          fov: 32,
+          fov: entering
+          ? MathUtils.lerp(60,100,75)
+          : 60,
           near: 0.1,
           far: 100,
         }}
@@ -545,7 +623,7 @@ export function MikuThreeScene() {
           )
         }}
       >
-        <SceneContent />
+        <SceneContent entering={entering} />
       </Canvas>
     </section>
   )
