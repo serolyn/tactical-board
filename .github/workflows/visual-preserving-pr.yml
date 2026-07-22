@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: visual-preserving-cleanup
+  cancel-in-progress: true
+
 jobs:
   validate-and-commit:
     if: github.actor != 'github-actions[bot]'
@@ -50,12 +54,8 @@ jobs:
 
       - name: Enregistrer le correctif validé et retirer les outils temporaires
         run: |
-          rm -f .github/workflows/visual-preserving-cleanup.yml
           rm -f .github/workflows/visual-preserving-pr.yml
-          rm -f .github/workflows/diagnose-visual-cleanup.yml
           rm -f scripts/visual-preserving-cleanup.mjs
-          rm -f scripts/diagnose-visual-cleanup.mjs
-          rm -f visual-cleanup-diagnostic.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
