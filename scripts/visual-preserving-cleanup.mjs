@@ -108,13 +108,6 @@ await replaceRequired(
   'référence au fichier Vitest inexistant',
 )
 
-await replaceRequired(
-  '.github/workflows/deploy-pages.yml',
-  /      - name: Vérifier les types\n        run: npm run typecheck\n\n/,
-  `      # Le build lance déjà tsc -b, inutile de vérifier les types deux fois.\n`,
-  'double typecheck du déploiement',
-)
-
 const gitignorePath = '.gitignore'
 const gitignore = await readFile(gitignorePath, 'utf8')
 if (!gitignore.includes('/docs/api/')) {
