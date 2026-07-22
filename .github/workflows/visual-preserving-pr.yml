@@ -8,10 +8,6 @@ on:
 permissions:
   contents: write
 
-concurrency:
-  group: visual-preserving-cleanup
-  cancel-in-progress: true
-
 jobs:
   validate-and-commit:
     if: github.actor != 'github-actions[bot]'
