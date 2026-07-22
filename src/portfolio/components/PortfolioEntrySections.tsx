@@ -1,23 +1,8 @@
-/**
- * @packageDocumentation
- * Composant visuel réutilisable du portfolio.
- *
- * Ce fichier découpe l'interface en une petite pièce lisible: en-tête, carte,
- * section, indice ou bloc de liens. Si tu veux modifier ce que l'utilisateur
- * voit à l'écran, c'est souvent ici qu'il faut commencer.
- */
-
 import type { ContentLink, ContentSection, MetadataSection } from '../content/portfolioContentTypes'
 import { Reveal } from '../motion/Reveal'
-import { ContentLinkAction, EntryLinks } from './PortfolioEntryLinks'
-/**
- * Cette fonction intervient sur le sujet “signal Palette” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntrySections.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord SignalPalette dans EntrySections.tsx.
- */
+import { EntryLinks } from './PortfolioEntryLinks'
 
-
+/* La palette possède un rendu visuel spécial, différent d'une liste de métadonnées classique. */
 function SignalPalette({ section }: { section: MetadataSection }) {
   const paletteClasses = [
     'signal-palette__void',
@@ -40,14 +25,8 @@ function SignalPalette({ section }: { section: MetadataSection }) {
     </ul>
   )
 }
-/**
- * Cette fonction intervient sur le sujet “signal Typography” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntrySections.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord SignalTypography dans EntrySections.tsx.
- */
 
-
+/* Même principe pour l'échantillon typographique de la page Signal fantôme. */
 function SignalTypography({ section }: { section: MetadataSection }) {
   return (
     <div className="signal-type-sample">
@@ -62,14 +41,12 @@ interface EntrySectionsProps {
   sections: readonly ContentSection[]
   links?: readonly ContentLink[]
 }
-/**
- * Cette fonction intervient sur le sujet “entry Sections” dans portfolio.
- *
- * Fichier: src/portfolio/components/EntrySections.tsx
- * Si tu lis ce fichier pour apprendre, regarde d’abord EntrySections dans EntrySections.tsx.
+
+/*
+ * Transforme les objets écrits dans les fichiers de contenu en sections visibles.
+ * Chaque type correspond à une seule branche de rendu, ce qui permet d'ajouter
+ * du texte, une image, une citation, des métadonnées ou un composant personnalisé.
  */
-
-
 export function EntrySections({ sections, links = [] }: EntrySectionsProps) {
   return (
     <div className="entry-sections page-boundary">
@@ -133,16 +110,6 @@ export function EntrySections({ sections, links = [] }: EntrySectionsProps) {
               </div>
             ) : null}
 
-            {section.type === 'link' ? (
-              <div className="entry-section__content">
-                {section.title ? <h2>{section.title}</h2> : null}
-                {section.description ? <p>{section.description}</p> : null}
-                <div className="entry-section__link">
-                  <ContentLinkAction link={section.link} />
-                </div>
-              </div>
-            ) : null}
-
             {section.type === 'component' ? (
               <div className="entry-section__content entry-section__content--component">
                 <section.component />
@@ -151,6 +118,8 @@ export function EntrySections({ sections, links = [] }: EntrySectionsProps) {
           </Reveal>
         )
       })}
+
+      {/* Les liens généraux restent regroupés à la fin de la fiche. */}
       <EntryLinks links={links} />
     </div>
   )
