@@ -1,12 +1,3 @@
-/**
- * @packageDocumentation
- * Tests automatiques du projet.
- *
- * Ce fichier vérifie un comportement précis pour éviter les régressions.
- * Quand tu modifies le code associé, lis ce test pour comprendre ce qui doit
- * rester vrai.
- */
-
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -25,21 +16,37 @@ import {
 import type { PortfolioContent } from '@/portfolio/content/portfolioContentTypes'
 
 describe('contenus publiés du portfolio', () => {
-  it('valide le catalogue livré et exclut les brouillons des sélecteurs publics', () => {
+  it('valide le catalogue et expose exactement les entrées marquées comme publiées', () => {
     expect(validatePortfolioContent(portfolioContent)).toEqual([])
-    expect(projects[0]?.published).toBe(true)
-    expect(projects[0]?.sections.some((section) => section.type === 'component')).toBe(true)
-    expect(publishedProjects.map((entry) => entry.slug)).toEqual(['project-template'])
-    expect(music[0]?.published).toBe(true)
-    expect(music[1]?.published).toBe(false)
-    expect(publishedMusic.map((entry) => entry.slug)).toEqual(['ep-1'])
+
+    expect(publishedProjects.map((entry) => entry.slug)).toEqual(
+      projects.filter((entry) => entry.published).map((entry) => entry.slug),
+    )
+    expect(publishedMusic.map((entry) => entry.slug)).toEqual(
+      music.filter((entry) => entry.published).map((entry) => entry.slug),
+    )
+    expect(publishedLab.map((entry) => entry.slug)).toEqual(
+      lab.filter((entry) => entry.published).map((entry) => entry.slug),
+    )
+
     expect(getPublishedProjectBySlug('project-template')).toMatchObject({
-      title: 'PROJET À DOCUMENTER — BROUILLON NON PUBLIÉ',
+      title: 'Nemyl, la ville des reflets',
+      published: true,
     })
+    expect(
+      getPublishedProjectBySlug('project-template')?.sections.some(
+        (section) => section.type === 'component',
+      ),
+    ).toBe(true)
+
     expect(getPublishedMusicBySlug('ep-1')).toMatchObject({
       title: 'Nemyl',
+      published: true,
     })
-    expect(getPublishedMusicBySlug('music-template-2')).toBeUndefined()
+    expect(getPublishedMusicBySlug('music-template-2')).toMatchObject({
+      title: 'SRO',
+      published: true,
+    })
   })
 
   it('conserve les contrats essentiels des deux entrées Lab publiées', () => {
@@ -61,8 +68,10 @@ describe('contenus publiés du portfolio', () => {
     expect(
       tacticalBoard?.sections.some(
         (section) =>
-          section.type === 'metadata' &&
-          section.items.some((item) => item.value === 'Les données restent locales au navigateur.'),
+          section.type === 'metadata'
+          && section.items.some(
+            (item) => item.value === 'Les données restent locales au navigateur.',
+          ),
       ),
     ).toBe(true)
 
