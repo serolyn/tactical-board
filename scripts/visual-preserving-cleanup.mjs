@@ -12,7 +12,7 @@ async function replaceRequired(path, pattern, replacement, label) {
 await replaceRequired(
   'src/portfolio/motion/PortfolioMotionProvider.tsx',
   /<MotionConfig reducedMotion="user" transition=\{motionTransitions\.interface\}>/,
-  `{/* Le portfolio conserve sa chorégraphie même si Firefox annonce par erreur un mouvement réduit. */}\n    <MotionConfig reducedMotion="never" transition={motionTransitions.interface}>`,
+  '<MotionConfig reducedMotion="never" transition={motionTransitions.interface}>',
   'MotionConfig',
 )
 
