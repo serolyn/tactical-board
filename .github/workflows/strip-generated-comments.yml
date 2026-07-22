@@ -1,0 +1,92 @@
+name: Retirer les commentaires générés
+
+on:
+  push:
+    branches:
+      - cleanup/preserve-ui
+
+permissions:
+  contents: write
+
+jobs:
+  clean-comments:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer la branche
+        uses: actions/checkout@v4
+        with:
+          ref: cleanup/preserve-ui
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Retirer uniquement les blocs injectés automatiquement
+        run: |
+          node --input-type=module <<'NODE'
+          import { readdir, readFile, writeFile } from 'node:fs/promises'
+          import path from 'node:path'
+
+          async function collect(directory) {
+            const entries = await readdir(directory, { withFileTypes: true })
+            const files = []
+
+            for (const entry of entries) {
+              const absolute = path.join(directory, entry.name)
+              if (entry.isDirectory()) files.push(...await collect(absolute))
+              else if (/\.(ts|tsx)$/.test(entry.name)) files.push(absolute)
+            }
+
+            return files
+          }
+
+          let changed = 0
+          for (const file of await collect('src')) {
+            const source = await readFile(file, 'utf8')
+            const cleaned = source
+              .replace(/\/\*\*[\s\S]*?\*\//g, (block) => {
+                const generatedPackageDoc = block.includes('@packageDocumentation')
+                const generatedFunctionDoc =
+                  block.includes('Fichier:')
+                  && block.includes('Si tu lis ce fichier pour apprendre')
+
+                return generatedPackageDoc || generatedFunctionDoc ? '' : block
+              })
+              .replace(/\n{3,}/g, '\n\n')
+              .replace(/^\s*\n/, '')
+
+            if (cleaned !== source) {
+              await writeFile(file, cleaned, 'utf8')
+              changed += 1
+            }
+          }
+
+          console.log(`Commentaires générés retirés dans ${changed} fichiers.`)
+          NODE
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Vérifier les types
+        run: npm run typecheck
+
+      - name: Vérifier le lint
+        run: npm run lint
+
+      - name: Exécuter les tests
+        run: npm run test
+
+      - name: Construire le site
+        run: npm run build
+
+      - name: Enregistrer le nettoyage validé
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: remove generated documentation comments"
+          git push
