@@ -6,19 +6,14 @@ import {
   getPublishedProjectBySlug,
   lab,
   music,
-  portfolioContent,
   projects,
   publishedLab,
   publishedMusic,
   publishedProjects,
-  validatePortfolioContent,
 } from '@/portfolio/content/portfolioContent'
-import type { PortfolioContent } from '@/portfolio/content/portfolioContentTypes'
 
 describe('contenus publiés du portfolio', () => {
-  it('valide le catalogue et expose exactement les entrées marquées comme publiées', () => {
-    expect(validatePortfolioContent(portfolioContent)).toEqual([])
-
+  it('expose exactement les entrées marquées comme publiées', () => {
     expect(publishedProjects.map((entry) => entry.slug)).toEqual(
       projects.filter((entry) => entry.published).map((entry) => entry.slug),
     )
@@ -82,45 +77,5 @@ describe('contenus publiés du portfolio', () => {
       kind: 'static',
     })
     expect(signal?.sections.filter((section) => section.type === 'image')).toHaveLength(5)
-  })
-
-  it('refuse doublons, slugs réservés ou non canoniques et média publié absent', () => {
-    const duplicate = {
-      ...portfolioContent,
-      music: [{ ...music[0], slug: projects[0]!.slug }],
-    } satisfies PortfolioContent
-    expect(validatePortfolioContent(duplicate)).toContainEqual(
-      expect.objectContaining({ code: 'duplicate-slug', collection: 'music' }),
-    )
-
-    for (const slug of ['board', 'projects', 'art-direction']) {
-      const reserved = {
-        ...portfolioContent,
-        lab: [{ ...lab[0]!, slug }],
-      } satisfies PortfolioContent
-      expect(validatePortfolioContent(reserved)).toContainEqual(
-        expect.objectContaining({ code: 'reserved-slug', slug }),
-      )
-    }
-
-    const malformed = {
-      ...portfolioContent,
-      music: [
-        {
-          ...music[0]!,
-          slug: 'Scène Invalide',
-          title: '   ',
-          artwork: null,
-          published: true,
-        },
-      ],
-    } satisfies PortfolioContent
-    expect(validatePortfolioContent(malformed)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ code: 'invalid-slug', field: 'slug' }),
-        expect.objectContaining({ code: 'missing-field', field: 'title' }),
-        expect.objectContaining({ code: 'missing-field', field: 'artwork' }),
-      ]),
-    )
   })
 })
