@@ -71,21 +71,30 @@ export function MusicDetailView({ entry }: MusicDetailViewProps) {
   }
 
   /*
-   * Prépare la scène animée.
-   * Elle reste vide si aucune scène n'est associée à la musique.
+   * Les scènes musicales n'ont pas toutes la même nature :
    *
-   * La scène est transmise directement au hero. Son calque absolu utilise donc
-   * toujours la hauteur du hero comme référence, y compris sur Safari mobile.
+   * - Nemyl est un calque absolu qui doit vivre dans le hero ;
+   * - Miku est une scène 3D autonome qui doit conserver sa propre boîte après le hero.
+   *
+   * On prépare donc deux emplacements distincts au lieu de forcer tous les composants
+   * dans le même conteneur.
    */
-  let storyOverlay: ReactNode = null
+  let heroStoryOverlay: ReactNode = null
+  let standaloneStoryScene: ReactNode = null
 
   if (entry.storyOverlay) {
     const StoryOverlay = entry.storyOverlay
-    storyOverlay = (
+    const storyScene = (
       <Suspense fallback={null}>
         <StoryOverlay />
       </Suspense>
     )
+
+    if (entry.storyOverlayPlacement === 'hero') {
+      heroStoryOverlay = storyScene
+    } else {
+      standaloneStoryScene = storyScene
+    }
   }
 
   /*
@@ -132,11 +141,12 @@ export function MusicDetailView({ entry }: MusicDetailViewProps) {
             value: audioAvailability,
           },
         ]}
-        overlay={storyOverlay}
+        overlay={heroStoryOverlay}
         summary={entry.summary}
         title={entry.title}
       />
 
+      {standaloneStoryScene}
       {audioPlayer}
 
       <EntrySections
