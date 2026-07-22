@@ -2,10 +2,5 @@
 > chess-strat@0.0.0 typecheck
 > tsc -b --pretty false
 
-src/portfolio/motion/PortfolioMotionProvider.tsx(33,19): error TS1005: ')' expected.
-src/portfolio/motion/PortfolioMotionProvider.tsx(33,41): error TS1005: ';' expected.
-src/portfolio/motion/PortfolioMotionProvider.tsx(33,70): error TS1005: ',' expected.
-src/portfolio/motion/PortfolioMotionProvider.tsx(37,5): error TS1128: Declaration or statement expected.
-src/portfolio/motion/PortfolioMotionProvider.tsx(38,3): error TS1109: Expression expected.
 
-exit_code=2
+exit_code=0
