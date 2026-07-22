@@ -63,7 +63,7 @@ afterEach(() => {
 })
 
 describe('portfolio et navigation principale', () => {
-  it('rend l’accueil dans son shell avec ses liens et métadonnées', async () => {
+  it('rend l’accueil actuel dans son shell avec ses liens et métadonnées', async () => {
     const { container } = visit(`${BASE_PATH}/`)
 
     expect(
@@ -84,7 +84,7 @@ describe('portfolio et navigation principale', () => {
     expect(container.querySelector('[data-portfolio-scroll]')).toBeInTheDocument()
 
     await waitFor(() => {
-      expect(document.title).toBe('SEROLYN — Entre plusieurs vies')
+      expect(document.title).toBe('SEROLYN — CODE ART WAR')
       expect(descriptionMeta()).toHaveAttribute(
         'content',
         'Code, sons et systèmes pour donner une forme à ce qui flotte.',
@@ -124,22 +124,25 @@ describe('portfolio et navigation principale', () => {
     }
   })
 
-  it('affiche les états vides sans rendre les brouillons ni un lecteur audio', async () => {
+  it('rend les projets et scènes musicales actuellement publiés', async () => {
     const { unmount } = visit(`${BASE_PATH}/projects`)
 
     expect(await screen.findByRole('heading', { level: 1, name: 'PROJETS' }))
       .toBeInTheDocument()
-    expect(screen.getByText('Les premiers systèmes sont encore en cours de documentation.'))
-      .toBeInTheDocument()
-    expect(screen.queryByText('PROJET À DOCUMENTER — BROUILLON NON PUBLIÉ'))
+    expect(screen.getByRole('link', { name: 'Découvrir Nemyl, la ville des reflets' }))
+      .toHaveAttribute('href', `${BASE_PATH}/projects/project-template`)
+    expect(screen.queryByText('Les premiers systèmes sont encore en cours de documentation.'))
       .not.toBeInTheDocument()
 
     unmount()
     visit(`${BASE_PATH}/music`)
     expect(await screen.findByRole('heading', { level: 1, name: 'SCÈNES SONORES' }))
       .toBeInTheDocument()
-    expect(screen.getByText('Les premières scènes seront ajoutées ici.')).toBeInTheDocument()
-    expect(screen.queryByText('À TITRER — BROUILLON NON PUBLIÉ')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Découvrir Nemyl' }))
+      .toHaveAttribute('href', `${BASE_PATH}/music/ep-1`)
+    expect(screen.getByRole('link', { name: 'Découvrir SRO' }))
+      .toHaveAttribute('href', `${BASE_PATH}/music/music-template-2`)
+    expect(screen.queryByText('Les premières scènes seront ajoutées ici.')).not.toBeInTheDocument()
     expect(document.querySelector('audio')).not.toBeInTheDocument()
   })
 
